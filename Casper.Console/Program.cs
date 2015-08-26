@@ -4,6 +4,7 @@ using Boo.Lang.Compiler.Pipelines;
 using Boo.Lang.Compiler.IO;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
+using System.Linq;
 
 namespace Casper {
 	public static class MainClass {
@@ -38,9 +39,10 @@ namespace Casper {
 
 			try {
 				context.GeneratedAssembly.EntryPoint.Invoke(null, new Object[] { new String[0] });
-				var taskName = args[1];
-				var task = GetTaskByName(taskName);
-				task.Execute();
+				var tasks = args.Skip(1).Select(a => GetTaskByName(a)).ToArray();
+				foreach(var task in tasks) {
+					task.Execute();
+				}
 			} catch(TargetInvocationException ex) {
 				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
 			}

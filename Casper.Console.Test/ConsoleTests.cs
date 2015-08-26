@@ -15,10 +15,11 @@ task 'hello':
 
 task 'goodbye':
 	print 'Goodbye World!'
-", "goodbye");
+", "goodbye", "hello");
 			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
 		}
 
 		[Test]
@@ -27,7 +28,7 @@ task 'goodbye':
 import Casper.Script
 task 'hello':
 	print 'Hello World!'
-", "goodbye");
+", "hello", "goodbye");
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(2));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Null);
