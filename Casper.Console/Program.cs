@@ -14,8 +14,14 @@ namespace Casper {
 		public static int Main(string[] args) {
 
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
-				Console.Error.WriteLine(e.ExceptionObject);
-				Environment.Exit(EXIT_CODE_UNHANDLED_EXCEPTION);
+				var casperEx = e.ExceptionObject as CasperException;
+				if(null != casperEx) {
+					Console.Error.WriteLine(casperEx.Message);
+					Environment.Exit(casperEx.ExitCode);
+				} else {
+					Console.Error.WriteLine(e.ExceptionObject);
+					Environment.Exit(EXIT_CODE_UNHANDLED_EXCEPTION);
+				}
 			};
 
 			var compileParams = new CompilerParameters();
@@ -32,17 +38,37 @@ namespace Casper {
 
 			try {
 				context.GeneratedAssembly.EntryPoint.Invoke(null, new Object[] { new String[0] });
-				var task = Script.GetTaskByName(args[1]);
-				if(null == task) {
-					Console.Error.WriteLine("Task '{0}' does not exist", args[1]);
-					return EXIT_CODE_MISSING_TASK;
-				}
+				var taskName = args[1];
+				var task = GetTaskByName(taskName);
 				task.Execute();
 			} catch(TargetInvocationException ex) {
 				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
 			}
 
 			return 0;
+		}
+
+		static Script.Task GetTaskByName(string taskName) {
+			var task = Script.GetTaskByName(taskName);
+			if (null == task) {
+				throw new CasperException(EXIT_CODE_MISSING_TASK, "Task '{0}' does not exist", taskName);
+			}
+			return task;
+		}
+
+		private class CasperException : Exception {
+			private readonly int exitCode;
+
+			public CasperException(int exitCode, string message, params object[] args)
+				: base(string.Format(message, args)) {
+				this.exitCode = exitCode;
+			}
+
+			public int ExitCode {
+				get {
+					return exitCode;
+				}
+			}
 		}
 	}
 }
