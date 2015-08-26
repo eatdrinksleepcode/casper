@@ -7,14 +7,16 @@ namespace Casper {
 	[TestFixture]
 	public class ConsoleTests {
 		[Test]
-		public void ExecuteTask() {
+		public void ExecuteTasksInOrder() {
 			var testProcess = ExecuteScript("Test1.casper", @"
 import Casper.Script
 task 'hello':
-	print 'Hello World!'
+	act:
+		print 'Hello World!'
 
 task 'goodbye':
-	print 'Goodbye World!'
+	act:
+		print 'Goodbye World!'
 ", "goodbye", "hello");
 			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
@@ -23,11 +25,31 @@ task 'goodbye':
 		}
 
 		[Test]
+		public void ExecuteTaskWithDependency() {
+			var testProcess = ExecuteScript("Test1.casper", @"
+import Casper.Script
+hello = task('hello'):
+	act:
+		print 'Hello World!'
+
+task 'goodbye':
+	dependsOn hello
+	act:
+		print 'Goodbye World!'
+", "goodbye");
+			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Empty);
+			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
+		}
+
+		[Test]
 		public void TaskDoesNotExist() {
 			var testProcess = ExecuteScript("Test1.casper", @"
 import Casper.Script
 task 'hello':
-	print 'Hello World!'
+	act:
+		print 'Hello World!'
 ", "hello", "goodbye");
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(2));
