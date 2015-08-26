@@ -8,6 +8,7 @@ using System.Runtime.ExceptionServices;
 namespace Casper {
 	public static class MainClass {
 		const int EXIT_CODE_COMPILATION_ERROR = 1;
+		const int EXIT_CODE_MISSING_TASK = 2;
 		const int EXIT_CODE_UNHANDLED_EXCEPTION = 255;
 		
 		public static int Main(string[] args) {
@@ -31,7 +32,12 @@ namespace Casper {
 
 			try {
 				context.GeneratedAssembly.EntryPoint.Invoke(null, new Object[] { new String[0] });
-				Script.RunAll();
+				var task = Script.GetTaskByName(args[1]);
+				if(null == task) {
+					Console.Error.WriteLine("Task '{0}' does not exist", args[1]);
+					return EXIT_CODE_MISSING_TASK;
+				}
+				task.Execute();
 			} catch(TargetInvocationException ex) {
 				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
 			}

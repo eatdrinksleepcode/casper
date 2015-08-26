@@ -5,20 +5,27 @@ using System.Collections.Generic;
 namespace Casper {
 	public static class Script {
 
-		private class Task {
-			public ICallable Body { get; set; }
-		}
+		public class Task {
+			private readonly ICallable body;
 
-		private static HashSet<Task> tasks = new HashSet<Task>();
-		
-		public static void task(ICallable body) {
-			tasks.Add(new Task { Body = body });
-		}
-
-		public static void RunAll() {
-			foreach (var task in tasks) {
-				task.Body.Call(null);
+			public Task(ICallable body) {
+				this.body = body;
 			}
+
+			public void Execute() {
+				this.body.Call(null);
+			}
+		}
+
+		private static Dictionary<string, Task> tasks = new Dictionary<string, Task>();
+		
+		public static void task(string name, ICallable body) {
+			tasks.Add(name, new Task(body));
+		}
+
+		public static Task GetTaskByName(string name) {
+			Task result;
+			return tasks.TryGetValue(name, out result) ? result : null;
 		}
 	}
 }
