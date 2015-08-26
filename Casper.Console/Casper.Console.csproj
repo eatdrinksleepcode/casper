@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{CA667BDA-EB41-40CC-87CB-490802903432}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>Casper.Console</RootNamespace>
+    <RootNamespace>Casper</RootNamespace>
     <AssemblyName>casper</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Script.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

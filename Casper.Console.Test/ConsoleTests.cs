@@ -3,15 +3,23 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 
-namespace Casper.Console.Test {
+namespace Casper {
 	[TestFixture]
 	public class ConsoleTests {
 		[Test]
-		public void ExecuteScript() {
-			var testProcess = ExecuteScript("Test1.casper", "print 'Hello World!'");
+		public void ExecuteTasks() {
+			var testProcess = ExecuteScript("Test1.casper", @"
+import Casper.Script
+task:
+	print 'Hello World!'
+
+task:
+	print 'Goodbye World!'
+");
 			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
 		}
 
 		[Test]

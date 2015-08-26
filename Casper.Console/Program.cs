@@ -11,6 +11,7 @@ namespace Casper {
 		const int EXIT_CODE_UNHANDLED_EXCEPTION = 255;
 		
 		public static int Main(string[] args) {
+
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
 				Console.Error.WriteLine(e.ExceptionObject);
 				Environment.Exit(EXIT_CODE_UNHANDLED_EXCEPTION);
@@ -18,6 +19,7 @@ namespace Casper {
 
 			var compileParams = new CompilerParameters();
 			compileParams.GenerateInMemory = true;
+			compileParams.References.Add(Assembly.GetExecutingAssembly());
 			compileParams.Input.Add(new FileInput(args[0]));
 			var context = new CompilerContext(compileParams);
 			new CompileToMemory().Run(context);
@@ -29,6 +31,7 @@ namespace Casper {
 
 			try {
 				context.GeneratedAssembly.EntryPoint.Invoke(null, new Object[] { new String[0] });
+				Script.RunAll();
 			} catch(TargetInvocationException ex) {
 				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
 			}

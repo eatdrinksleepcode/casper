@@ -5,7 +5,7 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Casper.Console.Test</RootNamespace>
+    <RootNamespace>Casper</RootNamespace>
     <AssemblyName>Casper.Console.Test</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
