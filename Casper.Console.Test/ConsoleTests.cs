@@ -22,25 +22,47 @@ task 'goodbye':
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
-		public void ExecuteTaskWithDependency() {
+		public void ExecuteTaskWithDependencyGraph() {
 			var testProcess = ExecuteScript("Test1.casper", @"
 import Casper.Script
-hello = task('hello'):
-	act:
-		print 'Hello World!'
 
-task 'goodbye':
-	dependsOn hello
+wake = task('wake'):
 	act:
-		print 'Goodbye World!'
-", "goodbye");
+		print 'Stretch'
+
+shower = task('shower'):
+	dependsOn wake
+	act:
+		print 'Squeaky clean'
+
+eat = task('eat'):
+	dependsOn wake
+	act:
+		print 'Yummy!'
+
+dress = task('dress'):
+	dependsOn shower
+	act:
+		print 'Dressed'
+
+task 'leave':
+	dependsOn dress
+	dependsOn eat
+	act:
+		print 'Bye!'
+", "leave");
 			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Stretch"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Squeaky clean"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Dressed"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Yummy!"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Bye!"));
+			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
@@ -92,4 +114,3 @@ task 'hello':
 		}
 	}
 }
-

@@ -1,18 +1,15 @@
 ﻿using Boo.Lang;
 using System.Collections.Generic;
-
+using System.Linq;
 
 namespace Casper {
 	public static class Script {
 
 		public class Task {
 			private ICallable body;
-			private Task dependency;
+			private readonly IList<Task> dependencies = new System.Collections.Generic.List<Task>();
 
 			public void Execute() {
-				if (null != dependency) {
-					dependency.Execute();
-				}
 				this.body.Call(null);
 			}
 
@@ -21,7 +18,11 @@ namespace Casper {
 			}
 
 			public void AddDependency(Task dependency) {
-				this.dependency = dependency;
+				this.dependencies.Add(dependency);
+			}
+
+			public IEnumerable<Task> AllDependencies() {
+				return Enumerable.Repeat(this, 1).Concat(dependencies.SelectMany(d => d.AllDependencies()));
 			}
 		}
 

@@ -40,7 +40,9 @@ namespace Casper {
 			try {
 				context.GeneratedAssembly.EntryPoint.Invoke(null, new Object[] { new String[0] });
 				var tasks = args.Skip(1).Select(a => GetTaskByName(a)).ToArray();
-				foreach(var task in tasks) {
+				var taskGraphClosure = tasks.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
+				Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
+				foreach(var task in taskGraphClosure) {
 					task.Execute();
 				}
 			} catch(TargetInvocationException ex) {
