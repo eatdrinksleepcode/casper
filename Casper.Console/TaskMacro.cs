@@ -1,7 +1,5 @@
 ﻿using Boo.Lang.Compiler.Ast;
 using Casper;
-using System.Collections.Generic;
-using System.Linq;
 
 public class TaskMacro : Boo.Lang.Compiler.AbstractAstGeneratorMacro {
 
@@ -23,8 +21,8 @@ public class TaskMacro : Boo.Lang.Compiler.AbstractAstGeneratorMacro {
 			taskName = methodCall.Target.ToString();
 			namedArgs = methodCall.NamedArguments;
 		}
-		var declaration = new Declaration(taskName, new SimpleTypeReference(macro.LexicalInfo, "Casper.Script.Task"));
-		var declarationStatement = new DeclarationStatement(macro.LexicalInfo, declaration, new MethodInvocationExpression(macro.LexicalInfo, Expression.Lift(typeof(Casper.Script.Task)), Expression.Lift(macro.Body)) {
+		var declaration = new Declaration(taskName, new SimpleTypeReference(macro.LexicalInfo, typeof(Task).FullName));
+		var declarationStatement = new DeclarationStatement(macro.LexicalInfo, declaration, new MethodInvocationExpression(macro.LexicalInfo, Expression.Lift(typeof(Task)), Expression.Lift(macro.Body)) {
 			NamedArguments = namedArgs
 		});
 		yield return declarationStatement;
