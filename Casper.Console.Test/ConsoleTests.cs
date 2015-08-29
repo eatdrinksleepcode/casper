@@ -9,14 +9,11 @@ namespace Casper {
 		[Test]
 		public void ExecuteTasksInOrder() {
 			var testProcess = ExecuteScript("Test1.casper", @"
-import Casper.Script
-task 'hello':
-	act:
-		print 'Hello World!'
+task hello:
+	print 'Hello World!'
 
-task 'goodbye':
-	act:
-		print 'Goodbye World!'
+task goodbye:
+	print 'Goodbye World!'
 ", "goodbye", "hello");
 			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
@@ -28,10 +25,8 @@ task 'goodbye':
 		[Test]
 		public void TaskDoesNotExist() {
 			var testProcess = ExecuteScript("Test1.casper", @"
-import Casper.Script
-task 'hello':
-	act:
-		print 'Hello World!'
+task hello:
+	print 'Hello World!'
 ", "hello", "goodbye");
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(2));

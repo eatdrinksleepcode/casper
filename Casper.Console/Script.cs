@@ -7,52 +7,31 @@ using Boo.Lang.Compiler.IO;
 using System.Reflection;
 using System;
 using System.Runtime.ExceptionServices;
+using System.Collections;
 
 namespace Casper {
 	public static class Script {
 
 		public class Task {
-			private ICallable body;
-			private readonly IList<Task> dependencies = new System.Collections.Generic.List<Task>();
+			private readonly ICallable body;
+			private IEnumerable<Task> dependencies = Enumerable.Empty<Task>();
+
+			public Task(ICallable body) {
+				this.body = body;
+			}
 
 			public void Execute() {
 				this.body.Call(null);
 			}
 
-			public void Act(ICallable body) {
-				this.body = body;
-			}
-
-			public void AddDependency(Task dependency) {
-				this.dependencies.Add(dependency);
-			}
-
 			public IEnumerable<Task> AllDependencies() {
 				return Enumerable.Repeat(this, 1).Concat(dependencies.SelectMany(d => d.AllDependencies()));
 			}
+
+			public IEnumerable dependsOn { set { dependencies = value.Cast<Task>() ?? Enumerable.Empty<Task>(); } }
 		}
 
 		private static Dictionary<string, Task> tasks = new Dictionary<string, Task>();
-		private static Task currentTask;
-		
-		public static Task task(string name, ICallable body) {
-			try {
-				currentTask = new Task();
-				body.Call(null);
-				tasks.Add(name, currentTask);
-				return currentTask;
-			} finally {
-				currentTask = null;
-			}
-		}
-
-		public static void act(ICallable body) {
-			currentTask.Act(body);
-		}
-
-		public static void dependsOn(Task dependency) {
-			currentTask.AddDependency(dependency);
-		}
 
 		private static Task GetTaskByName(string name) {
 			Task result;
@@ -90,6 +69,15 @@ namespace Casper {
 			}
 		}
 
+		public static void AddTask(string name, Task task) {
+			tasks.Add(name, task);
+		}
+
+		public static void CompileAndExecute(string scriptPath, params string[] taskNamesToExecute) {
+			CompileAndExecute(scriptPath, (IEnumerable<string>)taskNamesToExecute);
+			
+		}
+
 		public static void CompileAndExecute(string scriptPath, IEnumerable<string> taskNamesToExecute) {
 			var context = CompileScript(scriptPath);
 			try {
@@ -104,6 +92,5 @@ namespace Casper {
 		public static void Reset() {
 			tasks.Clear();
 		}
-
 	}
 }

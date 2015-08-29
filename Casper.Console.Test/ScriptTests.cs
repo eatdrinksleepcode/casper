@@ -29,14 +29,11 @@ namespace Casper {
 		[Test]
 		public void ExecuteTasksInOrder() {
 			ExecuteScript("Test1.casper", @"
-import Casper.Script
-task 'hello':
-	act:
-		print 'Hello World!'
+task hello:
+	print 'Hello World!'
 
-task 'goodbye':
-	act:
-		print 'Goodbye World!'
+task goodbye:
+	print 'Goodbye World!'
 ", "goodbye", "hello");
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Goodbye World!"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
@@ -46,32 +43,20 @@ task 'goodbye':
 		[Test]
 		public void ExecuteTaskWithDependencyGraph() {
 			ExecuteScript("Test1.casper", @"
-import Casper.Script
+task wake:
+	print 'Stretch'
 
-wake = task('wake'):
-	act:
-		print 'Stretch'
+task shower(dependsOn: [wake]):
+	print 'Squeaky clean'
 
-shower = task('shower'):
-	dependsOn wake
-	act:
-		print 'Squeaky clean'
+task eat(dependsOn: [wake]):
+	print 'Yummy!'
 
-eat = task('eat'):
-	dependsOn wake
-	act:
-		print 'Yummy!'
+task dress(dependsOn: [shower]):
+	print 'Dressed'
 
-dress = task('dress'):
-	dependsOn shower
-	act:
-		print 'Dressed'
-
-task 'leave':
-	dependsOn dress
-	dependsOn eat
-	act:
-		print 'Bye!'
+task leave(dependsOn: [dress, eat]):
+	print 'Bye!'
 ", "leave");
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Stretch"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Squeaky clean"));
@@ -84,10 +69,8 @@ task 'leave':
 		[Test]
 		public void TaskDoesNotExist() {
 			Assert.Throws<CasperException>(() => ExecuteScript("Test1.casper", @"
-import Casper.Script
-task 'hello':
-	act:
-		print 'Hello World!'
+task hello:
+	print 'Hello World!'
 ", "hello", "goodbye"), "Task 'goodbye' does not exist");
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
