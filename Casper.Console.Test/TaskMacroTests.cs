@@ -36,7 +36,7 @@ task hello:
 	print 'Hello World!'
 ";
 			File.WriteAllText("Test1.casper", scriptContents);
-			Script.CompileAndExecute("Test1.casper", "hello");
+			Script.CompileAndExecuteTasks("Test1.casper", "hello");
 
 			standardOutWriter.Flush();
 			standardOutStream.Seek(0, SeekOrigin.Begin);
@@ -59,7 +59,7 @@ task copy(CopyFile,
 			File.WriteAllText("Source.txt", "Hello World!");
 			File.Delete(destinationFileName);
 			Assert.False(File.Exists(destinationFileName));
-			Script.CompileAndExecute("Test1.casper", "copy");
+			Script.CompileAndExecuteTasks("Test1.casper", "copy");
 
 			Assert.True(File.Exists(destinationFileName));
 			Assert.That(File.ReadAllText(destinationFileName), Is.EqualTo("Hello World!"));

@@ -25,6 +25,7 @@ namespace Casper {
 			compileParams.GenerateInMemory = true;
 			compileParams.References.Add(Assembly.GetExecutingAssembly());
 			compileParams.Input.Add(new FileInput(scriptPath));
+			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);
 			new CompileToMemory().Run(context);
 			if (context.Errors.Count > 0) {
@@ -52,16 +53,25 @@ namespace Casper {
 			tasks.Add(name, task);
 		}
 
-		public static void CompileAndExecute(string scriptPath, params string[] taskNamesToExecute) {
-			CompileAndExecute(scriptPath, (IEnumerable<string>)taskNamesToExecute);
+		public static void CompileAndExecuteTasks(string scriptPath, params string[] taskNamesToExecute) {
+			CompileAndExecuteTasks(scriptPath, (IEnumerable<string>)taskNamesToExecute);
 			
 		}
 
-		public static void CompileAndExecute(string scriptPath, IEnumerable<string> taskNamesToExecute) {
+		public static void CompileAndExecuteTasks(string scriptPath, IEnumerable<string> taskNamesToExecute) {
+			CompileAndExecuteScript(scriptPath);
+			try {
+				ExecuteTasks(taskNamesToExecute);
+			}
+			catch (TargetInvocationException ex) {
+				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+			}
+		}
+
+		public static void CompileAndExecuteScript(string scriptPath) {
 			var context = CompileScript(scriptPath);
 			try {
 				ExecuteScript(context);
-				ExecuteTasks(taskNamesToExecute);
 			}
 			catch (TargetInvocationException ex) {
 				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();

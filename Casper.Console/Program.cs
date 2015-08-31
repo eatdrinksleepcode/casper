@@ -39,7 +39,7 @@ namespace Casper {
 			var arguments = Parser.Default.ParseArguments<Options>(args);
 			return arguments.MapResult(
 				o => {
-					Script.CompileAndExecute(o.ScriptPath, o.Tasks);
+					Script.CompileAndExecuteTasks(o.ScriptPath, o.Tasks);
 					return 0;
 				},
 				errors => {

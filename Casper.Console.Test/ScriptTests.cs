@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System;
+using System.Collections.Generic;
 
 namespace Casper {
 	[TestFixture]
@@ -11,6 +12,8 @@ namespace Casper {
 		private MemoryStream standardOut;
 		private TextWriter oldStandardOut;
 
+		private List<string> scripts = new List<string>();
+
 		[SetUp]
 		public void SetUp() {
 			Script.Reset();
@@ -19,10 +22,14 @@ namespace Casper {
 			standardOutWriter = new StreamWriter(standardOut) { AutoFlush = true };
 			standardOutReader = new StreamReader(standardOut);
 			Console.SetOut(standardOutWriter);
+			scripts.Clear();
 		}
 
 		[TearDown]
 		public void TearDown() {
+			foreach (var script in scripts) {
+				File.Delete(script);
+			}
 			Console.SetOut(oldStandardOut);
 		}
 
@@ -67,6 +74,19 @@ task leave(dependsOn: [dress, eat]):
 		}
 
 		[Test]
+		public void ExecuteTasksFromSubProject() {
+			WriteScript("subprojectA\\build.casper", @"
+task hello:
+	print 'Hello World!'
+");
+			ExecuteScript("build.casper", @"
+include """"""subprojectA\build.casper""""""
+", "hello");
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
+		}
+
+		[Test]
 		public void TaskDoesNotExist() {
 			Assert.Throws<CasperException>(() => ExecuteScript("Test1.casper", @"
 task hello:
@@ -87,14 +107,15 @@ task hello:
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
 
-		void ExecuteScript(string scriptName, string scriptContents, params string[] args) {
-			try {
-				File.WriteAllText(scriptName, scriptContents);
-				Script.CompileAndExecute(scriptName, args);
-				standardOut.Seek(0, SeekOrigin.Begin);
-			} finally {
-				File.Delete(scriptName);
-			}
+		void ExecuteScript(string scriptPath, string scriptContents, params string[] args) {
+			WriteScript(scriptPath, scriptContents);
+			Script.CompileAndExecuteTasks(scriptPath, args);
+			standardOut.Seek(0, SeekOrigin.Begin);
+		}
+
+		void WriteScript(string scriptPath, string scriptContents) {
+			scripts.Add(scriptPath);
+			File.WriteAllText(scriptPath, scriptContents);
 		}
 	}
 }
