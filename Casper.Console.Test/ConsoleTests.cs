@@ -39,22 +39,38 @@ task hello:
 			Assert.That(testProcess.ExitCode, Is.EqualTo(255));
 		}
 
+		[Test]
+		public void Help() {
+			var testProcess = ExecuteCasper("--help");
+			testProcess.StandardError.ReadLine();
+			testProcess.StandardError.ReadLine();
+			Assert.That(testProcess.StandardError.ReadToEnd(), Contains.Substring("USAGE:"));
+			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
+			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
+		}
+
 		static Process ExecuteScript(string scriptName, string scriptContents, params string[] args) {
 			Process testProcess;
 			try {
+				var arguments = scriptName + " " + string.Join(" ", args);
 				File.WriteAllText(scriptName, scriptContents);
-				testProcess = Process.Start(new ProcessStartInfo {
-					FileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "casper.exe"),
-					Arguments = scriptName + " " + string.Join(" ", args),
-					UseShellExecute = false,
-					RedirectStandardOutput = true,
-					RedirectStandardError = true,
-				});
-				testProcess.WaitForExit();
+				testProcess = ExecuteCasper(arguments);
 			}
 			finally {
 				File.Delete(scriptName);
 			}
+			return testProcess;
+		}
+
+		static Process ExecuteCasper(string arguments) {
+			var testProcess = Process.Start(new ProcessStartInfo {
+				FileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "casper.exe"),
+				Arguments = arguments,
+				UseShellExecute = false,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
+			});
+			testProcess.WaitForExit();
 			return testProcess;
 		}
 	}
