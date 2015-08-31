@@ -1,5 +1,4 @@
-﻿using Boo.Lang;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Boo.Lang.Compiler;
 using Boo.Lang.Compiler.Pipelines;
@@ -7,15 +6,14 @@ using Boo.Lang.Compiler.IO;
 using System.Reflection;
 using System;
 using System.Runtime.ExceptionServices;
-using System.Collections;
 
 namespace Casper {
 	public static class Script {
 
-		private static Dictionary<string, Task> tasks = new Dictionary<string, Task>();
+		private static Dictionary<string, TaskBase> tasks = new Dictionary<string, TaskBase>();
 
-		private static Task GetTaskByName(string name) {
-			Task result;
+		private static TaskBase GetTaskByName(string name) {
+			TaskBase result;
 			if (!tasks.TryGetValue(name, out result)) {
 				throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, "Task '{0}' does not exist", name);
 			}
@@ -50,7 +48,7 @@ namespace Casper {
 			}
 		}
 
-		public static void AddTask(string name, Task task) {
+		public static void AddTask(string name, TaskBase task) {
 			tasks.Add(name, task);
 		}
 

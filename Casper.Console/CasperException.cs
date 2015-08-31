@@ -5,6 +5,7 @@ namespace Casper {
 	public class CasperException : Exception {
 		public const int EXIT_CODE_COMPILATION_ERROR = 1;
 		public const int EXIT_CODE_MISSING_TASK = 2;
+		public const int EXIT_CODE_CONFIGURATION_ERROR = 3;
 		public const int EXIT_CODE_UNHANDLED_EXCEPTION = 255;
 
 		private readonly int exitCode;

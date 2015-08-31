@@ -43,6 +43,27 @@ task hello:
 			var standardOut = new StreamReader(standardOutStream);
 			Assert.That(standardOut.ReadLine(), Is.EqualTo("Hello World!"));
 		}
+
+		[Test]
+		public void MakeTypedTask() {
+
+			string scriptContents = @"
+import Casper
+task copy(CopyFile,
+		Source: 'Source.txt', 
+		Destination: 'Destination.txt')
+";
+			var destinationFileName = "Destination.txt";
+
+			File.WriteAllText("Test1.casper", scriptContents);
+			File.WriteAllText("Source.txt", "Hello World!");
+			File.Delete(destinationFileName);
+			Assert.False(File.Exists(destinationFileName));
+			Script.CompileAndExecute("Test1.casper", "copy");
+
+			Assert.True(File.Exists(destinationFileName));
+			Assert.That(File.ReadAllText(destinationFileName), Is.EqualTo("Hello World!"));
+		}
 	}
 }
 
