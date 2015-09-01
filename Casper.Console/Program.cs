@@ -11,18 +11,21 @@ namespace Casper {
 			[Value(0, Required = true, MetaName = "script", HelpText = "The relative path of the Casper script to execute")]
 			public string ScriptPath { get; set; }
 
-			[Value(1, Required = true, MetaName = "task1 [task2 ...]", HelpText = "The tasks to execute")]
-			public IEnumerable<string> Tasks { get; set; }
+			[Value(1, Required = false, MetaName = "task1 [task2 ...]", HelpText = "The tasks to execute")]
+			public IEnumerable<string> TasksToExecute { get; set; }
+
+			[Option]
+			public bool Tasks { get; set; }
 
 			[Usage]
 			public static IEnumerable<Example> Usage {
 				get {
-					yield return new Example("Execute a task", new Options { ScriptPath = "script", Tasks = new [] { "task1" } } );
-					yield return new Example("Execute multiple tasks", new Options { ScriptPath = "script", Tasks = new [] { "task1", "task2" } } );
+					yield return new Example("Execute a task", new Options { ScriptPath = "script", TasksToExecute = new [] { "task1" } } );
+					yield return new Example("Execute multiple tasks", new Options { ScriptPath = "script", TasksToExecute = new [] { "task1", "task2" } } );
 				}
 			}
 		}
-		
+
 		public static int Main(string[] args) {
 
 			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
@@ -39,7 +42,14 @@ namespace Casper {
 			var arguments = Parser.Default.ParseArguments<Options>(args);
 			return arguments.MapResult(
 				o => {
-					Script.CompileAndExecuteTasks(o.ScriptPath, o.Tasks);
+					if(o.Tasks) {
+						Script.CompileAndExecuteScript(o.ScriptPath);
+						foreach(var task in Script.GetAllTaskNames()) {
+							Console.Error.WriteLine(task);
+						}
+					} else {
+						Script.CompileAndExecuteTasks(o.ScriptPath, o.TasksToExecute);
+					}
 					return 0;
 				},
 				errors => {
