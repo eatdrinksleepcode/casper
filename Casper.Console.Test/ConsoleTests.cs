@@ -48,10 +48,22 @@ task hello:
 		}
 
 		[Test]
-		public void UnhandledException() {
+		public void ExceptionDuringConfiguration() {
 			var testProcess = ExecuteScript("Test1.casper", @"raise System.Exception(""Script failure"")", "hello");
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("System.Exception: Script failure"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(255));
+		}
+
+		[Test]
+		public void TaskFailure() {
+			File.Delete("foo.txt");
+			var testProcess = ExecuteScript("Test1.casper", @"
+import Casper;
+task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
+", "move");
+			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Not.Empty);
+			Assert.That(testProcess.ExitCode, Is.EqualTo(CasperException.EXIT_CODE_TASK_FAILED));
+			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
