@@ -53,9 +53,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Casper.Console\Casper.Console.csproj">
+    <ProjectReference Include="..\Console\Console.csproj">
       <Project>{CA667BDA-EB41-40CC-87CB-490802903432}</Project>
-      <Name>Casper.Console</Name>
+      <Name>Console</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>
