@@ -14,6 +14,6 @@ namespace Casper {
 			return Enumerable.Repeat(this, 1).Concat(dependencies.SelectMany(d => d.AllDependencies()));
 		}
 
-		public IEnumerable dependsOn { set { dependencies = value.Cast<TaskBase>() ?? Enumerable.Empty<TaskBase>(); } }
+		public IEnumerable DependsOn { set { dependencies = value.Cast<TaskBase>() ?? Enumerable.Empty<TaskBase>(); } }
 	}
 }

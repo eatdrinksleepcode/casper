@@ -53,16 +53,16 @@ task goodbye:
 task wake:
 	print 'Stretch'
 
-task shower(dependsOn: [wake]):
+task shower(DependsOn: [wake]):
 	print 'Squeaky clean'
 
-task eat(dependsOn: [wake]):
+task eat(DependsOn: [wake]):
 	print 'Yummy!'
 
-task dress(dependsOn: [shower]):
+task dress(DependsOn: [shower]):
 	print 'Dressed'
 
-task leave(dependsOn: [dress, eat]):
+task leave(DependsOn: [dress, eat]):
 	print 'Bye!'
 ", "leave");
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Stretch"));
