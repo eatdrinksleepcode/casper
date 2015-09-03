@@ -53,8 +53,8 @@ namespace Casper {
 			tasks.Add(name, task);
 		}
 
-		public static IEnumerable<string> GetAllTaskNames() {
-			return tasks.Keys;
+		public static IEnumerable<KeyValuePair<string, TaskBase>> GetAllTasks() {
+			return tasks;
 		}
 
 		public static void CompileAndExecuteTasks(string scriptPath, params string[] taskNamesToExecute) {

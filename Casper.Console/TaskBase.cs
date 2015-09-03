@@ -15,5 +15,7 @@ namespace Casper {
 		}
 
 		public IEnumerable DependsOn { set { dependencies = value.Cast<TaskBase>() ?? Enumerable.Empty<TaskBase>(); } }
+
+		public string Description { get; set; }
 	}
 }
