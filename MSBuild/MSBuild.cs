@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
-
+using System.Collections;
 
 namespace Casper {
 	public class MSBuild : TaskBase {
 		public string WorkingDirectory { get; set; }
 		public string ProjectFile {	get; set; }
-		public string[] Targets { get; set; }
-		public IDictionary<string, string> Properties { get; set; }
+		public IList Targets { get; set; }
+		public IDictionary Properties { get; set; }
 
 		public override void Execute() {
 
@@ -18,8 +18,8 @@ namespace Casper {
 				args.Add("/t:" + string.Join(";", Targets));
 			}
 			if (null != Properties) {
-				foreach (var entry in Properties) {
-					args.Add("/p:" + entry.Key + "=" + entry.Value);
+				foreach (var propertyName in Properties.Keys) {
+					args.Add("/p:" + propertyName + "=" + Properties[propertyName]);
 				}
 			}
 
