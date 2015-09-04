@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}</ProjectGuid>
+    <ProjectGuid>{F9AB3C7A-9663-467D-9540-F1F575F006C7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Casper</RootNamespace>
-    <AssemblyName>Casper.Console.Test</AssemblyName>
+    <AssemblyName>Casper.MSBuild</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,39 +29,16 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang">
-      <HintPath>..\packages\Boo.0.9.4\lib\Boo.Lang.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Compiler">
-      <HintPath>..\packages\Boo-Compiler.0.9.4\lib\Boo.Lang.Compiler.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Parser">
-      <HintPath>..\packages\Boo-Compiler.0.9.4\lib\Boo.Lang.Parser.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Interpreter">
-      <HintPath>..\packages\Boo-Interpreter.0.9.4\lib\Boo.Lang.Interpreter.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="*.cs" />
-    <Compile Include="MSBuildTests.cs" />
-    <Compile Include="PathExtensions.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="MSBuild.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Console\Console.csproj">
       <Project>{CA667BDA-EB41-40CC-87CB-490802903432}</Project>
       <Name>Console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MSBuild\MSBuild.csproj">
-      <Project>{F9AB3C7A-9663-467D-9540-F1F575F006C7}</Project>
-      <Name>MSBuild</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

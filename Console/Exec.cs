@@ -2,6 +2,7 @@
 
 namespace Casper {
 	public class Exec : TaskBase {
+		public string WorkingDirectory { get; set; }
 		public string Executable { get; set; }
 		public string Arguments { get; set; }
 
@@ -13,6 +14,7 @@ namespace Casper {
 				FileName = Executable,
 				Arguments = Arguments,
 				UseShellExecute = false,
+				WorkingDirectory = WorkingDirectory,
 			};
 			var process = Process.Start(processStartInfo);
 			process.WaitForExit();
