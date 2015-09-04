@@ -47,8 +47,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
-    <Compile Include="MSBuildTests.cs" />
-    <Compile Include="PathExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -58,6 +56,10 @@
     <ProjectReference Include="..\Console\Console.csproj">
       <Project>{CA667BDA-EB41-40CC-87CB-490802903432}</Project>
       <Name>Console</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core\Core.csproj">
+      <Project>{B6E67DA9-81EB-47AF-AB22-1CC148901165}</Project>
+      <Name>Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\MSBuild\MSBuild.csproj">
       <Project>{F9AB3C7A-9663-467D-9540-F1F575F006C7}</Project>

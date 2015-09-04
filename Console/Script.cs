@@ -24,6 +24,7 @@ namespace Casper {
 			var compileParams = new CompilerParameters();
 			compileParams.GenerateInMemory = true;
 			compileParams.References.Add(Assembly.GetExecutingAssembly());
+			compileParams.References.Add(typeof(TaskBase).Assembly);
 			compileParams.Input.Add(new FileInput(scriptPath));
 			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);

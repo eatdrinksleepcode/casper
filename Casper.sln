@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSBuild", "MSBuild\MSBuild.csproj", "{F9AB3C7A-9663-467D-9540-F1F575F006C7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{B6E67DA9-81EB-47AF-AB22-1CC148901165}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -17,6 +19,10 @@ Global
 		{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}.Debug|x86.Build.0 = Debug|Any CPU
 		{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}.Release|x86.ActiveCfg = Release|Any CPU
 		{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}.Release|x86.Build.0 = Release|Any CPU
+		{B6E67DA9-81EB-47AF-AB22-1CC148901165}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B6E67DA9-81EB-47AF-AB22-1CC148901165}.Debug|x86.Build.0 = Debug|Any CPU
+		{B6E67DA9-81EB-47AF-AB22-1CC148901165}.Release|x86.ActiveCfg = Release|Any CPU
+		{B6E67DA9-81EB-47AF-AB22-1CC148901165}.Release|x86.Build.0 = Release|Any CPU
 		{CA667BDA-EB41-40CC-87CB-490802903432}.Debug|x86.ActiveCfg = Debug|x86
 		{CA667BDA-EB41-40CC-87CB-490802903432}.Debug|x86.Build.0 = Debug|x86
 		{CA667BDA-EB41-40CC-87CB-490802903432}.Release|x86.ActiveCfg = Release|x86

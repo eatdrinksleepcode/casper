@@ -1,15 +1,15 @@
-﻿using Boo.Lang;
+﻿using System;
 
 namespace Casper {
 	public class Task : TaskBase {
-		private readonly ICallable body;
+		private readonly Action body;
 
-		public Task(ICallable body) {
+		public Task(Action body) {
 			this.body = body;
 		}
 
 		public override void Execute() {
-			this.body.Call(null);
+			this.body();
 		}
 	}
 }
