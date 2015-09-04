@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>Casper.Console</id>
+    <version>0.0.1-alpha</version>
+    <title>Casper.Console</title>
+    <authors>David Nelson</authors>
+    <owners>David Nelson</owners>
+    <projectUrl>https://github.com/eatdrinksleepcode/casper</projectUrl>
+    <description>Command-line tool for Casper, the friendly .NET Build System</description>
+    <copyright>Copyright 2015</copyright>
+    <tags>build casper</tags>
+  </metadata>
+  <files>
+  	<file src="bin/Debug/*.dll" target="tools" />
+    <file src="bin/Debug/*.exe" target="tools" />
+  </files>
+</package>

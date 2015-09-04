@@ -1,0 +1,7 @@
+#! /bin/sh
+
+./build
+rm -r .casper
+mkdir .casper
+nuget install Casper.Console -OutputDirectory .casper -pre
+find .casper -name "Casper.Console.*" -type d | xargs -I{} mono {}/tools/casper.exe build.casper pack

@@ -60,5 +60,9 @@
       <Project>{B6E67DA9-81EB-47AF-AB22-1CC148901165}</Project>
       <Name>Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MSBuild\MSBuild.csproj">
+      <Project>{F9AB3C7A-9663-467D-9540-F1F575F006C7}</Project>
+      <Name>MSBuild</Name>
+    </ProjectReference>
   </ItemGroup>
 </Project>

@@ -1,0 +1,6 @@
+#! /bin/sh
+
+xbuild
+rm -r out
+mkdir -p out/packages
+nuget pack Console/Console.nuspec -OutputDirectory out/packages
