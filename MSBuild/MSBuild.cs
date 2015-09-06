@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 
 namespace Casper {
 	public class MSBuild : TaskBase {
@@ -15,7 +16,7 @@ namespace Casper {
 				args.Add(ProjectFile);
 			}
 			if (null != Targets) {
-				args.Add("/t:" + string.Join(";", Targets));
+				args.Add("/t:" + string.Join(";", Targets.Cast<object>().Select(t => t.ToString())));
 			}
 			if (null != Properties) {
 				foreach (var propertyName in Properties.Keys) {
