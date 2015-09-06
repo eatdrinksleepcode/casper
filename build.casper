@@ -1,4 +1,5 @@
 import Casper;
-task build(MSBuild, Properties: {"Configuration": "Release"})
-task pack(Exec, DependsOn: [build], Executable: "nuget", Arguments: "pack Console/Console.nuspec -OutputDirectory out/packages")
-task test(NUnit, DependsOn: [build], TestAssembly: 'Test/bin/Release/Casper.Test.dll')
+task compile(MSBuild, Properties: {"Configuration": "Release"})
+task pack(Exec, DependsOn: [compile], Executable: "nuget", Arguments: "pack Console/Console.nuspec -OutputDirectory out/packages")
+task test(NUnit, DependsOn: [compile], TestAssembly: 'Test/bin/Release/Casper.Test.dll')
+task build(DependsOn: [test, pack])
