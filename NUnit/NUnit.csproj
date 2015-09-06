@@ -3,10 +3,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}</ProjectGuid>
+    <ProjectGuid>{42CB5134-5D5F-4564-A548-6260352C0420}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Casper</RootNamespace>
-    <AssemblyName>Casper.Test</AssemblyName>
+    <AssemblyName>Casper.NUnit</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -29,18 +29,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="Boo.Lang">
-      <HintPath>..\packages\Boo.0.9.4\lib\Boo.Lang.dll</HintPath>
+    <Reference Include="nunit.core.engine">
+      <HintPath>..\packages\NUnit.Core.Engine.3.0.0-beta-4\lib\nunit.core.engine.dll</HintPath>
     </Reference>
-    <Reference Include="Boo.Lang.Compiler">
-      <HintPath>..\packages\Boo-Compiler.0.9.4\lib\Boo.Lang.Compiler.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Parser">
-      <HintPath>..\packages\Boo-Compiler.0.9.4\lib\Boo.Lang.Parser.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Interpreter">
-      <HintPath>..\packages\Boo-Interpreter.0.9.4\lib\Boo.Lang.Interpreter.dll</HintPath>
-    </Reference>
+    <Reference Include="System.Xml" />
     <Reference Include="Mono.Cecil">
       <HintPath>..\packages\Mono.Cecil.0.9.6.0\lib\net45\Mono.Cecil.dll</HintPath>
     </Reference>
@@ -58,28 +50,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="*.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NUnit.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Console\Console.csproj">
-      <Project>{CA667BDA-EB41-40CC-87CB-490802903432}</Project>
-      <Name>Console</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Core\Core.csproj">
       <Project>{B6E67DA9-81EB-47AF-AB22-1CC148901165}</Project>
       <Name>Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MSBuild\MSBuild.csproj">
-      <Project>{F9AB3C7A-9663-467D-9540-F1F575F006C7}</Project>
-      <Name>MSBuild</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NUnit\NUnit.csproj">
-      <Project>{42CB5134-5D5F-4564-A548-6260352C0420}</Project>
-      <Name>NUnit</Name>
-    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

@@ -9,12 +9,25 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MSBuild", "MSBuild\MSBuild.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{B6E67DA9-81EB-47AF-AB22-1CC148901165}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnit", "NUnit\NUnit.csproj", "{42CB5134-5D5F-4564-A548-6260352C0420}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{125E3DB8-8D26-43FF-8AD3-D0C8FC0DD0E8}"
+	ProjectSection(SolutionItems) = preProject
+		build.casper = build.casper
+		dogfood = dogfood
+		build = build
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42CB5134-5D5F-4564-A548-6260352C0420}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{42CB5134-5D5F-4564-A548-6260352C0420}.Debug|x86.Build.0 = Debug|Any CPU
+		{42CB5134-5D5F-4564-A548-6260352C0420}.Release|x86.ActiveCfg = Release|Any CPU
+		{42CB5134-5D5F-4564-A548-6260352C0420}.Release|x86.Build.0 = Release|Any CPU
 		{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}.Debug|x86.Build.0 = Debug|Any CPU
 		{B25EF8FD-DC9A-488F-AE5B-D6056F4FFC62}.Release|x86.ActiveCfg = Release|Any CPU
@@ -31,6 +44,8 @@ Global
 		{F9AB3C7A-9663-467D-9540-F1F575F006C7}.Debug|x86.Build.0 = Debug|Any CPU
 		{F9AB3C7A-9663-467D-9540-F1F575F006C7}.Release|x86.ActiveCfg = Release|Any CPU
 		{F9AB3C7A-9663-467D-9540-F1F575F006C7}.Release|x86.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

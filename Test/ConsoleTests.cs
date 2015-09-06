@@ -76,14 +76,14 @@ task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
 
 		[Test]
 		public void Tasks() {
-			WriteScript("build.casper", @"
+			WriteScript("test.casper", @"
 task hello(Description: 'Hello'):
 	print 'Hello World!'
 
 task goodbye(Description: 'Goodbye'):
 	print 'Goodbye World!'
 ");
-			var testProcess = ExecuteCasper("build.casper --tasks");
+			var testProcess = ExecuteCasper("test.casper --tasks");
 			var standardError = testProcess.StandardError.ReadToEnd();
 			Assert.That(standardError, Contains.Substring("goodbye"));
 			Assert.That(standardError, Contains.Substring("Goodbye"));

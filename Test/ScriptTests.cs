@@ -75,12 +75,12 @@ task leave(DependsOn: [dress, eat]):
 
 		[Test]
 		public void ExecuteTasksFromSubProject() {
-			WriteScript("subprojectA\\build.casper", @"
+			WriteScript("subprojectA\\test.casper", @"
 task hello:
 	print 'Hello World!'
 ");
-			ExecuteScript("build.casper", @"
-include """"""subprojectA\build.casper""""""
+			ExecuteScript("test.casper", @"
+include """"""subprojectA\test.casper""""""
 ", "hello");
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);

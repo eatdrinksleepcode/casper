@@ -26,6 +26,7 @@ namespace Casper {
 			compileParams.References.Add(Assembly.GetExecutingAssembly());
 			compileParams.References.Add(typeof(TaskBase).Assembly);
 			compileParams.References.Add(typeof(MSBuild).Assembly);
+			compileParams.References.Add(typeof(NUnit).Assembly);
 			compileParams.Input.Add(new FileInput(scriptPath));
 			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);

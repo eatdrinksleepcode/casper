@@ -54,6 +54,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Console.nuspec" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.csproj">
@@ -63,6 +64,10 @@
     <ProjectReference Include="..\MSBuild\MSBuild.csproj">
       <Project>{F9AB3C7A-9663-467D-9540-F1F575F006C7}</Project>
       <Name>MSBuild</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NUnit\NUnit.csproj">
+      <Project>{42CB5134-5D5F-4564-A548-6260352C0420}</Project>
+      <Name>NUnit</Name>
     </ProjectReference>
   </ItemGroup>
 </Project>

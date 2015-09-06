@@ -4,6 +4,13 @@ using System.IO;
 namespace Casper {
 	[TestFixture]
 	public class CopyFileTests {
+
+		[TearDown]
+		public void TearDown() {
+			File.Delete("Source.txt");
+			File.Delete("Destination.txt");
+		}
+
 		[Test]
 		public void CopyFile() {
 			File.WriteAllText("Source.txt", "Hello World!");

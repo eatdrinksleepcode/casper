@@ -26,6 +26,9 @@ namespace Casper {
 			standardOutStream.Dispose();
 			standardOutStream = null;
 			standardOutWriter = null;
+
+			File.Delete("Source.txt");
+			File.Delete("Destination.txt");
 		}
 		
 		[Test]
