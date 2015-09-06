@@ -30,7 +30,9 @@ namespace Casper {
 			compileParams.Input.Add(new FileInput(scriptPath));
 			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);
-			new CompileToMemory().Run(context);
+			var pipeline = new CompileToMemory();
+			pipeline.Insert(1, new BaseClassStep());
+			pipeline.Run(context);
 			if (context.Errors.Count > 0) {
 				throw new CasperException(CasperException.EXIT_CODE_COMPILATION_ERROR, context.Errors.ToString());
 			}
@@ -38,9 +40,9 @@ namespace Casper {
 		}
 
 		private static void ExecuteScript(CompilerContext context) {
-			context.GeneratedAssembly.EntryPoint.Invoke(null, new object[] {
-				new string[0]
-			});
+			var projectType = context.GeneratedAssembly.GetTypes().First();
+			var project = (ProjectBase)Activator.CreateInstance(projectType);
+			project.Configure();
 		}
 
 		private static void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
