@@ -5,7 +5,7 @@ using System.Collections;
 namespace Casper {
 
 	public abstract class TaskBase {
-		private IEnumerable<TaskBase> dependencies = Enumerable.Empty<TaskBase>();
+		private IList<TaskBase> dependencies = new List<TaskBase>();
 
 		public abstract void Execute();
 
@@ -13,7 +13,10 @@ namespace Casper {
 			return Enumerable.Repeat(this, 1).Concat(dependencies.SelectMany(d => d.AllDependencies()));
 		}
 
-		public IEnumerable DependsOn { set { dependencies = value.Cast<TaskBase>() ?? Enumerable.Empty<TaskBase>(); } }
+		public IList DependsOn { 
+			get { return (IList)dependencies; }
+			set { dependencies = value.Cast<TaskBase>().ToList() ?? new List<TaskBase>(); }
+		}
 
 		public string Description { get; set; }
 	}

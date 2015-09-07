@@ -10,15 +10,7 @@ using System.Runtime.ExceptionServices;
 namespace Casper {
 	public static class Script {
 
-		private static Dictionary<string, TaskBase> tasks = new Dictionary<string, TaskBase>();
-
-		private static TaskBase GetTaskByName(string name) {
-			TaskBase result;
-			if (!tasks.TryGetValue(name, out result)) {
-				throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, "Task '{0}' does not exist", name);
-			}
-			return result;
-		}
+		private static ProjectBase currentProject;
 			
 		private static CompilerContext CompileScript(string scriptPath) {
 			var compileParams = new CompilerParameters();
@@ -41,12 +33,19 @@ namespace Casper {
 
 		private static void ExecuteScript(CompilerContext context) {
 			var projectType = context.GeneratedAssembly.GetTypes().First();
-			var project = (ProjectBase)Activator.CreateInstance(projectType);
-			project.Configure();
+			var oldProject = currentProject;
+			try {
+				currentProject = (ProjectBase)Activator.CreateInstance(projectType, new object[] { Script.GetCurrentProject()});
+				currentProject.Configure();
+			} finally {
+				if (null != oldProject) {
+					currentProject = oldProject;
+				}
+			}
 		}
 
 		private static void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
-			var tasks = taskNamesToExecute.Select(a => GetTaskByName(a)).ToArray();
+			var tasks = taskNamesToExecute.Select(a => currentProject.GetTaskByName(a)).ToArray();
 			var taskGraphClosure = tasks.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
 			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
 			foreach (var task in taskGraphClosure) {
@@ -55,11 +54,11 @@ namespace Casper {
 		}
 
 		public static void AddTask(string name, TaskBase task) {
-			tasks.Add(name, task);
+			currentProject.AddTask(name, task);
 		}
 
-		public static IEnumerable<KeyValuePair<string, TaskBase>> GetAllTasks() {
-			return tasks;
+		public static IEnumerable<KeyValuePair<string, TaskBase>> GetCurrentTasks() {
+			return currentProject.GetTasks();
 		}
 
 		public static void CompileAndExecuteTasks(string scriptPath, params string[] taskNamesToExecute) {
@@ -88,7 +87,11 @@ namespace Casper {
 		}
 
 		public static void Reset() {
-			tasks.Clear();
+			currentProject = null;
+		}
+
+		public static ProjectBase GetCurrentProject() {
+			return currentProject;
 		}
 	}
 }

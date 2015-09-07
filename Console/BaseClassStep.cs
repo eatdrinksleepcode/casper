@@ -18,6 +18,13 @@ namespace Casper {
 					Body = node.Globals,
 				};
 				baseClass.Members.Add(configureMethod);
+				var constructor = new Constructor(node.LexicalInfo);
+				constructor.Parameters.Add(new ParameterDeclaration(node.LexicalInfo) {
+					Name = "parent",
+					Type = TypeReference.Lift(typeof(ProjectBase))
+				});
+				constructor.Body.Add(new MethodInvocationExpression(node.LexicalInfo, new SuperLiteralExpression(node.LexicalInfo), new ReferenceExpression(node.LexicalInfo, "parent")));
+				baseClass.Members.Add(constructor);
 				node.Globals = null;
 				node.Members.Add(baseClass);
 			}

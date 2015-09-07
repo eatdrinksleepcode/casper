@@ -1,0 +1,8 @@
+﻿import Casper;
+
+task pack(Exec,
+		  DependsOn: [parent.GetTaskByName('compile')],
+		  Executable: "nuget",
+		  Arguments: "pack Console/Console.nuspec -OutputDirectory out/packages")
+
+parent.GetTaskByName('build').DependsOn.Add(pack)
