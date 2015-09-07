@@ -34,6 +34,8 @@ task goodbye:
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo(""));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
 			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
@@ -43,6 +45,10 @@ task goodbye:
 task hello:
 	print 'Hello World!'
 ", "hello", "goodbye");
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("* What went wrong:"));
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(2));
 		}
@@ -50,6 +56,10 @@ task hello:
 		[Test]
 		public void ExceptionDuringConfiguration() {
 			var testProcess = ExecuteScript("Test1.casper", @"raise System.Exception(""Script failure"")", "hello");
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("* What went wrong:"));
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("System.Exception: Script failure"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(255));
 		}

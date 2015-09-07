@@ -1,7 +1,12 @@
 #! /bin/sh
 
+task=${1:-build}
+
 ./build
 rm -r .casper
 mkdir .casper
-nuget install Casper.Console -OutputDirectory .casper -pre
-find .casper -name "Casper.Console.*" -type d | xargs -I{} mono {}/tools/casper.exe build.casper build
+echo "Installing casper..."
+nuget install Casper.Console -OutputDirectory .casper -pre -Verbosity quiet
+casperPath=`find .casper -name "Casper.Console.*" -type d`
+echo "Running casper..."
+mono $casperPath/tools/casper.exe build.casper $task

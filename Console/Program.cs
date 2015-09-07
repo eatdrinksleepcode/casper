@@ -28,34 +28,54 @@ namespace Casper {
 
 		public static int Main(string[] args) {
 
-			AppDomain.CurrentDomain.UnhandledException += (sender, e) => {
-				var casperEx = e.ExceptionObject as CasperException;
-				if(null != casperEx) {
-					Console.Error.WriteLine(casperEx.Message);
-					Environment.Exit(casperEx.ExitCode);
-				} else {
-					Console.Error.WriteLine(e.ExceptionObject);
-					Environment.Exit(CasperException.EXIT_CODE_UNHANDLED_EXCEPTION);
-				}
-			};
-
-			var arguments = Parser.Default.ParseArguments<Options>(args);
-			return arguments.MapResult(
-				o => {
-					if(o.Tasks) {
-						Script.CompileAndExecuteScript(o.ScriptPath);
-						foreach(var task in Script.GetCurrentTasks()) {
-							Console.Error.WriteLine("{0} - {1}", task.Key, task.Value.Description);
-						}
-					} else {
-						Script.CompileAndExecuteTasks(o.ScriptPath, o.TasksToExecute);
-					}
-					return 0;
-				},
-				errors => {
-					return errors.Any(e => e.Tag == ErrorType.HelpRequestedError) ? 0 : CasperException.EXIT_CODE_UNHANDLED_EXCEPTION;
-				}
-			);
+			try {
+				var arguments = Parser.Default.ParseArguments<Options>(args);
+				return Run(arguments);
+			} catch (CasperException ex) {
+				WriteError(ex.Message);
+				return ex.ExitCode;
+			} catch (Exception ex) {
+				WriteError(ex);
+				return CasperException.EXIT_CODE_UNHANDLED_EXCEPTION;
+			}
 		}
+
+		static int Run(ParserResult<Options> arguments) {
+			return arguments.MapResult(o =>  {
+				if (o.Tasks) {
+					Script.CompileAndExecuteScript(o.ScriptPath);
+					foreach (var task in Script.GetCurrentTasks()) {
+						Console.Error.WriteLine("{0} - {1}", task.Key, task.Value.Description);
+					}
+				}
+				else {
+					Script.CompileAndExecuteTasks(o.ScriptPath, o.TasksToExecute);
+					Console.WriteLine();
+					WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
+				}
+				return 0;
+			}, errors =>  {
+				return errors.Any(e => e.Tag == ErrorType.HelpRequestedError) ? 0 : CasperException.EXIT_CODE_UNHANDLED_EXCEPTION;
+			});
+		}
+
+		static void WriteError(object whatWentWrong) {
+			Console.Error.WriteLine();
+			WriteLine(ConsoleColor.Red, Console.Error, "BUILD FAILURE");
+			Console.Error.WriteLine();
+			Console.Error.WriteLine("* What went wrong:");
+			Console.Error.WriteLine(whatWentWrong);
+		}
+
+		static void WriteLine(ConsoleColor consoleColor, System.IO.TextWriter writer, object message) {
+			try {
+				Console.ForegroundColor = consoleColor;
+				writer.WriteLine(message);
+			}
+			finally {
+				Console.ResetColor();
+			}
+		}
+
 	}
 }
