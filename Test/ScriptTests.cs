@@ -42,7 +42,9 @@ task hello:
 task goodbye:
 	print 'Goodbye World!'
 ", "goodbye", "hello");
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("goodbye:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Goodbye World!"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("hello:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
@@ -65,10 +67,15 @@ task dress(DependsOn: [shower]):
 task leave(DependsOn: [dress, eat]):
 	print 'Bye!'
 ", "leave");
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("wake:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Stretch"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("shower:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Squeaky clean"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("dress:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Dressed"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("eat:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Yummy!"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("leave:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Bye!"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
@@ -85,7 +92,9 @@ task hello:
 
 include """"""subprojectA\test.casper""""""
 ", "goodbye");
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("hello:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("goodbye:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Goodbye World!"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}

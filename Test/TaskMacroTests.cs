@@ -39,11 +39,13 @@ task hello:
 	print 'Hello World!'
 ";
 			File.WriteAllText("Test1.casper", scriptContents);
+			// TODO: remove dependency on Script
 			Script.CompileAndExecuteTasks("Test1.casper", "hello");
 
 			standardOutWriter.Flush();
 			standardOutStream.Seek(0, SeekOrigin.Begin);
 			var standardOut = new StreamReader(standardOutStream);
+			Assert.That(standardOut.ReadLine(), Is.EqualTo("hello:"));
 			Assert.That(standardOut.ReadLine(), Is.EqualTo("Hello World!"));
 		}
 
@@ -62,6 +64,7 @@ task copy(CopyFile,
 			File.WriteAllText("Source.txt", "Hello World!");
 			File.Delete(destinationFileName);
 			Assert.False(File.Exists(destinationFileName));
+			// TODO: remove dependency on Script
 			Script.CompileAndExecuteTasks("Test1.casper", "copy");
 
 			Assert.True(File.Exists(destinationFileName));

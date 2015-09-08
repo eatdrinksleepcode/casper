@@ -49,6 +49,7 @@ namespace Casper {
 			var taskGraphClosure = tasks.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
 			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
 			foreach (var task in taskGraphClosure) {
+				Console.WriteLine(task.Name + ":");
 				task.Execute();
 			}
 		}
