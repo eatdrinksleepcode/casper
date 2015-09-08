@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 
-
 namespace Casper
 {
 	public abstract class ProjectBase
-	{
-		private readonly Dictionary<string, TaskBase> tasks = new Dictionary<string, TaskBase>();
+	{		
+		private readonly TaskCollection tasks = new TaskCollection();
 		private readonly List<ProjectBase> subprojects = new List<ProjectBase>();
 		protected readonly ProjectBase parent;
 
@@ -20,11 +19,12 @@ namespace Casper
 		public abstract void Configure();
 
 		public void AddTask(string name, TaskBase task) {
-			tasks.Add(name, task);
+			task.Name = name;
+			tasks.Add(task);
 		}
 
-		public IEnumerable<KeyValuePair<string, TaskBase>> GetTasks() {
-			return tasks;
+		public TaskCollection Tasks {
+			get { return tasks; }
 		}
 
 		public TaskBase GetTaskByName(string name) {

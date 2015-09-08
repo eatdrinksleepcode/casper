@@ -45,7 +45,7 @@ namespace Casper {
 				if (o.Tasks) {
 					Script.CompileAndExecuteScript(o.ScriptPath);
 					foreach (var task in Script.GetCurrentTasks()) {
-						Console.Error.WriteLine("{0} - {1}", task.Key, task.Value.Description);
+						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
 					}
 				}
 				else {

@@ -57,8 +57,8 @@ namespace Casper {
 			currentProject.AddTask(name, task);
 		}
 
-		public static IEnumerable<KeyValuePair<string, TaskBase>> GetCurrentTasks() {
-			return currentProject.GetTasks();
+		public static TaskCollection GetCurrentTasks() {
+			return currentProject.Tasks;
 		}
 
 		public static void CompileAndExecuteTasks(string scriptPath, params string[] taskNamesToExecute) {
