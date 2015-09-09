@@ -1,0 +1,8 @@
+#! /bin/sh
+
+task=${1:-build}
+
+casperPath=`find .casper -name "Casper.Console.*" -type d`
+echo "Running casper..."
+mono $casperPath/tools/casper.exe build.casper $task
+
