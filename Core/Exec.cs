@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Text;
+using System;
 
 namespace Casper {
 	public class Exec : TaskBase {
@@ -15,10 +17,18 @@ namespace Casper {
 				Arguments = Arguments,
 				UseShellExecute = false,
 				WorkingDirectory = WorkingDirectory,
+				RedirectStandardOutput = true,
+				RedirectStandardError = true,
 			};
 			var process = Process.Start(processStartInfo);
+			var allOutput = new StringBuilder();
+			process.ErrorDataReceived += (sender, e) => allOutput.AppendLine(e.Data);
+			process.OutputDataReceived += (sender, e) => allOutput.AppendLine(e.Data);
+			process.BeginOutputReadLine();
+			process.BeginErrorReadLine();
 			process.WaitForExit();
 			if (0 != process.ExitCode) {
+				Console.Error.WriteLine(allOutput.ToString());
 				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "Process '{0}{1}' exited with code {2}", Executable, null == Arguments ? "" : " " + Arguments, process.ExitCode);
 			}
 		}
