@@ -36,7 +36,7 @@ namespace Casper {
 			var projectType = context.GeneratedAssembly.GetTypes().First();
 			var oldProject = currentProject;
 			try {
-				currentProject = (ProjectBase)Activator.CreateInstance(projectType, new object[] { Script.GetCurrentProject()});
+				currentProject = (ProjectBase)Activator.CreateInstance(projectType, new object[] { currentProject });
 				currentProject.Configure();
 			} finally {
 				if (null != oldProject) {
@@ -56,17 +56,12 @@ namespace Casper {
 			}
 		}
 
-		public static void AddTask(string name, TaskBase task) {
-			currentProject.AddTask(name, task);
-		}
-
 		public static TaskCollection GetCurrentTasks() {
 			return currentProject.Tasks;
 		}
 
 		public static void CompileAndExecuteTasks(string scriptPath, params string[] taskNamesToExecute) {
 			CompileAndExecuteTasks(scriptPath, (IEnumerable<string>)taskNamesToExecute);
-			
 		}
 
 		public static void CompileAndExecuteTasks(string scriptPath, IEnumerable<string> taskNamesToExecute) {
@@ -91,10 +86,6 @@ namespace Casper {
 
 		public static void Reset() {
 			currentProject = null;
-		}
-
-		public static ProjectBase GetCurrentProject() {
-			return currentProject;
 		}
 	}
 }

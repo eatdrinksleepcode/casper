@@ -4,8 +4,6 @@ using System.Collections.Generic;
 
 public class TaskMacro : Boo.Lang.Compiler.AbstractAstGeneratorMacro {
 
-	#region implemented abstract members of AbstractAstGeneratorMacro
-
 	public override Statement Expand(MacroStatement macro) {
 		return null;
 	}
@@ -33,9 +31,7 @@ public class TaskMacro : Boo.Lang.Compiler.AbstractAstGeneratorMacro {
 			NamedArguments = namedArgs
 		});
 		yield return declarationStatement;
-		var methodInvocationExpression = new MethodInvocationExpression(macro.LexicalInfo, new MemberReferenceExpression(macro.LexicalInfo, Expression.Lift(typeof(Script)), "AddTask"), Expression.Lift(taskName), new ReferenceExpression(macro.LexicalInfo, taskName));
+		var methodInvocationExpression = new MethodInvocationExpression(macro.LexicalInfo, new ReferenceExpression(macro.LexicalInfo, "AddTask"), Expression.Lift(taskName), new ReferenceExpression(macro.LexicalInfo, taskName));
 		yield return methodInvocationExpression;
 	}
-
-	#endregion
 }
