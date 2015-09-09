@@ -12,7 +12,7 @@ namespace Casper {
 		private MemoryStream standardOut;
 		private TextWriter oldStandardOut;
 
-		private List<string> scripts = new List<string>();
+		private List<string> testFiles = new List<string>();
 
 		[SetUp]
 		public void SetUp() {
@@ -22,12 +22,12 @@ namespace Casper {
 			standardOutWriter = new StreamWriter(standardOut) { AutoFlush = true };
 			standardOutReader = new StreamReader(standardOut);
 			Console.SetOut(standardOutWriter);
-			scripts.Clear();
+			testFiles.Clear();
 		}
 
 		[TearDown]
 		public void TearDown() {
-			foreach (var script in scripts) {
+			foreach (var script in testFiles) {
 				File.Delete(script);
 			}
 			Console.SetOut(oldStandardOut);
@@ -82,20 +82,31 @@ task leave(DependsOn: [dress, eat]):
 
 		[Test]
 		public void ExecuteTasksFromSubProject() {
-			WriteScript("subprojectA\\test.casper", @"
+
+			var subProjectDir = "subProjectA";
+			var subProjectFile = subProjectDir.File("foo.txt");
+			testFiles.Add(subProjectFile);
+
+			if (Directory.Exists(subProjectDir)) {
+				Directory.Delete(subProjectDir, true);
+			}
+			Directory.CreateDirectory(subProjectDir);
+			File.Delete(subProjectFile);
+			
+			WriteScript(subProjectDir.File("test.casper"), @"
 task goodbye(DependsOn: [parent.GetTaskByName('hello')]):
-	print 'Goodbye World!'
+	print System.IO.File.ReadAllText('foo.txt')
 ");
 			ExecuteScript("test.casper", @"
 task hello:
-	print 'Hello World!'
+	System.IO.File.WriteAllText('" + subProjectDir.File("foo.txt") + @"', 'Hello World!')
 
-include """"""subprojectA\test.casper""""""
+include """"""" + subProjectDir.File("test.casper") + @"""""""
 ", "goodbye");
+
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("hello:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("goodbye:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Goodbye World!"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
 
@@ -127,7 +138,7 @@ task hello:
 		}
 
 		void WriteScript(string scriptPath, string scriptContents) {
-			scripts.Add(scriptPath);
+			testFiles.Add(scriptPath);
 			File.WriteAllText(scriptPath, scriptContents);
 		}
 	}

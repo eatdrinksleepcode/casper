@@ -7,6 +7,7 @@ rm -r .casper
 mkdir .casper
 echo "Installing casper..."
 nuget install Casper.Console -OutputDirectory .casper -pre -Verbosity quiet
+rm -r out
 casperPath=`find .casper -name "Casper.Console.*" -type d`
 echo "Running casper..."
 mono $casperPath/tools/casper.exe build.casper $task

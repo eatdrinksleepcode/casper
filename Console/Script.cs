@@ -6,6 +6,7 @@ using Boo.Lang.Compiler.IO;
 using System.Reflection;
 using System;
 using System.Runtime.ExceptionServices;
+using System.IO;
 
 namespace Casper {
 	public static class Script {
@@ -23,7 +24,7 @@ namespace Casper {
 			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);
 			var pipeline = new CompileToMemory();
-			pipeline.Insert(1, new BaseClassStep());
+			pipeline.Insert(1, new BaseClassStep(Path.GetDirectoryName(Path.GetFullPath(scriptPath))));
 			pipeline.Run(context);
 			if (context.Errors.Count > 0) {
 				throw new CasperException(CasperException.EXIT_CODE_COMPILATION_ERROR, context.Errors.ToString());
@@ -50,7 +51,8 @@ namespace Casper {
 			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
 			foreach (var task in taskGraphClosure) {
 				Console.WriteLine(task.Name + ":");
-				task.Execute();
+				// HACK: this is awkward
+				task.Project.Execute(task);
 			}
 		}
 
