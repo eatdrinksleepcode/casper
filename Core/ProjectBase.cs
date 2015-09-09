@@ -1,6 +1,7 @@
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
+using System.Linq;
 
 namespace Casper
 {
@@ -31,7 +32,28 @@ namespace Casper
 			get { return tasks; }
 		}
 
-		public TaskBase GetTaskByName(string name) {
+		public void Execute(TaskBase task) {
+			var currentDirectory = Directory.GetCurrentDirectory();
+			try {
+				Directory.SetCurrentDirectory(location);
+				task.Execute();
+			} finally {
+				Directory.SetCurrentDirectory(currentDirectory);
+			}
+		}
+
+		protected void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
+			var tasks = taskNamesToExecute.Select(a => this.GetTaskByName(a)).ToArray();
+			var taskGraphClosure = tasks.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
+			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
+			foreach (var task in taskGraphClosure) {
+				Console.WriteLine(task.Name + ":");
+				// HACK: this is awkward
+				task.Project.Execute(task);
+			}
+		}
+
+		private TaskBase GetTaskByName(string name) {
 			TaskBase result = GetTaskByNameIncludingSubProjects(name);
 			if (null == result) {
 				throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, "Task '{0}' does not exist", name);
@@ -45,16 +67,6 @@ namespace Casper
 				result = subprojects.Select(p => p.GetTaskByNameIncludingSubProjects(name)).FirstOrDefault(t => null != t);
 			}
 			return result;
-		}
-
-		public void Execute(TaskBase task) {
-			var currentDirectory = Directory.GetCurrentDirectory();
-			try {
-				Directory.SetCurrentDirectory(location);
-				task.Execute();
-			} finally {
-				Directory.SetCurrentDirectory(currentDirectory);
-			}
 		}
 	}
 }

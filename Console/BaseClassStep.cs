@@ -1,5 +1,5 @@
-﻿using Boo.Lang.Compiler.Steps;
-using Boo.Lang.Compiler.Ast;
+﻿using Boo.Lang.Compiler.Ast;
+using Boo.Lang.Compiler.Steps;
 
 namespace Casper {
 	public class BaseClassStep : AbstractTransformerCompilerStep {
@@ -17,7 +17,7 @@ namespace Casper {
 			if (node.Namespace == null) {
 				var baseClass = new ClassDefinition(node.LexicalInfo);
 				baseClass.Name = node.Name + "Project";
-				baseClass.BaseTypes.Add(TypeReference.Lift(typeof(ProjectBase)));
+				baseClass.BaseTypes.Add(TypeReference.Lift(typeof(BooProject)));
 				var configureMethod = new Method(node.LexicalInfo) {
 					Name = "Configure",
 					Modifiers = TypeMemberModifiers.Override | TypeMemberModifiers.Public,

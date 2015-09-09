@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using CommandLine;
 using CommandLine.Text;
-using System.Linq;
 
 namespace Casper {
 	public static class MainClass {
@@ -42,14 +42,15 @@ namespace Casper {
 
 		static int Run(ParserResult<Options> arguments) {
 			return arguments.MapResult(o =>  {
+				var rootProject = new RootProject();
 				if (o.Tasks) {
-					Script.CompileAndExecuteScript(o.ScriptPath);
-					foreach (var task in Script.GetCurrentTasks()) {
+					var project = rootProject.CompileAndExecuteScript(o.ScriptPath);
+					foreach (var task in project.Tasks) {
 						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
 					}
 				}
 				else {
-					Script.CompileAndExecuteTasks(o.ScriptPath, o.TasksToExecute);
+					rootProject.CompileAndExecuteTasks(o.ScriptPath, o.TasksToExecute);
 					Console.WriteLine();
 					WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
 				}

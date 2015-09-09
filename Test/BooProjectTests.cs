@@ -1,27 +1,31 @@
-﻿using NUnit.Framework;
-using System.IO;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using NUnit.Framework;
 
 namespace Casper {
 	[TestFixture]
-	public class ScriptTests {
+	public class BooProjectTests {
 
-		private StreamWriter standardOutWriter;
-		private StreamReader standardOutReader;
-		private MemoryStream standardOut;
-		private TextWriter oldStandardOut;
+		StreamWriter standardOutWriter;
+		StreamReader standardOutReader;
+		MemoryStream standardOut;
+		TextWriter oldStandardOut;
 
-		private List<string> testFiles = new List<string>();
+		List<string> testFiles = new List<string>();
+
+		RootProject rootProject;
 
 		[SetUp]
 		public void SetUp() {
-			Script.Reset();
+			rootProject = new RootProject();
+
 			oldStandardOut = Console.Out;
 			standardOut = new MemoryStream();
 			standardOutWriter = new StreamWriter(standardOut) { AutoFlush = true };
 			standardOutReader = new StreamReader(standardOut);
 			Console.SetOut(standardOutWriter);
+
 			testFiles.Clear();
 		}
 
@@ -94,7 +98,7 @@ task leave(DependsOn: [dress, eat]):
 			File.Delete(subProjectFile);
 			
 			WriteScript(subProjectDir.File("test.casper"), @"
-task goodbye(DependsOn: [parent.GetTaskByName('hello')]):
+task goodbye(DependsOn: [parent.Tasks['hello']]):
 	print System.IO.File.ReadAllText('foo.txt')
 ");
 			ExecuteScript("test.casper", @"
@@ -133,7 +137,7 @@ task hello:
 
 		void ExecuteScript(string scriptPath, string scriptContents, params string[] args) {
 			WriteScript(scriptPath, scriptContents);
-			Script.CompileAndExecuteTasks(scriptPath, args);
+			rootProject.CompileAndExecuteTasks(scriptPath, args);
 			standardOut.Seek(0, SeekOrigin.Begin);
 		}
 

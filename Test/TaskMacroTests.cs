@@ -10,9 +10,12 @@ namespace Casper {
 		private MemoryStream standardOutStream;
 		private TextWriter standardOutWriter;
 
+		RootProject rootProject;
+
 		[SetUp]
 		public void SetUp() {
-			Script.Reset();
+			rootProject = new RootProject();
+
 			oldStandardOut = Console.Out;
 			standardOutStream = new MemoryStream();
 			standardOutWriter = new StreamWriter(standardOutStream);
@@ -39,8 +42,8 @@ task hello:
 	print 'Hello World!'
 ";
 			File.WriteAllText("Test1.casper", scriptContents);
-			// TODO: remove dependency on Script
-			Script.CompileAndExecuteTasks("Test1.casper", "hello");
+
+			rootProject.CompileAndExecuteTasks("Test1.casper", "hello");
 
 			standardOutWriter.Flush();
 			standardOutStream.Seek(0, SeekOrigin.Begin);
@@ -64,12 +67,11 @@ task copy(CopyFile,
 			File.WriteAllText("Source.txt", "Hello World!");
 			File.Delete(destinationFileName);
 			Assert.False(File.Exists(destinationFileName));
-			// TODO: remove dependency on Script
-			Script.CompileAndExecuteTasks("Test1.casper", "copy");
+
+			rootProject.CompileAndExecuteTasks("Test1.casper", "copy");
 
 			Assert.True(File.Exists(destinationFileName));
 			Assert.That(File.ReadAllText(destinationFileName), Is.EqualTo("Hello World!"));
 		}
 	}
 }
-
