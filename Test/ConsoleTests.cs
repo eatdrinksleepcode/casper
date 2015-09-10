@@ -36,8 +36,10 @@ task goodbye:
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("hello:"));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo(""));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
+			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
 			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
@@ -53,6 +55,9 @@ task hello:
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("* What went wrong:"));
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(2));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
+			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
@@ -64,6 +69,9 @@ task hello:
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("* What went wrong:"));
 			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("System.Exception: Script failure"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(255));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
+			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
@@ -76,6 +84,8 @@ task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
 			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Not.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(CasperException.EXIT_CODE_TASK_FAILED));
 			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("move:"));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
+			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
 			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
@@ -84,6 +94,8 @@ task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
 			var testProcess = ExecuteCasper("--help");
 			Assert.That(testProcess.StandardError.ReadToEnd(), Contains.Substring("USAGE:"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
+			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
 			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 
@@ -103,6 +115,8 @@ task goodbye(Description: 'Goodbye'):
 			Assert.That(standardError, Contains.Substring("hello"));
 			Assert.That(standardError, Contains.Substring("Hello"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
+			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
+			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
 			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
 		}
 

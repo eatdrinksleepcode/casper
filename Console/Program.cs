@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using CommandLine;
 using CommandLine.Text;
+using System.Diagnostics;
 
 namespace Casper {
 	public static class MainClass {
@@ -27,7 +28,7 @@ namespace Casper {
 		}
 
 		public static int Main(string[] args) {
-
+			var timer = Stopwatch.StartNew();
 			try {
 				var arguments = Parser.Default.ParseArguments<Options>(args);
 				return Run(arguments);
@@ -37,6 +38,9 @@ namespace Casper {
 			} catch (Exception ex) {
 				WriteError(ex);
 				return CasperException.EXIT_CODE_UNHANDLED_EXCEPTION;
+			} finally {
+				Console.WriteLine();
+				Console.WriteLine("Total time: {0}", timer.Elapsed);
 			}
 		}
 
