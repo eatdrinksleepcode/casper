@@ -2,7 +2,7 @@
 
 task=${1:-build}
 
-casperPath=`find .casper -name "Casper.Console.*" -type d`
+myDir="`dirname \"$0\"`"
+casperPath=`find $myDir/.casper -name "Casper.Console.*" -type d`
 echo "Running casper..."
 mono $casperPath/tools/casper.exe build.casper $task
-

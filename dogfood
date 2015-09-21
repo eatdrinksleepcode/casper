@@ -1,9 +1,10 @@
 #! /bin/sh
 
-./build
-rm -r .casper
-mkdir .casper
+myDir="`dirname \"$0\"`"
+$myDir/build
+rm -r $myDir/.casper
+mkdir $myDir/.casper
 echo "Installing casper..."
-nuget install Casper.Console -OutputDirectory .casper -pre -Verbosity quiet
-rm -r out
-./casper $@
+$myDir/nuget install Casper.Console -OutputDirectory $myDir/.casper -pre -Verbosity quiet
+rm -r $myDir/out
+$myDir/casper $@
