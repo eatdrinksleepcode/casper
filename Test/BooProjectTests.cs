@@ -102,7 +102,7 @@ task hello:
 	System.IO.File.WriteAllText('" + subProjectDir.File("foo.txt") + @"', 'Hello World!')
 
 include """"""" + subProjectDir.File("test.casper") + @"""""""
-", "goodbye");
+", "subProjectA:goodbye");
 
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("hello:"));
 			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("goodbye:"));

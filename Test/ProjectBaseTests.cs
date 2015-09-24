@@ -11,7 +11,10 @@ namespace Casper {
 
 			public TestProject(string location) : base(null, location) {
 			}
-			
+
+			public TestProject(ProjectBase parent, string location) : base(parent, location) {
+			}
+
 			public override void Configure() {
 			}
 
@@ -54,7 +57,54 @@ namespace Casper {
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist"));
 
-			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist"));
+			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist in root project"));
+		}
+
+		[Test]
+		public void SubProjectNameDoesNotExistInTaskPath() {
+			var project = new TestProject(Directory.GetCurrentDirectory());
+
+			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist:foo"));
+
+			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in root project"));
+		}
+
+		[Test]
+		public void SubProjectNameDoesNotExistInSubProjectInTaskPath() {
+			var currentDirectory = Directory.GetCurrentDirectory();
+			var projectDirectory = currentDirectory.SubDirectory("testA");
+			var project = new TestProject(currentDirectory);
+			new TestProject(project, projectDirectory);
+
+			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist:foo"));
+
+			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project 'testA'"));
+		}
+
+		[Test]
+		public void SubProjectNameDoesNotExistInMultiSubProjectInTaskPath() {
+			var currentDirectory = Directory.GetCurrentDirectory();
+			var projectDirectory = currentDirectory.SubDirectory("testA");
+			var subProjectDirectory = projectDirectory.SubDirectory("testB");
+			var project = new TestProject(currentDirectory);
+			var subProject = new TestProject(project, projectDirectory);
+			new TestProject(subProject, subProjectDirectory);
+
+			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:testB:doesNotExist:foo"));
+
+			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project 'testA:testB'"));
+		}
+
+		[Test]
+		public void TaskNameDoesNotExistInSubProject() {
+			var currentDirectory = Directory.GetCurrentDirectory();
+			var projectDirectory = currentDirectory.SubDirectory("testA");
+			var project = new TestProject(currentDirectory);
+			new TestProject(project, projectDirectory);
+
+			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist"));
+
+			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist in project 'testA'"));
 		}
 	}
 }

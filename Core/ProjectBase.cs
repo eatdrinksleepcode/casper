@@ -2,22 +2,29 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 namespace Casper
 {
 	public abstract class ProjectBase
 	{		
-		private readonly TaskCollection tasks = new TaskCollection();
-		private readonly List<ProjectBase> subprojects = new List<ProjectBase>();
+		private readonly TaskCollection tasks;
+		private readonly ProjectCollection subprojects;
 		protected readonly ProjectBase parent;
 		private readonly string location;
 
 		protected ProjectBase(ProjectBase parent, string location) {
+			this.parent = parent;
+			this.location = location;
+			this.Name = Path.GetFileName(location);
+			this.PathPrefix = null == parent ? "" : parent.PathPrefix + this.Name + ":";
+			this.PathDescription = null == parent ? "root project" : "project '" + parent.PathPrefix + this.Name + "'";
+			this.subprojects = new ProjectCollection(this);
+			this.tasks = new TaskCollection(this);
 			if (null != parent) {
 				parent.subprojects.Add(this);
 			}
-			this.parent = parent;
-			this.location = location;
 		}
 
 		public abstract void Configure();
@@ -26,6 +33,21 @@ namespace Casper
 			task.Name = name;
 			task.Project = this;
 			tasks.Add(task);
+		}
+
+		public string Name {
+			get;
+			private set;
+		}
+
+		private string PathPrefix {
+			get;
+			set;
+		}
+
+		public string PathDescription {
+			get;
+			private set;
 		}
 
 		public TaskCollection Tasks {
@@ -54,19 +76,17 @@ namespace Casper
 		}
 
 		private TaskBase GetTaskByName(string name) {
-			TaskBase result = GetTaskByNameIncludingSubProjects(name);
-			if (null == result) {
-				throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, "Task '{0}' does not exist", name);
-			}
-			return result;
+			string[] path = name.Split(':');
+			return GetTaskByPath(new Queue<string>(path));
 		}
 
-		private TaskBase GetTaskByNameIncludingSubProjects(string name) {
-			TaskBase result;
-			if (!tasks.TryGetValue(name, out result)) {
-				result = subprojects.Select(p => p.GetTaskByNameIncludingSubProjects(name)).FirstOrDefault(t => null != t);
+		private TaskBase GetTaskByPath(Queue<string> path) {
+			if (path.Count > 1) {
+				var projectName = path.Dequeue();
+				return this.subprojects[projectName].GetTaskByPath(path);
+			} else {
+				return this.tasks[path.Dequeue()];
 			}
-			return result;
 		}
 	}
 }
