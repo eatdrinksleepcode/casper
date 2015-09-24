@@ -3,10 +3,7 @@ import Casper;
 task compile(MSBuild,
 			 Properties: {"Configuration": "Release"})
 
-task test(NUnit,
-		  DependsOn: [compile],
-		  TestAssembly: 'Test/bin/Release/Casper.Test.dll')
-
-task build(DependsOn: [test])
+task build
 
 include 'Console/build.casper'
+include 'Test/build.casper'
