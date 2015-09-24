@@ -3,11 +3,15 @@ using System.IO;
 using System.Diagnostics;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Casper {
 	[TestFixture]
 	public class ConsoleTests {
 		List<string> scripts = new List<string>();
+
+		StringReader standardOutput;
+		StringReader standardError;
 
 		[SetUp]
 		public void SetUp() {
@@ -30,17 +34,17 @@ task hello:
 task goodbye:
 	print 'Goodbye World!'
 ", "goodbye", "hello");
-			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Empty);
+			Assert.That(standardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("goodbye:"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("hello:"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("Hello World!"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
-			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
-			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("goodbye:"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("hello:"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
@@ -49,29 +53,29 @@ task goodbye:
 task hello:
 	print 'Hello World!'
 ", "hello", "goodbye");
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("* What went wrong:"));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("* What went wrong:"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist in root project"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(2));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
-			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
-			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
 		public void ExceptionDuringConfiguration() {
 			var testProcess = ExecuteScript("Test1.casper", @"raise System.Exception(""Script failure"")", "hello");
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo(""));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("* What went wrong:"));
-			Assert.That(testProcess.StandardError.ReadLine(), Is.EqualTo("System.Exception: Script failure"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("* What went wrong:"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("System.Exception: Script failure"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(255));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
-			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
-			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
@@ -81,22 +85,22 @@ task hello:
 import Casper;
 task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
 ", "move");
-			Assert.That(testProcess.StandardError.ReadToEnd(), Is.Not.Empty);
+			Assert.That(standardError.ReadToEnd(), Is.Not.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(CasperException.EXIT_CODE_TASK_FAILED));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.EqualTo("move:"));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
-			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
-			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("move:"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
 		public void Help() {
 			var testProcess = ExecuteCasper("--help");
-			Assert.That(testProcess.StandardError.ReadToEnd(), Contains.Substring("USAGE:"));
+			Assert.That(standardError.ReadToEnd(), Contains.Substring("USAGE:"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
-			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
-			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		[Test]
@@ -109,15 +113,13 @@ task goodbye(Description: 'Goodbye'):
 	print 'Goodbye World!'
 ");
 			var testProcess = ExecuteCasper("test.casper --tasks");
-			var standardError = testProcess.StandardError.ReadToEnd();
-			Assert.That(standardError, Contains.Substring("goodbye"));
-			Assert.That(standardError, Contains.Substring("Goodbye"));
-			Assert.That(standardError, Contains.Substring("hello"));
-			Assert.That(standardError, Contains.Substring("Hello"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("hello - Hello"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("goodbye - Goodbye"));
+			Assert.That(standardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
-			Assert.That(testProcess.StandardOutput.ReadLine(), Is.Empty);
-			Assert.That(testProcess.StandardOutput.ReadLine(), Does.StartWith("Total time: "));
-			Assert.That(testProcess.StandardOutput.ReadToEnd(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		Process ExecuteScript(string scriptName, string scriptContents, params string[] args) {
@@ -132,14 +134,36 @@ task goodbye(Description: 'Goodbye'):
 		}
 
 		Process ExecuteCasper(string arguments) {
-			var testProcess = Process.Start(new ProcessStartInfo {
+			var testProcess = new Process();
+			var standardOutBuilder = new StringBuilder();
+			var standardErrorBuilder = new StringBuilder();
+			var combinedOutBuilder = new StringBuilder();
+			testProcess.OutputDataReceived += (sender, e) => {
+				if(null != e.Data) {
+					standardOutBuilder.AppendLine(e.Data);
+					combinedOutBuilder.AppendLine(e.Data);
+				}
+			};
+			testProcess.ErrorDataReceived += (sender, e) => {
+				if(null != e.Data) {
+					standardErrorBuilder.AppendLine(e.Data);
+					combinedOutBuilder.AppendLine(e.Data);
+				}
+			};
+			testProcess.StartInfo = new ProcessStartInfo {
 				FileName = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "casper.exe"),
 				Arguments = arguments,
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
-			});
+			};
+			testProcess.Start();
+			testProcess.BeginErrorReadLine();
+			testProcess.BeginOutputReadLine();
 			testProcess.WaitForExit();
+			System.Console.Write(combinedOutBuilder);
+			standardOutput = new StringReader(standardOutBuilder.ToString());
+			standardError = new StringReader(standardErrorBuilder.ToString());
 			return testProcess;
 		}
 	}
