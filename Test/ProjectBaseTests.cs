@@ -1,6 +1,7 @@
-﻿using NUnit.Framework;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
-using System;
+using NUnit.Framework;
 
 namespace Casper {
 	[TestFixture]
@@ -12,6 +13,14 @@ namespace Casper {
 			}
 			
 			public override void Configure() {
+			}
+
+			public void ExecuteTasks(params string[] taskNamesToExecute) {
+				this.ExecuteTasks((IEnumerable<string>)taskNamesToExecute);
+			}
+
+			public new void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
+				base.ExecuteTasks(taskNamesToExecute);
 			}
 		}
 
@@ -37,6 +46,15 @@ namespace Casper {
 
 			Assert.That(executeDirectory, Is.EqualTo(projectDirectory));
 			Assert.That(Directory.GetCurrentDirectory(), Is.EqualTo(currentDirectory));
+		}
+
+		[Test]
+		public void TaskNameDoesNotExistInRoot() {
+			var project = new TestProject(Directory.GetCurrentDirectory());
+
+			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist"));
+
+			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist"));
 		}
 	}
 }

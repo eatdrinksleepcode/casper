@@ -46,15 +46,15 @@ namespace Casper {
 
 		static int Run(ParserResult<Options> arguments) {
 			return arguments.MapResult(o =>  {
-				var rootProject = new RootProject();
 				if (o.Tasks) {
-					var project = rootProject.CompileAndExecuteScript(o.ScriptPath);
+					var project = BooProject.LoadProject(o.ScriptPath);
 					foreach (var task in project.Tasks) {
 						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
 					}
 				}
 				else {
-					rootProject.CompileAndExecuteTasks(o.ScriptPath, o.TasksToExecute);
+					var project = BooProject.LoadProject(o.ScriptPath);
+					project.ExecuteTasks(o.TasksToExecute);
 					Console.WriteLine();
 					WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
 				}

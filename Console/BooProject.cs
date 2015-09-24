@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -10,43 +8,35 @@ using Boo.Lang.Compiler.Pipelines;
 
 namespace Casper {
 	public abstract class BooProject : ProjectBase {
-		public BooProject(ProjectBase parent, string location) 
+		protected BooProject(ProjectBase parent, string location) 
 			: base(parent, location) {
 		}
-			
-		public BooProject CompileScript(string scriptPath) {
+
+		public static BooProject LoadProject(string scriptPath) {
+			return LoadProject(scriptPath, null);
+		}
+
+		private static BooProject LoadProject(string scriptPath, BooProject parent) {
+			var project = CompileScript(scriptPath, parent);
+			try {
+				project.Configure();
+			}
+			catch (TargetInvocationException ex) {
+				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+			}
+			return project;
+		}
+
+		private static BooProject CompileScript(string scriptPath, BooProject parent) {
 			var projectType = CompileToProjectType(scriptPath);
-			var project = (BooProject)Activator.CreateInstance(projectType, new object[] { this });
+			var project = (BooProject)Activator.CreateInstance(projectType, new object[] {
+				parent
+			});
 			return project;
 		}
 
-		public BooProject CompileAndExecuteScript(string scriptPath) {
-			var project = this.CompileScript(scriptPath);
-			try {
-				ConfigureProject(project);
-			}
-			catch (TargetInvocationException ex) {
-				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-			}
-			return project;
-		}
-
-		public void CompileAndExecuteTasks(string scriptPath, params string[] taskNamesToExecute) {
-			CompileAndExecuteTasks(scriptPath, (IEnumerable<string>)taskNamesToExecute);
-		}
-
-		public void CompileAndExecuteTasks(string scriptPath, IEnumerable<string> taskNamesToExecute) {
-			CompileAndExecuteScript(scriptPath);
-			try {
-				ExecuteTasks(taskNamesToExecute);
-			}
-			catch (TargetInvocationException ex) {
-				ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
-			}
-		}
-
-		private static void ConfigureProject(BooProject project) {
-			project.Configure();
+		public BooProject LoadSubProject(string scriptPath) {
+			return LoadProject(scriptPath, this);
 		}
 
 		private static Type CompileToProjectType(string scriptPath) {
@@ -60,7 +50,7 @@ namespace Casper {
 			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);
 			var pipeline = new CompileToMemory();
-			pipeline.Insert(1, new BaseClassStep(Path.GetDirectoryName(Path.GetFullPath(scriptPath))));
+			pipeline.Insert(1, new BaseClassStep(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(scriptPath))));
 			pipeline.Run(context);
 			if (context.Errors.Count > 0) {
 				throw new CasperException(CasperException.EXIT_CODE_COMPILATION_ERROR, context.Errors.ToString());

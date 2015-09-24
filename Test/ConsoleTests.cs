@@ -57,7 +57,7 @@ task hello:
 			Assert.That(standardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
 			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
 			Assert.That(standardError.ReadLine(), Is.EqualTo("* What went wrong:"));
-			Assert.That(standardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist in root project"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("Task 'goodbye' does not exist"));
 			Assert.That(testProcess.ExitCode, Is.EqualTo(2));
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
 			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));

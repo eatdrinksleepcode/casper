@@ -42,7 +42,7 @@ namespace Casper
 			}
 		}
 
-		protected void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
+		public void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
 			var tasks = taskNamesToExecute.Select(a => this.GetTaskByName(a)).ToArray();
 			var taskGraphClosure = tasks.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
 			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);

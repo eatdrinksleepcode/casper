@@ -14,12 +14,8 @@ namespace Casper {
 
 		List<string> testFiles = new List<string>();
 
-		RootProject rootProject;
-
 		[SetUp]
 		public void SetUp() {
-			rootProject = new RootProject();
-
 			oldStandardOut = Console.Out;
 			standardOut = new MemoryStream();
 			standardOutWriter = new StreamWriter(standardOut) { AutoFlush = true };
@@ -130,14 +126,26 @@ task hello:
 		}
 
 		[Test]
-		public void UnhandledException() {
+		public void UnhandledExceptionDuringConfiguration() {
 			Assert.Throws<Exception>(() => ExecuteScript("Test1.casper", @"raise System.Exception(""Script failure"")", "hello"));
+			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
+		}
+
+		[Test]
+		public void UnhandledExceptionDuringExecution() {
+			var ex = Assert.Throws<Exception>(() => ExecuteScript("Test1.casper", @"
+task hello:
+	raise System.Exception(""Task failure"")
+", "hello"));
+			Assert.That(ex.GetType(), Is.EqualTo(typeof(Exception)));
+			Assert.That(ex.Message, Is.EqualTo("Task failure"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
 
 		void ExecuteScript(string scriptPath, string scriptContents, params string[] args) {
 			WriteScript(scriptPath, scriptContents);
-			rootProject.CompileAndExecuteTasks(scriptPath, args);
+			var project = BooProject.LoadProject(scriptPath);
+			project.ExecuteTasks(args);
 			standardOut.Seek(0, SeekOrigin.Begin);
 		}
 
