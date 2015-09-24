@@ -1,0 +1,7 @@
+﻿import Casper;
+
+task test(NUnit,
+		  DependsOn: [parent.Tasks['compile']],
+		  TestAssembly: 'bin/Release/Casper.Test.Integration.dll')
+
+parent.Tasks['build'].DependsOn.Add(test)

@@ -7,3 +7,4 @@ task build
 
 include 'Console/build.casper'
 include 'Test/build.casper'
+include 'Test.Integration/build.casper'
