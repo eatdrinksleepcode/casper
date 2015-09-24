@@ -4,6 +4,7 @@ using System.Linq;
 using CommandLine;
 using CommandLine.Text;
 using System.Diagnostics;
+using System.IO;
 
 namespace Casper {
 	public static class MainClass {
@@ -46,14 +47,13 @@ namespace Casper {
 
 		static int Run(ParserResult<Options> arguments) {
 			return arguments.MapResult(o =>  {
+				var project = BooProject.LoadProject(new FileInfo(o.ScriptPath));
 				if (o.Tasks) {
-					var project = BooProject.LoadProject(o.ScriptPath);
 					foreach (var task in project.Tasks) {
 						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
 					}
 				}
 				else {
-					var project = BooProject.LoadProject(o.ScriptPath);
 					project.ExecuteTasks(o.TasksToExecute);
 					Console.WriteLine();
 					WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");

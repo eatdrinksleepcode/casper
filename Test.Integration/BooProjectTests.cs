@@ -144,7 +144,7 @@ task hello:
 
 		void ExecuteScript(string scriptPath, string scriptContents, params string[] args) {
 			WriteScript(scriptPath, scriptContents);
-			var project = BooProject.LoadProject(scriptPath);
+			var project = BooProject.LoadProject(new FileInfo(scriptPath));
 			project.ExecuteTasks(args);
 			standardOut.Seek(0, SeekOrigin.Begin);
 		}

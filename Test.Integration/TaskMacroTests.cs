@@ -39,7 +39,7 @@ task hello:
 ";
 			File.WriteAllText("Test1.casper", scriptContents);
 
-			var project = BooProject.LoadProject("Test1.casper");
+			var project = BooProject.LoadProject(new FileInfo("Test1.casper"));
 			project.ExecuteTasks(new [] { "hello" });
 
 			standardOutWriter.Flush();
@@ -65,7 +65,7 @@ task copy(CopyFile,
 			File.Delete(destinationFileName);
 			Assert.False(File.Exists(destinationFileName));
 
-			var project = BooProject.LoadProject("Test1.casper");
+			var project = BooProject.LoadProject(new FileInfo("Test1.casper"));
 			project.ExecuteTasks(new [] { "copy" });
 
 			Assert.True(File.Exists(destinationFileName));

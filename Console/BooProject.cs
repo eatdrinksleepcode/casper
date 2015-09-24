@@ -5,6 +5,7 @@ using System.Runtime.ExceptionServices;
 using Boo.Lang.Compiler;
 using Boo.Lang.Compiler.IO;
 using Boo.Lang.Compiler.Pipelines;
+using System.IO;
 
 namespace Casper {
 	public abstract class BooProject : ProjectBase {
@@ -12,11 +13,11 @@ namespace Casper {
 			: base(parent, location) {
 		}
 
-		public static BooProject LoadProject(string scriptPath) {
+		public static BooProject LoadProject(FileInfo scriptPath) {
 			return LoadProject(scriptPath, null);
 		}
 
-		private static BooProject LoadProject(string scriptPath, BooProject parent) {
+		private static BooProject LoadProject(FileInfo scriptPath, BooProject parent) {
 			var project = CompileScript(scriptPath, parent);
 			try {
 				project.Configure();
@@ -27,7 +28,7 @@ namespace Casper {
 			return project;
 		}
 
-		private static BooProject CompileScript(string scriptPath, BooProject parent) {
+		private static BooProject CompileScript(FileInfo scriptPath, BooProject parent) {
 			var projectType = CompileToProjectType(scriptPath);
 			var project = (BooProject)Activator.CreateInstance(projectType, new object[] {
 				parent
@@ -35,22 +36,22 @@ namespace Casper {
 			return project;
 		}
 
-		public BooProject LoadSubProject(string scriptPath) {
+		public BooProject LoadSubProject(FileInfo scriptPath) {
 			return LoadProject(scriptPath, this);
 		}
 
-		private static Type CompileToProjectType(string scriptPath) {
+		private static Type CompileToProjectType(FileInfo scriptPath) {
 			var compileParams = new CompilerParameters();
 			compileParams.GenerateInMemory = true;
 			compileParams.References.Add(Assembly.GetExecutingAssembly());
 			compileParams.References.Add(typeof(TaskBase).Assembly);
 			compileParams.References.Add(typeof(MSBuild).Assembly);
 			compileParams.References.Add(typeof(NUnit).Assembly);
-			compileParams.Input.Add(new FileInput(scriptPath));
+			compileParams.Input.Add(new FileInput(scriptPath.ToString()));
 			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);
 			var pipeline = new CompileToMemory();
-			pipeline.Insert(1, new BaseClassStep(System.IO.Path.GetDirectoryName(System.IO.Path.GetFullPath(scriptPath))));
+			pipeline.Insert(1, new BaseClassStep(Path.GetDirectoryName(scriptPath.FullName)));
 			pipeline.Run(context);
 			if (context.Errors.Count > 0) {
 				throw new CasperException(CasperException.EXIT_CODE_COMPILATION_ERROR, context.Errors.ToString());
