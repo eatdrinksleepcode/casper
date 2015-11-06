@@ -1,11 +1,12 @@
 ﻿using Boo.Lang.Compiler.Ast;
 using Boo.Lang.Compiler.Steps;
+using System.IO;
 
 namespace Casper {
 	public class BaseClassStep : AbstractTransformerCompilerStep {
-		private readonly string location;
+		private readonly DirectoryInfo location;
 
-		public BaseClassStep(string location) {
+		public BaseClassStep(DirectoryInfo location) {
 			this.location = location;
 		}
 		
@@ -29,7 +30,12 @@ namespace Casper {
 					Name = "parent",
 					Type = TypeReference.Lift(typeof(ProjectBase))
 				});
-				constructor.Body.Add(new MethodInvocationExpression(node.LexicalInfo, new SuperLiteralExpression(node.LexicalInfo), new ReferenceExpression(node.LexicalInfo, "parent"), Expression.Lift(this.location)));
+				constructor.Body.Add(new MethodInvocationExpression(
+					node.LexicalInfo,
+					new SuperLiteralExpression(node.LexicalInfo),
+					new ReferenceExpression(node.LexicalInfo, "parent"),
+					new MethodInvocationExpression(node.LexicalInfo, Expression.Lift(typeof(DirectoryInfo)), new Expression[] { Expression.Lift(this.location.FullName) })
+				));
 				baseClass.Members.Add(constructor);
 				node.Globals = null;
 				node.Members.Add(baseClass);

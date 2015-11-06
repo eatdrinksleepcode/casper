@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System.IO;
 
 namespace Casper {
 	[TestFixture]
@@ -6,7 +7,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject() : base(null, null) {
+			public TestProject() : base(null, new DirectoryInfo(Directory.GetCurrentDirectory())) {
 			}
 			
 			public override void Configure() {

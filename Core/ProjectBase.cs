@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
 
 namespace Casper
 {
@@ -12,12 +10,12 @@ namespace Casper
 		private readonly TaskCollection tasks;
 		private readonly ProjectCollection subprojects;
 		protected readonly ProjectBase parent;
-		private readonly string location;
+		private readonly DirectoryInfo location;
 
-		protected ProjectBase(ProjectBase parent, string location) {
+		protected ProjectBase(ProjectBase parent, DirectoryInfo location) {
 			this.parent = parent;
 			this.location = location;
-			this.Name = Path.GetFileName(location);
+			this.Name = location.Name;
 			this.PathPrefix = null == parent ? "" : parent.PathPrefix + this.Name + ":";
 			this.PathDescription = null == parent ? "root project" : "project '" + parent.PathPrefix + this.Name + "'";
 			this.subprojects = new ProjectCollection(this);
@@ -57,7 +55,7 @@ namespace Casper
 		public void Execute(TaskBase task) {
 			var currentDirectory = Directory.GetCurrentDirectory();
 			try {
-				Directory.SetCurrentDirectory(location);
+				Directory.SetCurrentDirectory(location.FullName);
 				task.Execute();
 			} finally {
 				Directory.SetCurrentDirectory(currentDirectory);

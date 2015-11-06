@@ -9,7 +9,7 @@ using System.IO;
 
 namespace Casper {
 	public abstract class BooProject : ProjectBase {
-		protected BooProject(ProjectBase parent, string location) 
+		protected BooProject(ProjectBase parent, DirectoryInfo location)
 			: base(parent, location) {
 		}
 
@@ -51,7 +51,7 @@ namespace Casper {
 			compileParams.OutputAssembly = Guid.NewGuid().ToString() + ".dll";
 			var context = new CompilerContext(compileParams);
 			var pipeline = new CompileToMemory();
-			pipeline.Insert(1, new BaseClassStep(Path.GetDirectoryName(scriptPath.FullName)));
+			pipeline.Insert(1, new BaseClassStep(scriptPath.Directory));
 			pipeline.Run(context);
 			if (context.Errors.Count > 0) {
 				throw new CasperException(CasperException.EXIT_CODE_COMPILATION_ERROR, context.Errors.ToString());

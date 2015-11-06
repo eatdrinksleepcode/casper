@@ -9,10 +9,10 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject(string location) : base(null, location) {
+			public TestProject(DirectoryInfo location) : base(null, location) {
 			}
 
-			public TestProject(ProjectBase parent, string location) : base(parent, location) {
+			public TestProject(ProjectBase parent, DirectoryInfo location) : base(parent, location) {
 			}
 
 			public override void Configure() {
@@ -27,21 +27,21 @@ namespace Casper {
 			}
 		}
 
-		string rootDirectory;
-		string firstSubDirectory;
-		string secondSubDirectory;
+		DirectoryInfo rootDirectory;
+		DirectoryInfo firstSubDirectory;
+		DirectoryInfo secondSubDirectory;
 
 		[SetUp]
 		public void SetUp() {
-			rootDirectory = Directory.GetCurrentDirectory();
-			firstSubDirectory = Path.Combine(rootDirectory, "testA");
-			secondSubDirectory = Path.Combine(firstSubDirectory, "testB");
+			rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+			firstSubDirectory = new DirectoryInfo(Path.Combine(rootDirectory.FullName, "testA"));
+			secondSubDirectory = new DirectoryInfo(Path.Combine(firstSubDirectory.FullName, "testB"));
 		}
 
 		[Test]
 		public void TaskName() {
 			var task = new Task(() => { });
-			var project = new TestProject(null);
+			var project = new TestProject(rootDirectory);
 			project.AddTask("foo", task);
 
 			Assert.That(task.Name, Is.EqualTo("foo"));
@@ -49,20 +49,20 @@ namespace Casper {
 
 		[Test]
 		public void ExecuteTaskRelativeToProjectDirectory() {
-			Directory.CreateDirectory(firstSubDirectory);
+			firstSubDirectory.Create();
 			string executeDirectory = null;
 			var task = new Task(() => { executeDirectory = Directory.GetCurrentDirectory(); throw new Exception(); });
 			var project = new TestProject(firstSubDirectory);
 
 			Assert.Throws<Exception>(() => project.Execute(task));
 
-			Assert.That(executeDirectory, Is.EqualTo(firstSubDirectory));
-			Assert.That(Directory.GetCurrentDirectory(), Is.EqualTo(rootDirectory));
+			Assert.That(executeDirectory, Is.EqualTo(firstSubDirectory.FullName));
+			Assert.That(Directory.GetCurrentDirectory(), Is.EqualTo(rootDirectory.FullName));
 		}
 
 		[Test]
 		public void TaskNameDoesNotExistInRoot() {
-			var project = new TestProject(Directory.GetCurrentDirectory());
+			var project = new TestProject(rootDirectory);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist"));
 
@@ -71,7 +71,7 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInTaskPath() {
-			var project = new TestProject(Directory.GetCurrentDirectory());
+			var project = new TestProject(rootDirectory);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist:foo"));
 
