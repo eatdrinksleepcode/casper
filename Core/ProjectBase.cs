@@ -12,10 +12,13 @@ namespace Casper
 		protected readonly ProjectBase parent;
 		private readonly DirectoryInfo location;
 
-		protected ProjectBase(ProjectBase parent, DirectoryInfo location) {
+		protected ProjectBase(ProjectBase parent, DirectoryInfo location) : this(parent, location, location.Name) {
+		}
+
+		protected ProjectBase(ProjectBase parent, DirectoryInfo location, string name) {
 			this.parent = parent;
 			this.location = location;
-			this.Name = location.Name;
+			this.Name = name;
 			this.PathPrefix = null == parent ? "" : parent.PathPrefix + this.Name + ":";
 			this.PathDescription = null == parent ? "root project" : "project '" + parent.PathPrefix + this.Name + "'";
 			this.subprojects = new ProjectCollection(this);

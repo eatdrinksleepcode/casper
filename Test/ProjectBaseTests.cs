@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using NUnit.Framework;
 
 namespace Casper {
@@ -9,60 +7,43 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject(DirectoryInfo location) : base(null, location) {
+			public TestProject(string name) : base(null, new DirectoryInfo(Directory.GetCurrentDirectory()), name) {
 			}
 
-			public TestProject(ProjectBase parent, DirectoryInfo location) : base(parent, location) {
+			public TestProject(ProjectBase parent, string name) : base(parent, new DirectoryInfo(Directory.GetCurrentDirectory()), name) {
 			}
 
 			public override void Configure() {
 			}
 
 			public void ExecuteTasks(params string[] taskNamesToExecute) {
-				this.ExecuteTasks((IEnumerable<string>)taskNamesToExecute);
-			}
-
-			public new void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
 				base.ExecuteTasks(taskNamesToExecute);
 			}
 		}
 
-		DirectoryInfo rootDirectory;
-		DirectoryInfo firstSubDirectory;
-		DirectoryInfo secondSubDirectory;
+		string rootProjectName;
+		string firstSubProjectName;
+		string secondSubProjectName;
 
 		[SetUp]
 		public void SetUp() {
-			rootDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-			firstSubDirectory = new DirectoryInfo(Path.Combine(rootDirectory.FullName, "testA"));
-			secondSubDirectory = new DirectoryInfo(Path.Combine(firstSubDirectory.FullName, "testB"));
+			rootProjectName = "Root";
+			firstSubProjectName = "testA";
+			secondSubProjectName = "testB";
 		}
 
 		[Test]
 		public void TaskName() {
 			var task = new Task(() => { });
-			var project = new TestProject(rootDirectory);
+			var project = new TestProject(rootProjectName);
 			project.AddTask("foo", task);
 
 			Assert.That(task.Name, Is.EqualTo("foo"));
 		}
 
 		[Test]
-		public void ExecuteTaskRelativeToProjectDirectory() {
-			firstSubDirectory.Create();
-			string executeDirectory = null;
-			var task = new Task(() => { executeDirectory = Directory.GetCurrentDirectory(); throw new Exception(); });
-			var project = new TestProject(firstSubDirectory);
-
-			Assert.Throws<Exception>(() => project.Execute(task));
-
-			Assert.That(executeDirectory, Is.EqualTo(firstSubDirectory.FullName));
-			Assert.That(Directory.GetCurrentDirectory(), Is.EqualTo(rootDirectory.FullName));
-		}
-
-		[Test]
 		public void TaskNameDoesNotExistInRoot() {
-			var project = new TestProject(rootDirectory);
+			var project = new TestProject(rootProjectName);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist"));
 
@@ -71,7 +52,7 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInTaskPath() {
-			var project = new TestProject(rootDirectory);
+			var project = new TestProject(rootProjectName);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist:foo"));
 
@@ -80,8 +61,8 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInSubProjectInTaskPath() {
-			var project = new TestProject(rootDirectory);
-			new TestProject(project, firstSubDirectory);
+			var project = new TestProject(rootProjectName);
+			new TestProject(project, firstSubProjectName);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist:foo"));
 
@@ -90,9 +71,9 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInMultiSubProjectInTaskPath() {
-			var project = new TestProject(rootDirectory);
-			var subProject = new TestProject(project, firstSubDirectory);
-			new TestProject(subProject, secondSubDirectory);
+			var project = new TestProject(rootProjectName);
+			var subProject = new TestProject(project, firstSubProjectName);
+			new TestProject(subProject, secondSubProjectName);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:testB:doesNotExist:foo"));
 
@@ -101,8 +82,8 @@ namespace Casper {
 
 		[Test]
 		public void TaskNameDoesNotExistInSubProject() {
-			var project = new TestProject(rootDirectory);
-			new TestProject(project, firstSubDirectory);
+			var project = new TestProject(rootProjectName);
+			new TestProject(project, firstSubProjectName);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist"));
 

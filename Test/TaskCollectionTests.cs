@@ -7,7 +7,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject() : base(null, new DirectoryInfo(Directory.GetCurrentDirectory())) {
+			public TestProject() : base(null, null, "Root") {
 			}
 			
 			public override void Configure() {
