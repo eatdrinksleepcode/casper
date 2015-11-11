@@ -34,53 +34,6 @@ namespace Casper {
 		}
 
 		[Test]
-		public void ExecuteTasksInOrder() {
-			ExecuteScript("Test1.casper", @"
-task hello:
-	print 'Hello World!'
-
-task goodbye:
-	print 'Goodbye World!'
-", "goodbye", "hello");
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("goodbye:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Goodbye World!"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("hello:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Hello World!"));
-			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
-		}
-
-		[Test]
-		public void ExecuteTaskWithDependencyGraph() {
-			ExecuteScript("Test1.casper", @"
-task wake:
-	print 'Stretch'
-
-task shower(DependsOn: [wake]):
-	print 'Squeaky clean'
-
-task eat(DependsOn: [wake]):
-	print 'Yummy!'
-
-task dress(DependsOn: [shower]):
-	print 'Dressed'
-
-task leave(DependsOn: [dress, eat]):
-	print 'Bye!'
-", "leave");
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("wake:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Stretch"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("shower:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Squeaky clean"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("dress:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Dressed"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("eat:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Yummy!"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("leave:"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("Bye!"));
-			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
-		}
-
-		[Test]
 		public void ExecuteTasksFromSubProject() {
 
 			var subProjectDir = "subProjectA";

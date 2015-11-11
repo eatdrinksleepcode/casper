@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using NUnit.Framework;
+using System.Collections.Generic;
 
 namespace Casper {
 	[TestFixture]
@@ -88,6 +89,39 @@ namespace Casper {
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist"));
 
 			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist in project 'testA'"));
+		}
+
+		[Test]
+		public void ExecuteTasksInOrder() {
+			var project = new TestProject(rootProjectName);
+			var results = new List<string>();
+			project.AddTask("hello", new Task(() => results.Add("hello")));
+			project.AddTask("goodbye", new Task(() => results.Add("goodbye")));
+
+			project.ExecuteTasks("goodbye", "hello");
+
+			CollectionAssert.AreEqual(new [] { "goodbye", "hello" }, results);
+		}
+
+		[Test]
+		public void ExecuteTaskWithDependencyGraph() {
+			var project = new TestProject(rootProjectName);
+			var results = new List<string>();
+			var wake = new Task(() => results.Add("wake"));
+			project.AddTask("wake", wake);
+			var shower = new Task(() => results.Add("shower")) { DependsOn = new[] { wake	} };
+			project.AddTask("shower", shower);
+			var eat = new Task(() => results.Add("eat")) { DependsOn = new[] { wake	} };
+			project.AddTask("eat", eat);
+			var dress = new Task(() => results.Add("dress")) { DependsOn = new[] { shower }	};
+			project.AddTask("dress", dress);
+			project.AddTask("sleep", new Task(() => results.Add("sleep")));
+			var leave = new Task(() => results.Add("leave")) { DependsOn = new[] { dress, eat } };
+			project.AddTask("leave", leave);
+
+			project.ExecuteTasks("leave");
+
+			CollectionAssert.AreEqual(new [] { "wake", "shower", "dress", "eat", "leave" }, results);
 		}
 	}
 }
