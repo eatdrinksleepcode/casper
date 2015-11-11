@@ -6,6 +6,13 @@ namespace Casper {
 			return Path.GetDirectoryName(path);
 		}
 
+		public static string Parent(this string path, int count) {
+			for (int i = 0; i < count; i++) {
+				path = path.Parent();
+			}
+			return path;
+		}
+
 		public static string SubDirectory(this string path, string directory) {
 			return Path.Combine(path, directory);
 		}

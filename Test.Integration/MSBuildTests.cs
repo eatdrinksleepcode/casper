@@ -7,7 +7,7 @@ namespace Casper {
 	public class MSBuildTests {
 		[Test]
 		public void MSBuild() {
-			var consoleProjDir = typeof(TaskBase).Assembly.Location.Parent().Parent().Parent().Parent().SubDirectory("Core");
+			var consoleProjDir = typeof(TaskBase).Assembly.Location.Parent(4).SubDirectory("Core");
 
 			var outputDirectory = consoleProjDir.SubDirectory("bin").SubDirectory("Release");
 			if (Directory.Exists(outputDirectory)) {
@@ -27,7 +27,7 @@ namespace Casper {
 
 		[Test]
 		public void DefaultTargets() {
-			var consoleProjDir = typeof(TaskBase).Assembly.Location.Parent().Parent().Parent().Parent().SubDirectory("Core");
+			var consoleProjDir = typeof(TaskBase).Assembly.Location.Parent(4).SubDirectory("Core");
 
 			var outputDirectory = consoleProjDir.SubDirectory("bin").SubDirectory("Debug");
 			if (Directory.Exists(outputDirectory)) {
