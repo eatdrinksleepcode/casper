@@ -18,7 +18,7 @@ namespace Casper {
 			if (node.Namespace == null) {
 				var baseClass = new ClassDefinition(node.LexicalInfo);
 				baseClass.Name = node.Name + "Project";
-				baseClass.BaseTypes.Add(TypeReference.Lift(typeof(BooProject)));
+				baseClass.BaseTypes.Add(TypeReference.Lift(typeof(ProjectBase)));
 				var configureMethod = new Method(node.LexicalInfo) {
 					Name = "Configure",
 					Modifiers = TypeMemberModifiers.Override | TypeMemberModifiers.Public,

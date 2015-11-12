@@ -35,7 +35,7 @@ task hello:
 	print 'Hello World!'
 ";
 
-			var project = BooProject.LoadProject(new StringReader(scriptContents));
+			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
 
 			TaskBase task;
 			Assert.True(project.Tasks.TryGetValue("hello", out task));
@@ -60,7 +60,7 @@ task copy(CopyFile,
 		Destination: 'Destination.txt')
 ";
 
-			var project = BooProject.LoadProject(new StringReader(scriptContents));
+			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
 			TaskBase task;
 			Assert.True(project.Tasks.TryGetValue("copy", out task));
 			Assert.IsInstanceOf<CopyFile>(task);

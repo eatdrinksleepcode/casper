@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Casper {
 	[TestFixture]
-	public class BooProjectTests {
+	public class BooProjectLoaderTests {
 
 		StreamWriter standardOutWriter;
 		StreamReader standardOutReader;
@@ -65,10 +65,11 @@ include """"""" + subProjectDir.File("test.casper") + @"""""""
 
 		[Test]
 		public void TaskDoesNotExist() {
-			Assert.Throws<CasperException>(() => ExecuteScript("Test1.casper", @"
+			var ex = Assert.Throws<CasperException>(() => ExecuteScript("Test1.casper", @"
 task hello:
 	print 'Hello World!'
-", "hello", "goodbye"), "Task 'goodbye' does not exist");
+", "hello", "goodbye"));
+			Assert.That(ex.Message, Is.EqualTo("Task 'goodbye' does not exist in root project"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
 
@@ -80,7 +81,7 @@ task hello:
 
 		[Test]
 		public void UnhandledExceptionDuringConfiguration() {
-			Assert.Throws<Exception>(() => ExecuteScript("Test1.casper", @"raise System.Exception(""Script failure"")", "hello"));
+			Assert.Throws<InvalidOperationException>(() => ExecuteScript("Test1.casper", @"raise System.InvalidOperationException(""Script failure"")", "hello"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
 
@@ -97,7 +98,7 @@ task hello:
 
 		void ExecuteScript(string scriptPath, string scriptContents, params string[] args) {
 			WriteScript(scriptPath, scriptContents);
-			var project = BooProject.LoadProject(new FileInfo(scriptPath));
+			var project = BooProjectLoader.LoadProject(new FileInfo(scriptPath));
 			project.ExecuteTasks(args);
 			standardOut.Seek(0, SeekOrigin.Begin);
 		}

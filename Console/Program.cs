@@ -47,7 +47,7 @@ namespace Casper {
 
 		static int Run(ParserResult<Options> arguments) {
 			return arguments.MapResult(o =>  {
-				var project = BooProject.LoadProject(new FileInfo(o.ScriptPath));
+				var project = BooProjectLoader.LoadProject(new FileInfo(o.ScriptPath));
 				if (o.Tasks) {
 					foreach (var task in project.Tasks) {
 						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
