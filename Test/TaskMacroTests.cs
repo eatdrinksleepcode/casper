@@ -20,33 +20,34 @@ namespace Casper {
 
 		[TearDown]
 		public void TearDown() {
-			File.Delete("Test1.casper");
 			Console.SetOut(oldStandardOut);
 			standardOutStream.Dispose();
 			standardOutStream = null;
 			standardOutWriter = null;
-
-			File.Delete("Source.txt");
-			File.Delete("Destination.txt");
 		}
 		
 		[Test]
 		public void MakeTask() {
 
+			// TODO: use project properties instead of console output to test task execution
 			string scriptContents = @"
 task hello:
 	print 'Hello World!'
 ";
-			File.WriteAllText("Test1.casper", scriptContents);
 
-			var project = BooProject.LoadProject(new FileInfo("Test1.casper"));
-			project.ExecuteTasks(new [] { "hello" });
+			var project = BooProject.LoadProject(new StringReader(scriptContents));
+
+			TaskBase task;
+			Assert.True(project.Tasks.TryGetValue("hello", out task));
+			Assert.IsInstanceOf<Task>(task);
+
+			task.Execute();
 
 			standardOutWriter.Flush();
 			standardOutStream.Seek(0, SeekOrigin.Begin);
 			var standardOut = new StreamReader(standardOutStream);
-			Assert.That(standardOut.ReadLine(), Is.EqualTo("hello:"));
 			Assert.That(standardOut.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.True(standardOut.EndOfStream);
 		}
 
 		[Test]
@@ -58,18 +59,16 @@ task copy(CopyFile,
 		Source: 'Source.txt', 
 		Destination: 'Destination.txt')
 ";
-			var destinationFileName = "Destination.txt";
 
-			File.WriteAllText("Test1.casper", scriptContents);
-			File.WriteAllText("Source.txt", "Hello World!");
-			File.Delete(destinationFileName);
-			Assert.False(File.Exists(destinationFileName));
+			var project = BooProject.LoadProject(new StringReader(scriptContents));
+			TaskBase task;
+			Assert.True(project.Tasks.TryGetValue("copy", out task));
+			Assert.IsInstanceOf<CopyFile>(task);
 
-			var project = BooProject.LoadProject(new FileInfo("Test1.casper"));
-			project.ExecuteTasks(new [] { "copy" });
+			CopyFile copyTask = (CopyFile)task;
 
-			Assert.True(File.Exists(destinationFileName));
-			Assert.That(File.ReadAllText(destinationFileName), Is.EqualTo("Hello World!"));
+			Assert.That(copyTask.Source, Is.EqualTo("Source.txt"));
+			Assert.That(copyTask.Destination, Is.EqualTo("Destination.txt"));
 		}
 	}
 }
