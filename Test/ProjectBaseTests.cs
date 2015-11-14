@@ -1,6 +1,8 @@
 ﻿using System.IO;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System;
+using System.Text;
 
 namespace Casper {
 	[TestFixture]
@@ -22,6 +24,26 @@ namespace Casper {
 			public void ExecuteTasks(params string[] taskNamesToExecute) {
 				base.ExecuteTasks(taskNamesToExecute);
 			}
+		}
+
+		private static TextWriter originalOutput;
+		private static StringBuilder output;
+
+		[TestFixtureSetUp]
+		public static void OneTimeSetUp() {
+			originalOutput = Console.Out;
+			output = new StringBuilder();
+			Console.SetOut(new StringWriter(output));
+		}
+			
+		[SetUp]
+		public void SetUp() {
+			output.Clear();
+		}
+
+		[TestFixtureTearDown]
+		public void OneTimeTearDown() {
+			Console.SetOut(originalOutput);
 		}
 
 		[Test]
@@ -92,6 +114,7 @@ namespace Casper {
 			project.ExecuteTasks("goodbye", "hello");
 
 			CollectionAssert.AreEqual(new [] { "goodbye", "hello" }, results);
+			Assert.That(output.ToString(), Is.EqualTo("goodbye:\nhello:\n"));
 		}
 
 		[Test]
@@ -113,6 +136,7 @@ namespace Casper {
 			project.ExecuteTasks("leave");
 
 			CollectionAssert.AreEqual(new [] { "wake", "shower", "dress", "eat", "leave" }, results);
+			Assert.That(output.ToString(), Is.EqualTo("wake:\nshower:\ndress:\neat:\nleave:\n"));
 		}
 
 		[Test]
@@ -130,6 +154,7 @@ namespace Casper {
 			project.ExecuteTasks("testA:goodbye");
 
 			CollectionAssert.AreEqual(new [] { "hello", "goodbye" }, results);
+			Assert.That(output.ToString(), Is.EqualTo("hello:\ngoodbye:\n"));
 		}
 	}
 }
