@@ -8,6 +8,8 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
+			public TestProject() : this("Root") {}
+
 			public TestProject(string name) : base(null, new DirectoryInfo(Directory.GetCurrentDirectory()), name) {
 			}
 
@@ -22,21 +24,10 @@ namespace Casper {
 			}
 		}
 
-		string rootProjectName;
-		string firstSubProjectName;
-		string secondSubProjectName;
-
-		[SetUp]
-		public void SetUp() {
-			rootProjectName = "Root";
-			firstSubProjectName = "testA";
-			secondSubProjectName = "testB";
-		}
-
 		[Test]
 		public void TaskName() {
 			var task = new Task(() => { });
-			var project = new TestProject(rootProjectName);
+			var project = new TestProject();
 			project.AddTask("foo", task);
 
 			Assert.That(task.Name, Is.EqualTo("foo"));
@@ -44,7 +35,7 @@ namespace Casper {
 
 		[Test]
 		public void TaskNameDoesNotExistInRoot() {
-			var project = new TestProject(rootProjectName);
+			var project = new TestProject();
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist"));
 
@@ -53,7 +44,7 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInTaskPath() {
-			var project = new TestProject(rootProjectName);
+			var project = new TestProject();
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist:foo"));
 
@@ -62,8 +53,8 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInSubProjectInTaskPath() {
-			var project = new TestProject(rootProjectName);
-			new TestProject(project, firstSubProjectName);
+			var project = new TestProject();
+			new TestProject(project, "testA");
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist:foo"));
 
@@ -72,9 +63,9 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInMultiSubProjectInTaskPath() {
-			var project = new TestProject(rootProjectName);
-			var subProject = new TestProject(project, firstSubProjectName);
-			new TestProject(subProject, secondSubProjectName);
+			var project = new TestProject();
+			var subProject = new TestProject(project, "testA");
+			new TestProject(subProject, "testB");
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:testB:doesNotExist:foo"));
 
@@ -83,8 +74,8 @@ namespace Casper {
 
 		[Test]
 		public void TaskNameDoesNotExistInSubProject() {
-			var project = new TestProject(rootProjectName);
-			new TestProject(project, firstSubProjectName);
+			var project = new TestProject();
+			new TestProject(project, "testA");
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist"));
 
@@ -93,7 +84,7 @@ namespace Casper {
 
 		[Test]
 		public void ExecuteTasksInOrder() {
-			var project = new TestProject(rootProjectName);
+			var project = new TestProject();
 			var results = new List<string>();
 			project.AddTask("hello", new Task(() => results.Add("hello")));
 			project.AddTask("goodbye", new Task(() => results.Add("goodbye")));
@@ -105,7 +96,7 @@ namespace Casper {
 
 		[Test]
 		public void ExecuteTaskWithDependencyGraph() {
-			var project = new TestProject(rootProjectName);
+			var project = new TestProject();
 			var results = new List<string>();
 			var wake = new Task(() => results.Add("wake"));
 			project.AddTask("wake", wake);
@@ -122,6 +113,23 @@ namespace Casper {
 			project.ExecuteTasks("leave");
 
 			CollectionAssert.AreEqual(new [] { "wake", "shower", "dress", "eat", "leave" }, results);
+		}
+
+		[Test]
+		public void ExecuteTasksFromSubProject() {
+
+			var results = new List<string>();
+
+			var project = new TestProject();
+			var hello = new Task(() => results.Add("hello"));
+			project.AddTask("hello", hello);
+			var subProject = new TestProject(project, "testA");
+			var goodbye = new Task(() => results.Add("goodbye")) { DependsOn = new [] { hello }};
+			subProject.AddTask("goodbye", goodbye);
+
+			project.ExecuteTasks("testA:goodbye");
+
+			CollectionAssert.AreEqual(new [] { "hello", "goodbye" }, results);
 		}
 	}
 }
