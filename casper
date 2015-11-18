@@ -1,6 +1,6 @@
 #! /bin/sh
 
-task=${1:-build}
+task=${1:-Build}
 
 myDir="`dirname \"$0\"`"
 casperPath=`find $myDir/.casper -name "Casper.Console.*" -type d`

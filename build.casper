@@ -1,9 +1,9 @@
 import Casper;
 
-task compile(MSBuild,
+task Compile(MSBuild,
 			 Properties: {"Configuration": "Release"})
 
-task build
+task Build
 
 include 'Console/build.casper'
 include 'Test/build.casper'

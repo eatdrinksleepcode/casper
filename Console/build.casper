@@ -1,11 +1,11 @@
 ﻿import Casper;
 
-task createPackagesDir:
+task CreatePackagesDir:
 	System.IO.Directory.CreateDirectory("../out/packages")
 
-task pack(Exec,
-		  DependsOn: [parent.Tasks['compile'], createPackagesDir],
+task Pack(Exec,
+		  DependsOn: [parent.Tasks['Compile'], CreatePackagesDir],
 		  Executable: "nuget",
 		  Arguments: "pack Console.nuspec -OutputDirectory ../out/packages")
 
-parent.Tasks['build'].DependsOn.Add(pack)
+parent.Tasks['Build'].DependsOn.Add(Pack)
