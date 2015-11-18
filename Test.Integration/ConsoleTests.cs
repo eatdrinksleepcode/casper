@@ -36,9 +36,9 @@ task goodbye:
 ", "goodbye", "hello");
 			Assert.That(standardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
-			Assert.That(standardOutput.ReadLine(), Is.EqualTo("goodbye:"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("goodbye"));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
-			Assert.That(standardOutput.ReadLine(), Is.EqualTo("hello:"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("hello"));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Hello World!"));
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
@@ -87,7 +87,7 @@ task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
 ", "move");
 			Assert.That(standardError.ReadToEnd(), Is.Not.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(CasperException.EXIT_CODE_TASK_FAILED));
-			Assert.That(standardOutput.ReadLine(), Is.EqualTo("move:"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("move"));
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
 			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
 			Assert.That(standardOutput.ReadToEnd(), Is.Empty);

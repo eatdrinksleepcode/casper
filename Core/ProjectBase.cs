@@ -41,7 +41,7 @@ namespace Casper
 			private set;
 		}
 
-		private string PathPrefix {
+		public string PathPrefix {
 			get;
 			set;
 		}
@@ -70,7 +70,7 @@ namespace Casper
 			var taskGraphClosure = tasksToExecute.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
 			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
 			foreach (var task in taskGraphClosure) {
-				Console.WriteLine(task.Name + ":");
+				Console.WriteLine(task.Path);
 				// HACK: this is awkward
 				task.Project.Execute(task);
 			}

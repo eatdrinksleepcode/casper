@@ -114,7 +114,7 @@ namespace Casper {
 			project.ExecuteTasks("goodbye", "hello");
 
 			CollectionAssert.AreEqual(new [] { "goodbye", "hello" }, results);
-			Assert.That(output.ToString(), Is.EqualTo("goodbye:\nhello:\n"));
+			Assert.That(output.ToString(), Is.EqualTo("goodbye\nhello\n"));
 		}
 
 		[Test]
@@ -136,7 +136,7 @@ namespace Casper {
 			project.ExecuteTasks("leave");
 
 			CollectionAssert.AreEqual(new [] { "wake", "shower", "dress", "eat", "leave" }, results);
-			Assert.That(output.ToString(), Is.EqualTo("wake:\nshower:\ndress:\neat:\nleave:\n"));
+			Assert.That(output.ToString(), Is.EqualTo("wake\nshower\ndress\neat\nleave\n"));
 		}
 
 		[Test]
@@ -154,7 +154,7 @@ namespace Casper {
 			project.ExecuteTasks("testA:goodbye");
 
 			CollectionAssert.AreEqual(new [] { "hello", "goodbye" }, results);
-			Assert.That(output.ToString(), Is.EqualTo("hello:\ngoodbye:\n"));
+			Assert.That(output.ToString(), Is.EqualTo("hello\ntestA:goodbye\n"));
 		}
 	}
 }

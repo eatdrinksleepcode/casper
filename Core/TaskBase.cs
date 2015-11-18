@@ -22,6 +22,8 @@ namespace Casper {
 
 		public string Name { get; internal set; }
 
+		public string Path { get { return Project.PathPrefix + Name ; } }
+
 		public ProjectBase Project { get; set; }
 	}
 }
