@@ -1,10 +1,10 @@
 #! /bin/sh
 
 myDir="`dirname \"$0\"`"
-$myDir/build
+$myDir/build || exit $?
 rm -r $myDir/.casper
 mkdir $myDir/.casper
 echo "Installing casper..."
-$myDir/nuget install Casper.Console -OutputDirectory $myDir/.casper -pre -Verbosity quiet
+$myDir/nuget install Casper.Console -OutputDirectory $myDir/.casper -pre -Verbosity quiet || exit $?
 rm -r $myDir/out
-$myDir/casper $@
+$myDir/casper $@ || exit $?

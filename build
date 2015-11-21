@@ -1,7 +1,7 @@
 #! /bin/sh
 
 myDir="`dirname \"$0\"`"
-xbuild
+xbuild || exit $?
 rm -r $myDir/out
 mkdir -p $myDir/out/packages
-$myDir/nuget pack $myDir/Console/Console.nuspec -OutputDirectory $myDir/out/packages
+$myDir/nuget pack $myDir/Console/Console.nuspec -OutputDirectory $myDir/out/packages || exit $?
