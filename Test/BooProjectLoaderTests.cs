@@ -45,13 +45,17 @@ task hello:
 ", "hello"));
 			Assert.That(ex.GetType(), Is.EqualTo(typeof(Exception)));
 			Assert.That(ex.Message, Is.EqualTo("Task failure"));
+			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("hello"));
 			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
 		}
 
 		void ExecuteScript(string scriptContents, params string[] args) {
 			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
-			project.ExecuteTasks(args);
-			standardOut.Seek(0, SeekOrigin.Begin);
+			try {
+				project.ExecuteTasks(args);
+			} finally {
+				standardOut.Seek(0, SeekOrigin.Begin);
+			}
 		}
 	}
 }
