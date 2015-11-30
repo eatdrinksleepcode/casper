@@ -5,6 +5,6 @@ $myDir/build || exit $?
 rm -r $myDir/.casper
 mkdir $myDir/.casper
 echo "Installing casper..."
-$myDir/nuget install Casper.Console -OutputDirectory $myDir/.casper -pre -Verbosity quiet || exit $?
+$myDir/nuget install Casper.Console -OutputDirectory $myDir/.casper -pre -Verbosity quiet -Source "Casper Dev" || exit $?
 rm -r $myDir/out
 $myDir/casper $@ || exit $?
