@@ -6,24 +6,16 @@ namespace Casper {
 	[TestFixture]
 	public class TaskMacroTests {
 
-		private TextWriter oldStandardOut;
-		private MemoryStream standardOutStream;
-		private TextWriter standardOutWriter;
+		private RedirectedStandardOutput output;
 
 		[SetUp]
 		public void SetUp() {
-			oldStandardOut = Console.Out;
-			standardOutStream = new MemoryStream();
-			standardOutWriter = new StreamWriter(standardOutStream);
-			Console.SetOut(standardOutWriter);
+			output = RedirectedStandardOutput.RedirectOut();
 		}
 
 		[TearDown]
 		public void TearDown() {
-			Console.SetOut(oldStandardOut);
-			standardOutStream.Dispose();
-			standardOutStream = null;
-			standardOutWriter = null;
+			output.Clear();
 		}
 		
 		[Test]
@@ -43,11 +35,7 @@ task hello:
 
 			task.Execute();
 
-			standardOutWriter.Flush();
-			standardOutStream.Seek(0, SeekOrigin.Begin);
-			var standardOut = new StreamReader(standardOutStream);
-			Assert.That(standardOut.ReadLine(), Is.EqualTo("Hello World!"));
-			Assert.True(standardOut.EndOfStream);
+			Assert.That(output.ToString(), Is.EqualTo("Hello World!\n"));
 		}
 
 		[Test]

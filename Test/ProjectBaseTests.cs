@@ -26,14 +26,11 @@ namespace Casper {
 			}
 		}
 
-		private static TextWriter originalOutput;
-		private static StringBuilder output;
+		private static RedirectedStandardOutput output;
 
 		[TestFixtureSetUp]
 		public static void OneTimeSetUp() {
-			originalOutput = Console.Out;
-			output = new StringBuilder();
-			Console.SetOut(new StringWriter(output));
+			output = RedirectedStandardOutput.RedirectOut();
 		}
 			
 		[SetUp]
@@ -43,7 +40,7 @@ namespace Casper {
 
 		[TestFixtureTearDown]
 		public void OneTimeTearDown() {
-			Console.SetOut(originalOutput);
+			output.Dispose();
 		}
 
 		[Test]

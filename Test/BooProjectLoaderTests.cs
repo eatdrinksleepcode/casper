@@ -6,35 +6,28 @@ namespace Casper {
 	[TestFixture]
 	public class BooProjectLoaderTests {
 
-		StreamWriter standardOutWriter;
-		StreamReader standardOutReader;
-		MemoryStream standardOut;
-		TextWriter oldStandardOut;
+		private RedirectedStandardOutput output;
 
 		[SetUp]
 		public void SetUp() {
-			oldStandardOut = Console.Out;
-			standardOut = new MemoryStream();
-			standardOutWriter = new StreamWriter(standardOut) { AutoFlush = true };
-			standardOutReader = new StreamReader(standardOut);
-			Console.SetOut(standardOutWriter);
+			output = RedirectedStandardOutput.RedirectOut();
 		}
 
 		[TearDown]
 		public void TearDown() {
-			Console.SetOut(oldStandardOut);
+			output.Clear();
 		}
 
 		[Test]
 		public void CompilationFailure() {
 			Assert.Throws<CasperException>(() => ExecuteScript("foobar", "hello"));
-			Assert.That(standardOutReader.ReadLine(), Is.Null);
+			Assert.That(output.ToString(), Is.Empty);
 		}
 
 		[Test]
 		public void UnhandledExceptionDuringConfiguration() {
 			Assert.Throws<InvalidOperationException>(() => ExecuteScript(@"raise System.InvalidOperationException(""Script failure"")", "hello"));
-			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
+			Assert.That(output.ToString(), Is.Empty);
 		}
 
 		[Test]
@@ -45,17 +38,12 @@ task hello:
 ", "hello"));
 			Assert.That(ex.GetType(), Is.EqualTo(typeof(Exception)));
 			Assert.That(ex.Message, Is.EqualTo("Task failure"));
-			Assert.That(standardOutReader.ReadLine(), Is.EqualTo("hello"));
-			Assert.That(standardOutReader.ReadToEnd(), Is.Empty);
+			Assert.That(output.ToString(), Is.EqualTo("hello\n"));
 		}
 
 		void ExecuteScript(string scriptContents, params string[] args) {
 			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
-			try {
-				project.ExecuteTasks(args);
-			} finally {
-				standardOut.Seek(0, SeekOrigin.Begin);
-			}
+			project.ExecuteTasks(args);
 		}
 	}
 }
