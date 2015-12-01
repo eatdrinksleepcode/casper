@@ -4,6 +4,19 @@ using System.Reflection;
 namespace Casper {
 	[TestFixture]
 	public class NUnitTests {
+
+		private RedirectedStandardOutput error;
+
+		[SetUp]
+		public void SetUp() {
+			error = RedirectedStandardOutput.RedirectError();
+		}
+
+		[TearDown]
+		public void TearDown() {
+			error.Dispose();
+		}
+		
 		[Test]
 		public void Pass() {
 			var task = new NUnit {
@@ -22,6 +35,12 @@ namespace Casper {
 			};
 
 			Assert.Throws<CasperException>(() => task.Execute());
+
+			Assert.That(error.ToString(), Is.EqualTo(@"
+Failing tests:
+
+Casper.NUnitTests.ShouldFail: Failed!
+"));
 		}
 
 		[Test]
@@ -38,7 +57,7 @@ namespace Casper {
 
 		[Test, Explicit]
 		public void ShouldFail() {
-			Assert.Fail();
+			Assert.Fail("Failed!");
 		}
 	}
 }

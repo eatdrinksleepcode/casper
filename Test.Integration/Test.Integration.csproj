@@ -47,6 +47,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
+    <Compile Include="..\Test\RedirectedStandardOutput.cs">
+      <Link>RedirectedStandardOutput.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

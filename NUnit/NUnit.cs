@@ -2,15 +2,10 @@
 using NUnit.Engine;
 using System.Xml;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Casper {
 	public class NUnit : TaskBase {
-
-		private class TestEventListener : ITestEventListener {
-			public void OnTestEvent(string report) {
-				Console.Error.WriteLine(report);
-			}
-		}
 
 		public string TestAssembly { get; set; }
 		public string TestName { get; set; }
@@ -29,25 +24,57 @@ namespace Casper {
 			var runner = engine.GetRunner(new TestPackage(TestAssembly));
 			var result = runner.Run(null, filter);
 
-			var failures = Visit(result);
-			if (0 < failures) {
-				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures);
+			var failures = TestResultVisitor.CollectErrors(result);
+			if (failures.Count > 0) {
+				Console.Error.WriteLine();
+				Console.Error.WriteLine("Failing tests:");
+				Console.Error.WriteLine();
+				foreach (var error in failures) {
+					Console.Error.WriteLine("{0}: {1}", error.Name, error.Message);
+				}
+				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures.Count);
 			}
 		}
 
-		private int Visit(XmlNode node) {
-			int count = node.Name == "test-case" && GetAttribute(node, "result") == "Failed" ? 1 : 0;
-			return count + Visit(node.ChildNodes);
+		private struct TestError {
+			public string Name;
+			public string Message;
 		}
 
-		private int Visit(XmlNodeList nodes)
-		{
-			return nodes.Cast<XmlNode>().Sum(Visit);
-		}
+		private class TestResultVisitor {
 
-		private static string GetAttribute(XmlNode node, string attributeName) {
-			var attr = node.Attributes[attributeName];
-			return attr == null ? null : attr.Value;
+			public static List<TestError> CollectErrors(XmlNode results) {
+				var visitor = new TestResultVisitor();
+				visitor.Visit(results);
+				return visitor.errors;
+			}
+			
+			private readonly List<TestError> errors = new List<TestError>();
+
+			private void Visit(XmlNode node) {
+				if (node.Name == "test-case" && GetAttribute(node, "result") == "Failed") {
+					errors.Add(new TestError { Name = GetAttribute(node, "fullname"), Message = FindErrorForTestCase(node) });
+				}
+				Visit(node.ChildNodes);
+			}
+
+			static string FindErrorForTestCase(XmlNode node) {
+				var failureNode = node.ChildNodes.Cast<XmlNode>().FirstOrDefault(n => n.Name == "failure");
+				var messageNode = failureNode?.ChildNodes?.Cast<XmlNode>()?.FirstOrDefault(n => n.Name == "message");
+				return messageNode?.InnerText;
+			}
+
+			private void Visit(XmlNodeList nodes)
+			{
+				foreach (var node in nodes.Cast<XmlNode>()) {
+					Visit(node);
+				}
+			}
+
+			private static string GetAttribute(XmlNode node, string attributeName) {
+				var attr = node.Attributes[attributeName];
+				return attr == null ? null : attr.Value;
+			}
 		}
 	}
 }
