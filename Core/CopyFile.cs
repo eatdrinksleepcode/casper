@@ -3,8 +3,8 @@
 
 namespace Casper {
 	public class CopyFile : TaskBase {
-		public string Source { get; set; }
-		public string Destination { get; set; }
+		public FileInfo Source { get; set; }
+		public FileInfo Destination { get; set; }
 
 		public override void Execute() {
 			if (null == Source) {
@@ -13,7 +13,7 @@ namespace Casper {
 			if (null == Destination) {
 				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Destination'");
 			}
-			File.Copy(Source, Destination, true);
+			File.Copy(Source.FullName, Destination.FullName, overwrite: true);
 		}
 	}
 }

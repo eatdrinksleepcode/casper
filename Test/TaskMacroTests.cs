@@ -42,10 +42,11 @@ task hello:
 		public void MakeTypedTask() {
 
 			string scriptContents = @"
+import System.IO
 import Casper
 task copy(CopyFile,
-		Source: 'Source.txt', 
-		Destination: 'Destination.txt')
+		Source: FileInfo('Source.txt'), 
+		Destination: FileInfo('Destination.txt'))
 ";
 
 			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
@@ -55,8 +56,8 @@ task copy(CopyFile,
 
 			CopyFile copyTask = (CopyFile)task;
 
-			Assert.That(copyTask.Source, Is.EqualTo("Source.txt"));
-			Assert.That(copyTask.Destination, Is.EqualTo("Destination.txt"));
+			Assert.That(copyTask.Source.Name, Is.EqualTo("Source.txt"));
+			Assert.That(copyTask.Destination.Name, Is.EqualTo("Destination.txt"));
 		}
 	}
 }

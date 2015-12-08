@@ -15,8 +15,8 @@ namespace Casper {
 		public void CopyFile() {
 			File.WriteAllText("Source.txt", "Hello World!");
 			var copyTask = new CopyFile {
-				Source = "Source.txt",
-				Destination = "Destination.txt",
+				Source = new FileInfo("Source.txt"),
+				Destination = new FileInfo("Destination.txt"),
 			};
 
 			File.Delete("Destination.txt");
@@ -29,7 +29,7 @@ namespace Casper {
 		[Test]
 		public void MissingSource() {
 			var copyTask = new CopyFile {
-				Destination = "Destination.txt",
+				Destination = new FileInfo("Destination.txt"),
 			};
 
 			Assert.Throws<CasperException>(() => copyTask.Execute());
@@ -38,7 +38,7 @@ namespace Casper {
 		[Test]
 		public void MissingDestination() {
 			var copyTask = new CopyFile {
-				Source = "Source.txt",
+				Source = new FileInfo("Source.txt"),
 			};
 
 			Assert.Throws<CasperException>(() => copyTask.Execute());
