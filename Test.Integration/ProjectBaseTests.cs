@@ -1,6 +1,7 @@
 ﻿using System;
-using NUnit.Framework;
 using System.IO;
+using Casper.IO;
+using NUnit.Framework;
 
 namespace Casper {
 	[TestFixture]
@@ -8,7 +9,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject(DirectoryInfo location) : base(null, location) {
+			public TestProject(DirectoryInfo location) : base(null, location, new RealFileSystem()) {
 			}
 
 			public override void Configure() {

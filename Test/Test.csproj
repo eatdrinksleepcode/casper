@@ -59,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
+    <Compile Include="IO\StubFileSystem.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -74,5 +75,8 @@
       <Project>{B6E67DA9-81EB-47AF-AB22-1CC148901165}</Project>
       <Name>Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IO\" />
   </ItemGroup>
 </Project>

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
+using Casper.IO;
 
 namespace Casper {
 	public class MSBuild : TaskBase {
@@ -9,7 +10,7 @@ namespace Casper {
 		public IList Targets { get; set; }
 		public IDictionary Properties { get; set; }
 
-		public override void Execute() {
+		public override void Execute(IFileSystem fileSystem) {
 
 			List<string> args = new List<string>();
 			if (null != ProjectFile) {
@@ -29,7 +30,7 @@ namespace Casper {
 				Executable = "xbuild",
 				Arguments = string.Join(" ", args),
 			};
-			exec.Execute();
+			exec.Execute(fileSystem);
 		}
 	}
 }

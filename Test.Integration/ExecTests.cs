@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System;
+using Casper.IO;
 
 namespace Casper {
 	[TestFixture]
@@ -10,6 +11,7 @@ namespace Casper {
 		StreamReader outputReader;
 		TextWriter originalOutput;
 		TextWriter originalError;
+		IFileSystem fileSystem = new RealFileSystem();
 
 		[SetUp]
 		public void SetUp() {
@@ -35,7 +37,7 @@ namespace Casper {
 				Executable = "echo",
 				Arguments = "'Hello World!'",
 			};
-			task.Execute();
+			task.Execute(fileSystem);
 
 			output.Seek(0, SeekOrigin.Begin);
 			Assert.That(outputReader.ReadLine(), Is.Null.Or.Empty);
@@ -43,18 +45,21 @@ namespace Casper {
 
 		[Test]
 		public void ExecAndArguments() {
-			File.WriteAllText(@"foo.txt", "Hello World!");
-			File.Delete("bar.txt");
+			var fooFile = fileSystem.File("foo.txt");
+			var barFile = fileSystem.File("bar.txt");
+
+			fooFile.WriteAllText("Hello World!");
+			barFile.Delete();
 
 			var task = new Exec {
 				Executable = "mv",
 				Arguments = "foo.txt bar.txt",
 			};
-			task.Execute();
+			task.Execute(fileSystem);
 
-			Assert.False(File.Exists("foo.txt"));
-			Assert.True(File.Exists("bar.txt"));
-			Assert.That(File.ReadAllText("bar.txt"), Is.EqualTo("Hello World!"));
+			Assert.False(fooFile.Exists());
+			Assert.True(barFile.Exists());
+			Assert.That(barFile.ReadAllText(), Is.EqualTo("Hello World!"));
 		}
 
 		[Test]
@@ -67,7 +72,7 @@ namespace Casper {
 				Arguments = "foo.txt bar.txt",
 			};
 				
-			Assert.Throws<CasperException>(() => task.Execute());
+			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
 			Assert.False(File.Exists("foo.txt"));
 			Assert.False(File.Exists("bar.txt"));
 
@@ -81,7 +86,7 @@ namespace Casper {
 				Arguments = "foo.txt bar.txt",
 			};
 
-			Assert.Throws<CasperException>(() => task.Execute());
+			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
 		}
 	}
 }

@@ -1,10 +1,14 @@
 ﻿using NUnit.Framework;
 using System.IO;
 using System.Collections.Generic;
+using Casper.IO;
 
 namespace Casper {
 	[TestFixture]
 	public class MSBuildTests {
+
+		IFileSystem fileSystem = new RealFileSystem();
+
 		[Test]
 		public void MSBuild() {
 			var consoleProjDir = typeof(TaskBase).Assembly.Location.Parent(4).SubDirectory("Core");
@@ -20,7 +24,7 @@ namespace Casper {
 				Properties = new Dictionary<string, string> { { "Configuration", "Release" } },
 			};
 
-			msbuild.Execute();
+			msbuild.Execute(fileSystem);
 
 			Assert.True(outputDirectory.File("Casper.Core.dll").Exists());
 		}
@@ -38,7 +42,7 @@ namespace Casper {
 				WorkingDirectory = consoleProjDir,
 			};
 
-			msbuild.Execute();
+			msbuild.Execute(fileSystem);
 
 			Assert.True(outputDirectory.File("Casper.Core.dll").Exists());
 		}

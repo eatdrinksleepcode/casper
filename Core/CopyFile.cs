@@ -1,19 +1,18 @@
-﻿using System.IO;
-
+﻿using Casper.IO;
 
 namespace Casper {
 	public class CopyFile : TaskBase {
-		public FileInfo Source { get; set; }
-		public FileInfo Destination { get; set; }
+		public string Source { get; set; }
+		public string Destination { get; set; }
 
-		public override void Execute() {
+		public override void Execute(IFileSystem fileSystem) {
 			if (null == Source) {
 				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Source'");
 			}
 			if (null == Destination) {
 				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Destination'");
 			}
-			File.Copy(Source.FullName, Destination.FullName, overwrite: true);
+			fileSystem.File(Source).CopyTo(fileSystem.File(Destination));
 		}
 	}
 }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Casper.IO;
 
 namespace Casper
 {
@@ -11,11 +12,12 @@ namespace Casper
 		private readonly ProjectCollection subprojects;
 		protected readonly ProjectBase parent;
 		private readonly DirectoryInfo location;
+		private readonly IFileSystem fileSystem;
 
-		protected ProjectBase(ProjectBase parent, DirectoryInfo location) : this(parent, location, location.Name) {
+		protected ProjectBase(ProjectBase parent, DirectoryInfo location, IFileSystem fileSystem) : this(parent, location, fileSystem, location.Name) {
 		}
 
-		protected ProjectBase(ProjectBase parent, DirectoryInfo location, string name) {
+		protected ProjectBase(ProjectBase parent, DirectoryInfo location, IFileSystem fileSystem, string name) {
 			this.parent = parent;
 			this.location = location;
 			this.Name = name;
@@ -23,6 +25,7 @@ namespace Casper
 			this.PathDescription = null == parent ? "root project" : "project '" + parent.PathPrefix + this.Name + "'";
 			this.subprojects = new ProjectCollection(this);
 			this.tasks = new TaskCollection(this);
+			this.fileSystem = fileSystem;
 			if (null != parent) {
 				parent.subprojects.Add(this);
 			}
@@ -34,6 +37,10 @@ namespace Casper
 			task.Name = name;
 			task.Project = this;
 			tasks.Add(task);
+		}
+
+		public IFile File(string path) {
+			return fileSystem.File(path);
 		}
 
 		public string Name {
@@ -59,7 +66,7 @@ namespace Casper
 			var currentDirectory = Directory.GetCurrentDirectory();
 			try {
 				Directory.SetCurrentDirectory(location.FullName);
-				task.Execute();
+				task.Execute(fileSystem);
 			} finally {
 				Directory.SetCurrentDirectory(currentDirectory);
 			}

@@ -3,6 +3,7 @@ using NUnit.Engine;
 using System.Xml;
 using System.Linq;
 using System.Collections.Generic;
+using Casper.IO;
 
 namespace Casper {
 	public class NUnit : TaskBase {
@@ -10,7 +11,7 @@ namespace Casper {
 		public string TestAssembly { get; set; }
 		public string TestName { get; set; }
 
-		public override void Execute() {
+		public override void Execute(IFileSystem fileSystem) {
 			if (null == TestAssembly) {
 				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'TestAssembly'");
 			}

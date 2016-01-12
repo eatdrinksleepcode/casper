@@ -1,4 +1,5 @@
 ﻿using System;
+using Casper.IO;
 
 namespace Casper {
 	public class Task : TaskBase {
@@ -8,7 +9,7 @@ namespace Casper {
 			this.body = body;
 		}
 
-		public override void Execute() {
+		public override void Execute(IFileSystem fileSystem) {
 			this.body();
 		}
 	}

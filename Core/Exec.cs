@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Text;
 using System;
+using Casper.IO;
 
 namespace Casper {
 	public class Exec : TaskBase {
@@ -8,7 +9,7 @@ namespace Casper {
 		public string Executable { get; set; }
 		public string Arguments { get; set; }
 
-		public override void Execute() {
+		public override void Execute(IFileSystem fileSystem) {
 			if (null == Executable) {
 				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Source'");
 			}

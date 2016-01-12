@@ -1,8 +1,7 @@
 ﻿using System.IO;
 using NUnit.Framework;
 using System.Collections.Generic;
-using System;
-using System.Text;
+using Casper.IO;
 
 namespace Casper {
 	[TestFixture]
@@ -12,10 +11,10 @@ namespace Casper {
 
 			public TestProject() : this("Root") {}
 
-			public TestProject(string name) : base(null, new DirectoryInfo(Directory.GetCurrentDirectory()), name) {
+			public TestProject(string name) : base(null, new DirectoryInfo(Directory.GetCurrentDirectory()), new StubFileSystem(), name) {
 			}
 
-			public TestProject(ProjectBase parent, string name) : base(parent, new DirectoryInfo(Directory.GetCurrentDirectory()), name) {
+			public TestProject(ProjectBase parent, string name) : base(parent, new DirectoryInfo(Directory.GetCurrentDirectory()), new StubFileSystem(), name) {
 			}
 
 			public override void Configure() {

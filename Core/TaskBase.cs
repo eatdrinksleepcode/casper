@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using Casper.IO;
 
 namespace Casper {
 
 	public abstract class TaskBase {
 		private IList<TaskBase> dependencies = new List<TaskBase>();
 
-		public abstract void Execute();
+		public abstract void Execute(IFileSystem fileSystem);
 
 		public IEnumerable<TaskBase> AllDependencies() {
 			return Enumerable.Repeat(this, 1).Concat(dependencies.SelectMany(d => d.AllDependencies()));

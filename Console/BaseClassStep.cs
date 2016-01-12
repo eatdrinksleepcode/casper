@@ -1,6 +1,7 @@
 ﻿using Boo.Lang.Compiler.Ast;
 using Boo.Lang.Compiler.Steps;
 using System.IO;
+using Casper.IO;
 
 namespace Casper {
 	public class BaseClassStep : AbstractTransformerCompilerStep {
@@ -30,11 +31,16 @@ namespace Casper {
 					Name = "parent",
 					Type = TypeReference.Lift(typeof(ProjectBase))
 				});
+				constructor.Parameters.Add(new ParameterDeclaration(node.LexicalInfo) {
+					Name = "fileSystem",
+					Type = TypeReference.Lift(typeof(IFileSystem))
+				});
 				constructor.Body.Add(new MethodInvocationExpression(
 					node.LexicalInfo,
 					new SuperLiteralExpression(node.LexicalInfo),
 					new ReferenceExpression(node.LexicalInfo, "parent"),
-					new MethodInvocationExpression(node.LexicalInfo, Expression.Lift(typeof(DirectoryInfo)), new Expression[] { Expression.Lift(this.location.FullName) })
+					new MethodInvocationExpression(node.LexicalInfo, Expression.Lift(typeof(DirectoryInfo)), new Expression[] { Expression.Lift(this.location.FullName) }),
+					new ReferenceExpression(node.LexicalInfo, "fileSystem")
 				));
 				baseClass.Members.Add(constructor);
 				node.Globals = null;

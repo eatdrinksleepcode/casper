@@ -1,12 +1,13 @@
-﻿using System;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System.IO;
+using Casper.IO;
 
 namespace Casper {
 	[TestFixture]
 	public class TaskMacroTests {
 
 		private RedirectedStandardOutput output;
+		IFileSystem fileSystem = new RealFileSystem();
 
 		[SetUp]
 		public void SetUp() {
@@ -33,7 +34,7 @@ task hello:
 			Assert.True(project.Tasks.TryGetValue("hello", out task));
 			Assert.IsInstanceOf<Task>(task);
 
-			task.Execute();
+			task.Execute(fileSystem);
 
 			Assert.That(output.ToString(), Is.EqualTo("Hello World!\n"));
 		}
@@ -45,8 +46,8 @@ task hello:
 import System.IO
 import Casper
 task copy(CopyFile,
-		Source: FileInfo('Source.txt'), 
-		Destination: FileInfo('Destination.txt'))
+		Source: 'Source.txt', 
+		Destination: 'Destination.txt')
 ";
 
 			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
@@ -56,8 +57,8 @@ task copy(CopyFile,
 
 			CopyFile copyTask = (CopyFile)task;
 
-			Assert.That(copyTask.Source.Name, Is.EqualTo("Source.txt"));
-			Assert.That(copyTask.Destination.Name, Is.EqualTo("Destination.txt"));
+			Assert.That(copyTask.Source, Is.EqualTo("Source.txt"));
+			Assert.That(copyTask.Destination, Is.EqualTo("Destination.txt"));
 		}
 	}
 }

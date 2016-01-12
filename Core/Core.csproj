@@ -32,7 +32,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
+    <Compile Include="IO\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <ItemGroup>
+    <Folder Include="IO\" />
+  </ItemGroup>
 </Project>

@@ -1,5 +1,5 @@
 ﻿using NUnit.Framework;
-using System.IO;
+using Casper.IO;
 
 namespace Casper {
 	[TestFixture]
@@ -7,7 +7,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject() : base(null, null, "Root") {
+			public TestProject() : base(null, null, new StubFileSystem(), "Root") {
 			}
 			
 			public override void Configure() {

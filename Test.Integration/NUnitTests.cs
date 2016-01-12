@@ -1,11 +1,13 @@
 ﻿using NUnit.Framework;
 using System.Reflection;
+using Casper.IO;
 
 namespace Casper {
 	[TestFixture]
 	public class NUnitTests {
 
 		private RedirectedStandardOutput error;
+		IFileSystem fileSystem = new RealFileSystem();
 
 		[SetUp]
 		public void SetUp() {
@@ -24,7 +26,7 @@ namespace Casper {
 				TestName = "Casper.NUnitTests.ShouldPass",
 			};
 
-			Assert.DoesNotThrow(() => task.Execute());
+			Assert.DoesNotThrow(() => task.Execute(fileSystem));
 		}
 
 		[Test]
@@ -34,7 +36,7 @@ namespace Casper {
 				TestName = "Casper.NUnitTests.ShouldFail",
 			};
 
-			Assert.Throws<CasperException>(() => task.Execute());
+			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
 
 			Assert.That(error.ToString(), Is.EqualTo(@"
 Failing tests:
@@ -47,7 +49,7 @@ Casper.NUnitTests.ShouldFail: Failed!
 		public void MissingTestAssembly() {
 			var task = new NUnit();
 
-			Assert.Throws<CasperException>(() => task.Execute());
+			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
 		}
 
 		[Test, Explicit]

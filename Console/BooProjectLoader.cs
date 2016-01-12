@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
-using Boo.Lang.Compiler.IO;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-using Boo.Lang.Compiler;
-using Boo.Lang.Compiler.Pipelines;
 using System.Linq;
+using System.Reflection;
+using Boo.Lang.Compiler;
+using Boo.Lang.Compiler.IO;
+using Boo.Lang.Compiler.Pipelines;
+using Casper.IO;
 
 namespace Casper {
 	public abstract class BooProjectLoader {
@@ -81,14 +81,15 @@ namespace Casper {
 
 		protected abstract BaseClassStep GetBaseClassStep();
 
-		protected static ProjectBase CreateProjectFromProjectType(ProjectBase parent, Type projectType) {
+		private static ProjectBase CreateProjectFromProjectType(ProjectBase parent, Type projectType) {
 			var project = (ProjectBase)Activator.CreateInstance(projectType, new object[] {
-				parent
+				parent,
+				new RealFileSystem(),
 			});
 			return project;
 		}
 
-		protected static Type CompileToProjectType(ICompilerInput projectInput, BaseClassStep baseClassStep) {
+		private static Type CompileToProjectType(ICompilerInput projectInput, BaseClassStep baseClassStep) {
 			var compileParams = new CompilerParameters();
 			compileParams.GenerateInMemory = true;
 			compileParams.References.Add(Assembly.GetExecutingAssembly());
