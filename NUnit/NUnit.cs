@@ -1,9 +1,9 @@
 ﻿using System;
-using NUnit.Engine;
-using System.Xml;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Xml;
 using Casper.IO;
+using NUnit.Engine;
 
 namespace Casper {
 	public class NUnit : TaskBase {
@@ -31,15 +31,16 @@ namespace Casper {
 				Console.Error.WriteLine("Failing tests:");
 				Console.Error.WriteLine();
 				foreach (var error in failures) {
-					Console.Error.WriteLine("{0}: {1}", error.Name, error.Message);
+					Console.Error.WriteLine("{0}:\n{1}\n{2}", error.Name, error.Message, error.StackTrace);
 				}
 				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures.Count);
 			}
 		}
 
-		private struct TestError {
+		private class TestError {
 			public string Name;
 			public string Message;
+			public string StackTrace;
 		}
 
 		private class TestResultVisitor {
@@ -54,15 +55,21 @@ namespace Casper {
 
 			private void Visit(XmlNode node) {
 				if (node.Name == "test-case" && GetAttribute(node, "result") == "Failed") {
-					errors.Add(new TestError { Name = GetAttribute(node, "fullname"), Message = FindErrorForTestCase(node) });
+					var error = new TestError { Name = GetAttribute(node, "fullname") };
+					FindErrorForTestCase(node, error);
+					errors.Add(error);
 				}
 				Visit(node.ChildNodes);
 			}
 
-			static string FindErrorForTestCase(XmlNode node) {
+			private static void FindErrorForTestCase(XmlNode node, TestError error) {
 				var failureNode = node.ChildNodes.Cast<XmlNode>().FirstOrDefault(n => n.Name == "failure");
-				var messageNode = failureNode?.ChildNodes?.Cast<XmlNode>()?.FirstOrDefault(n => n.Name == "message");
-				return messageNode?.InnerText;
+				error.Message = GetChildNode(failureNode, "message")?.InnerText;
+				error.StackTrace = GetChildNode(failureNode, "stack-trace")?.InnerText;
+			}
+
+			static XmlNode GetChildNode(XmlNode parentNode, string childNodeName) {
+				return parentNode.ChildNodes.Cast<XmlNode>().FirstOrDefault(n => n.Name == childNodeName);
 			}
 
 			private void Visit(XmlNodeList nodes)

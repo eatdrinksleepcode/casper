@@ -38,11 +38,12 @@ namespace Casper {
 
 			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
 
-			Assert.That(error.ToString(), Is.EqualTo(@"
+			Assert.That(error.ToString(), Does.StartWith(@"
 Failing tests:
 
-Casper.NUnitTests.ShouldFail: Failed!
-"));
+Casper.NUnitTests.ShouldFail:
+Failed!
+at Casper.NUnitTests.ShouldFail ()"));
 		}
 
 		[Test]
