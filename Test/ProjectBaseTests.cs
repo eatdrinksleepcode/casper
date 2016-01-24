@@ -9,12 +9,12 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject() : this("Root") {}
+			public TestProject(IFileSystem fileSystem) : this("Root", fileSystem) {}
 
-			public TestProject(string name) : base(null, new DirectoryInfo(Directory.GetCurrentDirectory()), new StubFileSystem(), name) {
+			public TestProject(string name, IFileSystem fileSystem) : base(null, "test", fileSystem, name) {
 			}
 
-			public TestProject(ProjectBase parent, string name) : base(parent, new DirectoryInfo(Directory.GetCurrentDirectory()), new StubFileSystem(), name) {
+			public TestProject(ProjectBase parent, string name, IFileSystem fileSystem) : base(parent, "test", fileSystem, name) {
 			}
 
 			public override void Configure() {
@@ -27,6 +27,8 @@ namespace Casper {
 
 		private static RedirectedStandardOutput output;
 
+		private IFileSystem fileSystem;
+
 		[TestFixtureSetUp]
 		public static void OneTimeSetUp() {
 			output = RedirectedStandardOutput.RedirectOut();
@@ -35,6 +37,7 @@ namespace Casper {
 		[SetUp]
 		public void SetUp() {
 			output.Clear();
+			fileSystem = new StubFileSystem();
 		}
 
 		[TestFixtureTearDown]
@@ -45,7 +48,7 @@ namespace Casper {
 		[Test]
 		public void TaskName() {
 			var task = new Task(() => { });
-			var project = new TestProject();
+			var project = new TestProject(fileSystem);
 			project.AddTask("foo", task);
 
 			Assert.That(task.Name, Is.EqualTo("foo"));
@@ -53,7 +56,7 @@ namespace Casper {
 
 		[Test]
 		public void TaskNameDoesNotExistInRoot() {
-			var project = new TestProject();
+			var project = new TestProject(fileSystem);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist"));
 
@@ -62,7 +65,7 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInTaskPath() {
-			var project = new TestProject();
+			var project = new TestProject(fileSystem);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist:foo"));
 
@@ -71,8 +74,8 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInSubProjectInTaskPath() {
-			var project = new TestProject();
-			new TestProject(project, "testA");
+			var project = new TestProject(fileSystem);
+			new TestProject(project, "testA", fileSystem);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist:foo"));
 
@@ -81,9 +84,9 @@ namespace Casper {
 
 		[Test]
 		public void SubProjectNameDoesNotExistInMultiSubProjectInTaskPath() {
-			var project = new TestProject();
-			var subProject = new TestProject(project, "testA");
-			new TestProject(subProject, "testB");
+			var project = new TestProject(fileSystem);
+			var subProject = new TestProject(project, "testA", fileSystem);
+			new TestProject(subProject, "testB", fileSystem);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:testB:doesNotExist:foo"));
 
@@ -92,8 +95,8 @@ namespace Casper {
 
 		[Test]
 		public void TaskNameDoesNotExistInSubProject() {
-			var project = new TestProject();
-			new TestProject(project, "testA");
+			var project = new TestProject(fileSystem);
+			new TestProject(project, "testA", fileSystem);
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist"));
 
@@ -102,7 +105,7 @@ namespace Casper {
 
 		[Test]
 		public void ExecuteTasksInOrder() {
-			var project = new TestProject();
+			var project = new TestProject(fileSystem);
 			var results = new List<string>();
 			project.AddTask("hello", new Task(() => results.Add("hello")));
 			project.AddTask("goodbye", new Task(() => results.Add("goodbye")));
@@ -115,7 +118,7 @@ namespace Casper {
 
 		[Test]
 		public void ExecuteTaskWithDependencyGraph() {
-			var project = new TestProject();
+			var project = new TestProject(fileSystem);
 			var results = new List<string>();
 			var wake = new Task(() => results.Add("wake"));
 			project.AddTask("wake", wake);
@@ -140,10 +143,10 @@ namespace Casper {
 
 			var results = new List<string>();
 
-			var project = new TestProject();
+			var project = new TestProject(fileSystem);
 			var hello = new Task(() => results.Add("hello"));
 			project.AddTask("hello", hello);
-			var subProject = new TestProject(project, "testA");
+			var subProject = new TestProject(project, "testA", fileSystem);
 			var goodbye = new Task(() => results.Add("goodbye")) { DependsOn = new [] { hello }};
 			subProject.AddTask("goodbye", goodbye);
 

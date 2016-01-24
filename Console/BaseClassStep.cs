@@ -39,7 +39,7 @@ namespace Casper {
 					node.LexicalInfo,
 					new SuperLiteralExpression(node.LexicalInfo),
 					new ReferenceExpression(node.LexicalInfo, "parent"),
-					new MethodInvocationExpression(node.LexicalInfo, Expression.Lift(typeof(DirectoryInfo)), new Expression[] { Expression.Lift(this.location.FullName) }),
+					Expression.Lift(this.location.FullName),
 					new ReferenceExpression(node.LexicalInfo, "fileSystem")
 				));
 				baseClass.Members.Add(constructor);

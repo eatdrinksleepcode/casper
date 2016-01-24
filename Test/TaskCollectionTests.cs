@@ -7,7 +7,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject() : base(null, null, new StubFileSystem(), "Root") {
+			public TestProject() : base(null, "test", new StubFileSystem(), "Root") {
 			}
 			
 			public override void Configure() {

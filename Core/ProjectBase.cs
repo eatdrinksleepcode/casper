@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using Casper.IO;
 
@@ -11,15 +10,15 @@ namespace Casper
 		private readonly TaskCollection tasks;
 		private readonly ProjectCollection subprojects;
 		protected readonly ProjectBase parent;
-		private readonly DirectoryInfo location;
+		private readonly IDirectory location;
 		private readonly IFileSystem fileSystem;
 
-		protected ProjectBase(ProjectBase parent, DirectoryInfo location, IFileSystem fileSystem) : this(parent, location, fileSystem, location.Name) {
+		protected ProjectBase(ProjectBase parent, string location, IFileSystem fileSystem) : this(parent, location, fileSystem, System.IO.Path.GetFileName(location)) {
 		}
 
-		protected ProjectBase(ProjectBase parent, DirectoryInfo location, IFileSystem fileSystem, string name) {
+		protected ProjectBase(ProjectBase parent, string location, IFileSystem fileSystem, string name) {
 			this.parent = parent;
-			this.location = location;
+			this.location = fileSystem.Directory(location);
 			this.Name = name;
 			this.PathPrefix = null == parent ? "" : parent.PathPrefix + this.Name + ":";
 			this.PathDescription = null == parent ? "root project" : "project '" + parent.PathPrefix + this.Name + "'";
@@ -63,13 +62,7 @@ namespace Casper
 		}
 
 		public void Execute(TaskBase task) {
-			var currentDirectory = Directory.GetCurrentDirectory();
-			try {
-				Directory.SetCurrentDirectory(location.FullName);
-				task.Execute(fileSystem);
-			} finally {
-				Directory.SetCurrentDirectory(currentDirectory);
-			}
+			ExecuteInProjectDirectory(task);
 		}
 
 		public void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
@@ -94,6 +87,17 @@ namespace Casper
 				return this.subprojects[projectName].GetTaskByPath(path);
 			} else {
 				return this.tasks[path.Dequeue()];
+			}
+		}
+
+		private void ExecuteInProjectDirectory(TaskBase task) {
+			var currentDirectory = fileSystem.GetCurrentDirectory();
+			try {
+				location.SetAsCurrent();
+				task.Execute(fileSystem);
+			}
+			finally {
+				currentDirectory.SetAsCurrent();
 			}
 		}
 	}

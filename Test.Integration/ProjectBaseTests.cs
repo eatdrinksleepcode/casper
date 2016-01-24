@@ -9,7 +9,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject(DirectoryInfo location) : base(null, location, new RealFileSystem()) {
+			public TestProject(string location) : base(null, location, new RealFileSystem()) {
 			}
 
 			public override void Configure() {
@@ -24,7 +24,8 @@ namespace Casper {
 
 			string executeDirectory = null;
 			var task = new Task(() => { executeDirectory = Directory.GetCurrentDirectory(); throw new Exception(); });
-			var project = new TestProject(firstSubDirectory);
+			var project = new TestProject(firstSubDirectory.FullName);
+			project.AddTask("test", task);
 
 			Assert.Throws<Exception>(() => project.Execute(task));
 
