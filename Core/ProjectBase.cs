@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Casper.IO;
 
-namespace Casper
-{
-	public abstract class ProjectBase
-	{		
+namespace Casper {
+	public abstract class ProjectBase {
 		private readonly TaskCollection tasks;
 		private readonly ProjectCollection subprojects;
 		protected readonly ProjectBase parent;
@@ -31,7 +29,7 @@ namespace Casper
 			this.records = taskRecordCache.Exists()
 						? taskRecordCache.ReadAll<Dictionary<string, TaskRecord>>()
 						: new Dictionary<string, TaskRecord>();
-			if (null != parent) {
+			if(null != parent) {
 				parent.subprojects.Add(this);
 			}
 		}
@@ -99,12 +97,22 @@ namespace Casper
 			}
 
 			public bool UpToDate(IEnumerable<IFile> files) {
-				return files.All(UpToDate);
+				return ToHashSet(fileStamps.Select(x => new { Path = x.Key, TimeStamp = x.Value })).SetEquals(files.Select(x => new { Path = x.Path, TimeStamp = x.LastWriteTimeUtc }));
 			}
 
-			private bool UpToDate(IFile file) {
-				DateTimeOffset modified;
-				return fileStamps.TryGetValue(file.Path, out modified) && modified.CompareTo(file.LastWriteTimeUtc) == 0;
+			private static HashSet<T> ToHashSet<T>(IEnumerable<T> source) {
+				return new HashSet<T>(source);
+			}
+		}
+
+		public void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
+			var tasksToExecute = taskNamesToExecute.Select(a => this.GetTaskByName(a)).ToArray();
+			var taskGraphClosure = tasksToExecute.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
+			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
+			foreach(var task in taskGraphClosure) {
+				Console.WriteLine(task.Path);
+				// HACK: this is awkward
+				task.Project.Execute(task);
 			}
 		}
 
@@ -131,24 +139,13 @@ namespace Casper
 			taskRecordCache.WriteAll(records);
 		}
 
-		public void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
-			var tasksToExecute = taskNamesToExecute.Select(a => this.GetTaskByName(a)).ToArray();
-			var taskGraphClosure = tasksToExecute.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
-			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
-			foreach (var task in taskGraphClosure) {
-				Console.WriteLine(task.Path);
-				// HACK: this is awkward
-				task.Project.Execute(task);
-			}
-		}
-
 		private TaskBase GetTaskByName(string name) {
 			string[] path = name.Split(':');
 			return GetTaskByPath(new Queue<string>(path));
 		}
 
 		private TaskBase GetTaskByPath(Queue<string> path) {
-			if (path.Count > 1) {
+			if(path.Count > 1) {
 				var projectName = path.Dequeue();
 				return this.subprojects[projectName].GetTaskByPath(path);
 			} else {
@@ -161,8 +158,7 @@ namespace Casper
 			try {
 				location.SetAsCurrent();
 				task.Execute(fileSystem);
-			}
-			finally {
+			} finally {
 				currentDirectory.SetAsCurrent();
 			}
 		}

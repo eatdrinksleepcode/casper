@@ -9,8 +9,6 @@ namespace Casper {
 		private IFileSystem fileSystem;
 		private IFile inputFile;
 		private IFile outputFile;
-		private IFile missingInputFile;
-		private IFile missingOutputFile;
 
 		[SetUp]
 		public void SetUp() {
@@ -19,8 +17,6 @@ namespace Casper {
 			inputFile.WriteAllText("Input");
 			outputFile = fileSystem.File("output.txt");
 			outputFile.WriteAllText("Output");
-			missingInputFile = fileSystem.File("missing-input.txt");
-			missingOutputFile = fileSystem.File("missing-output.txt");
 		}
 
 		private class TestProject : ProjectBase {
@@ -100,7 +96,7 @@ namespace Casper {
 
 		[Test]
 		public void InputsAndOutputsDoNotExist() {
-			Assert.False(ExecuteTwice(missingInputFile, missingOutputFile));
+			Assert.False(ExecuteTwice(fileSystem.File("missing-input.txt"), fileSystem.File("missing-output.txt")));
 		}
 
 		[Test]
@@ -131,6 +127,30 @@ namespace Casper {
 		[Test]
 		public void OutputGoesMissing() {
 			Assert.True(ExecuteTwice(inputFile, outputFile, () => { outputFile.Delete(); }));
+		}
+
+		[Test]
+		public void InputAdded() {
+			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
+			Assert.True(CreateUpToDateTask(new[] { inputFile, fileSystem.File("new-input.txt") }, new[] { outputFile }));
+		}
+
+		[Test]
+		public void OutputAdded() {
+			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
+			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile, fileSystem.File("new-output.txt") }));
+		}
+
+		[Test]
+		public void InputRemoved() {
+			Assert.True(CreateUpToDateTask(new[] { inputFile, fileSystem.File("new-input.txt") }, new[] { outputFile }));
+			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
+		}
+
+		[Test]
+		public void OutputRemoved() {
+			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile, fileSystem.File("new-output.txt") }));
+			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
 		}
 	}
 }
