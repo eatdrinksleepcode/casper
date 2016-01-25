@@ -3,6 +3,6 @@
 task=${1:-Build}
 
 myDir="`dirname \"$0\"`"
-casperPath=`find $myDir/.casper -name "Casper.Console.*" -type d`
+casperPath=`find $myDir/.msbuild -name "Casper.Console.*" -type d`
 echo "Running casper..."
 mono --debug $casperPath/tools/casper.exe build.casper $task
