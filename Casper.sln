@@ -85,6 +85,12 @@ Global
 		$2.inheritsSet = Mono
 		$2.inheritsScope = text/x-csharp
 		$2.scope = text/x-csharp
+		$2.SpacingAfterMethodDeclarationName = False
+		$2.SpaceAfterMethodCallName = False
+		$2.SpaceAfterControlFlowStatementKeyword = False
+		$2.SpaceBeforeOpenSquareBracket = False
+		$2.NewLinesForBracesInTypes = False
+		$2.NewLinesForBracesInMethods = False
 		$0.DotNetNamingPolicy = $3
 		$3.DirectoryNamespaceAssociation = PrefixedHierarchical
 		$3.ResourceNamePolicy = FileFormatDefault
