@@ -19,6 +19,13 @@
     <WarningLevel>4</WarningLevel>
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
+  <PropertyGroup>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="${SolutionDir}/.msbuild/Casper.Console.0.0.1-alpha/tools/casper.exe build.casper Test:Test" workingdir="${SolutionDir}" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
