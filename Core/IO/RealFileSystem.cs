@@ -28,8 +28,22 @@ namespace Casper.IO {
 				System.IO.File.WriteAllText(path, text);
 			}
 
+			public void WriteAll<T>(T content) {
+				var formatter = new BinaryFormatter();
+				using (var stream = System.IO.File.OpenWrite(path)) {
+					formatter.Serialize(stream, content);
+				}
+			}
+
 			public string ReadAllText() {
 				return System.IO.File.ReadAllText(path);
+			}
+
+			public T ReadAll<T>() {
+				var formatter = new BinaryFormatter();
+				using (var stream = System.IO.File.OpenRead(path)) {
+					return (T)formatter.Deserialize(stream);
+				}
 			}
 
 			public bool Exists() {
@@ -42,6 +56,16 @@ namespace Casper.IO {
 
 			public void CopyTo(IFile destination) {
 				System.IO.File.Copy(path, destination.Path, true);
+			}
+
+			public void CreateDirectories() {
+				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+			}
+
+			public DateTimeOffset LastWriteTimeUtc {
+				get {
+					return System.IO.File.GetLastWriteTimeUtc(path);
+				}
 			}
 
 			public string Path {
@@ -60,6 +84,10 @@ namespace Casper.IO {
 
 			public IFile File(string relativePath) {
 				return new RealFile(System.IO.Path.Combine(path, relativePath));
+			}
+
+			public IDirectory Directory (string relativePath) {
+				return new RealDirectory(relativePath);
 			}
 
 			public void SetAsCurrent() {

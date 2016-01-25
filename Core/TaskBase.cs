@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
-using System.Collections;
 using Casper.IO;
 
 namespace Casper {
@@ -26,5 +26,13 @@ namespace Casper {
 		public string Path { get { return Project.PathPrefix + Name ; } }
 
 		public ProjectBase Project { get; set; }
+
+		protected internal virtual IEnumerable<IFile> InputFiles {
+			get { return Enumerable.Empty<IFile>(); }
+		}
+
+		protected internal virtual IEnumerable<IFile> OutputFiles {
+			get { return Enumerable.Empty<IFile>(); }
+		}
 	}
 }

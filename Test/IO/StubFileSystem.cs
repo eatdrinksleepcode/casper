@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
-using Casper.IO;
-using System;
 
 namespace Casper.IO {
 
@@ -29,6 +29,7 @@ namespace Casper.IO {
 			}
 
 			public void Delete() {
+				lastWriteTimeUtc = DateTimeOffset.MinValue;
 				contentStream = null;
 			}
 
@@ -39,15 +40,41 @@ namespace Casper.IO {
 				}
 			}
 
+			public T ReadAll<T>() {
+				BinaryFormatter formatter = new BinaryFormatter();
+				contentStream.Seek(0, SeekOrigin.Begin);
+				return (T)formatter.Deserialize(contentStream);
+			}
+
 			public void WriteAllText(string text) {
 				var bytes = Encoding.UTF8.GetBytes(text);
-				contentStream = new MemoryStream(bytes, 0, bytes.Length, true, true);
+				WriteContent(bytes);
+			}
+
+			public void WriteAll<T>(T content) {
+				BinaryFormatter formatter = new BinaryFormatter();
+				var newContentStream = new MemoryStream();
+				formatter.Serialize(newContentStream, content);
+				WriteContent(newContentStream.ToArray());
+			}
+
+			private void WriteContent(byte[] newContent) {
+				this.contentStream = new MemoryStream(newContent, 0, newContent.Length, true, true);
+				lastWriteTimeUtc = DateTimeOffset.UtcNow;
 			}
 
 			public void CopyTo(IFile destination) {
-				var stubDestination = destination as StubFile;
-				var newBuffer = (byte[])contentStream.GetBuffer().Clone();
-				stubDestination.contentStream = new MemoryStream(newBuffer);
+				var stubDestination = (StubFile)destination;
+				stubDestination.WriteContent((byte[])contentStream.GetBuffer().Clone());
+			}
+
+			public void CreateDirectories() {
+			}
+
+			public DateTimeOffset LastWriteTimeUtc {
+				get {
+					return lastWriteTimeUtc;
+				}
 			}
 
 			public string Path {
@@ -67,6 +94,10 @@ namespace Casper.IO {
 
 			public IFile File(string relativePath) {
 				return fileSystem.File(System.IO.Path.Combine(path, relativePath));
+			}
+
+			public IDirectory Directory(string relativePath) {
+				return fileSystem.Directory(System.IO.Path.Combine(path, relativePath));
 			}
 
 			public void SetAsCurrent() {

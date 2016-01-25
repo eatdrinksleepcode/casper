@@ -1,7 +1,6 @@
-﻿using System.IO;
-using NUnit.Framework;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Casper.IO;
+using NUnit.Framework;
 
 namespace Casper {
 	[TestFixture]

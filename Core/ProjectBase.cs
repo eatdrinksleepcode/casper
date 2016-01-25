@@ -12,6 +12,8 @@ namespace Casper
 		protected readonly ProjectBase parent;
 		private readonly IDirectory location;
 		private readonly IFileSystem fileSystem;
+		private readonly Dictionary<string, TaskRecord> records;
+		private readonly IFile taskRecordCache;
 
 		protected ProjectBase(ProjectBase parent, string location, IFileSystem fileSystem) : this(parent, location, fileSystem, System.IO.Path.GetFileName(location)) {
 		}
@@ -25,6 +27,10 @@ namespace Casper
 			this.subprojects = new ProjectCollection(this);
 			this.tasks = new TaskCollection(this);
 			this.fileSystem = fileSystem;
+			this.taskRecordCache = fileSystem.Directory(location).Directory(".casper").File("tasks");
+			this.records = taskRecordCache.Exists()
+						? taskRecordCache.ReadAll<Dictionary<string, TaskRecord>>()
+						: new Dictionary<string, TaskRecord>();
 			if (null != parent) {
 				parent.subprojects.Add(this);
 			}
@@ -61,8 +67,68 @@ namespace Casper
 			get { return tasks; }
 		}
 
-		public void Execute(TaskBase task) {
+		[Serializable]
+		private class TaskRecord {
+			private TaskState input = new TaskState();
+			private TaskState output = new TaskState();
+
+			public void RecordInputs(TaskBase task) {
+				input.RecordFiles(task.InputFiles);
+			}
+
+			public void RecordOutputs(TaskBase task) {
+				output.RecordFiles(task.OutputFiles);
+			}
+
+			public bool IsUpToDate(TaskBase task) {
+				var hasOutputs = task.OutputFiles.Count() > 0;
+				var inputsUpToDate = input.UpToDate(task.InputFiles);
+				var outputsUpToDate = output.UpToDate(task.OutputFiles);
+				return hasOutputs && inputsUpToDate && outputsUpToDate;
+			}
+		}
+
+		[Serializable]
+		private class TaskState {
+			private Dictionary<string, DateTimeOffset> fileStamps = new Dictionary<string, DateTimeOffset>();
+
+			public void RecordFiles(IEnumerable<IFile> files) {
+				foreach(var file in files) {
+					fileStamps[file.Path] = file.LastWriteTimeUtc;
+				}
+			}
+
+			public bool UpToDate(IEnumerable<IFile> files) {
+				return files.All(UpToDate);
+			}
+
+			private bool UpToDate(IFile file) {
+				DateTimeOffset modified;
+				return fileStamps.TryGetValue(file.Path, out modified) && modified.CompareTo(file.LastWriteTimeUtc) == 0;
+			}
+		}
+
+		public bool Execute(TaskBase task) {
+			if(IsUpToDate(task)) {
+				return false;
+			}
+			TaskRecord record = new TaskRecord();
+			record.RecordInputs(task);
 			ExecuteInProjectDirectory(task);
+			record.RecordOutputs(task);
+			SaveTaskState(task, record);
+			return true;
+		}
+
+		private bool IsUpToDate(TaskBase task) {
+			TaskRecord oldRecord;
+			return records.TryGetValue(task.Name, out oldRecord) && oldRecord.IsUpToDate(task);
+		}
+
+		private void SaveTaskState(TaskBase task, TaskRecord record) {
+			records[task.Name] = record;
+			taskRecordCache.CreateDirectories();
+			taskRecordCache.WriteAll(records);
 		}
 
 		public void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
