@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 
 namespace Casper.IO {
 	public interface IFile : IFileSystemObject {
@@ -7,13 +8,15 @@ namespace Casper.IO {
 		void WriteAllText(string text);
 		void WriteAll<T>(T content);
 
+		TextReader OpenText();
+
 		string ReadAllText();
 		T ReadAll<T>();
 
 		void CreateDirectories();
 
-		DateTimeOffset LastWriteTimeUtc {
-			get;
-		}
+		IDirectory Directory { get; }
+
+		DateTimeOffset LastWriteTimeUtc { get; }
 	}
 }

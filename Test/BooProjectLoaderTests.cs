@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Casper.IO;
 using NUnit.Framework;
 
 namespace Casper {
@@ -7,10 +8,12 @@ namespace Casper {
 	public class BooProjectLoaderTests {
 
 		private RedirectedStandardOutput output;
+		private IFileSystem fileSystem;
 
 		[SetUp]
 		public void SetUp() {
 			output = RedirectedStandardOutput.RedirectOut();
+			fileSystem = new StubFileSystem();
 		}
 
 		[TearDown]
@@ -42,7 +45,8 @@ task hello:
 		}
 
 		void ExecuteScript(string scriptContents, params string[] args) {
-			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
+			fileSystem.File("build.casper").WriteAllText(scriptContents);
+			var project = BooProjectLoader.LoadProject("build.casper", fileSystem);
 			project.ExecuteTasks(args);
 		}
 	}

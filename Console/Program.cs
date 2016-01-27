@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using Casper.IO;
 using CommandLine;
 using CommandLine.Text;
-using System.Diagnostics;
-using System.IO;
 
 namespace Casper {
 	public static class MainClass {
@@ -47,7 +47,7 @@ namespace Casper {
 
 		static int Run(ParserResult<Options> arguments) {
 			return arguments.MapResult(o =>  {
-				var project = BooProjectLoader.LoadProject(new FileInfo(o.ScriptPath));
+				var project = BooProjectLoader.LoadProject(o.ScriptPath, new RealFileSystem());
 				if (o.Tasks) {
 					foreach (var task in project.Tasks) {
 						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);

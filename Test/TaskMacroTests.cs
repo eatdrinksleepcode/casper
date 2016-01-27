@@ -1,5 +1,4 @@
 ﻿using NUnit.Framework;
-using System.IO;
 using Casper.IO;
 
 namespace Casper {
@@ -7,11 +6,12 @@ namespace Casper {
 	public class TaskMacroTests {
 
 		private RedirectedStandardOutput output;
-		IFileSystem fileSystem = new RealFileSystem();
+		private IFileSystem fileSystem;
 
 		[SetUp]
 		public void SetUp() {
 			output = RedirectedStandardOutput.RedirectOut();
+			fileSystem = new StubFileSystem();
 		}
 
 		[TearDown]
@@ -27,8 +27,7 @@ namespace Casper {
 task hello:
 	print 'Hello World!'
 ";
-
-			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
+			ProjectBase project = LoadProject(scriptContents);
 
 			TaskBase task;
 			Assert.True(project.Tasks.TryGetValue("hello", out task));
@@ -50,7 +49,7 @@ task copy(CopyFile,
 		Destination: 'Destination.txt')
 ";
 
-			var project = BooProjectLoader.LoadProject(new StringReader(scriptContents));
+			var project = LoadProject(scriptContents);
 			TaskBase task;
 			Assert.True(project.Tasks.TryGetValue("copy", out task));
 			Assert.IsInstanceOf<CopyFile>(task);
@@ -59,6 +58,11 @@ task copy(CopyFile,
 
 			Assert.That(copyTask.Source, Is.EqualTo("Source.txt"));
 			Assert.That(copyTask.Destination, Is.EqualTo("Destination.txt"));
+		}
+
+		private ProjectBase LoadProject(string scriptContents) {
+			fileSystem.File("build.casper").WriteAllText(scriptContents);
+			return BooProjectLoader.LoadProject("build.casper", fileSystem);
 		}
 	}
 }

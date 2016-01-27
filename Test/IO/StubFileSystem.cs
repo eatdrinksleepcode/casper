@@ -16,11 +16,13 @@ namespace Casper.IO {
 		}
 
 		public class StubFile : IFile {
+			private readonly StubFileSystem fileSystem;
 			private readonly string path;
 			private DateTimeOffset lastWriteTimeUtc;
 			private MemoryStream contentStream;
 
-			public StubFile(string path) {
+			public StubFile(StubFileSystem fileSystem, string path) {
+				this.fileSystem = fileSystem;
 				this.path = path;
 			}
 
@@ -71,14 +73,21 @@ namespace Casper.IO {
 			public void CreateDirectories() {
 			}
 
+			public TextReader OpenText() {
+				contentStream.Seek(0, SeekOrigin.Begin);
+				return new StreamReader(contentStream);
+			}
+
 			public DateTimeOffset LastWriteTimeUtc {
-				get {
-					return lastWriteTimeUtc;
-				}
+				get { return lastWriteTimeUtc; }
 			}
 
 			public string Path {
 				get { return path; }
+			}
+
+			public IDirectory Directory {
+				get { return fileSystem.Directory(System.IO.Path.GetDirectoryName(Path)); }
 			}
 		}
 
@@ -113,17 +122,18 @@ namespace Casper.IO {
 			}
 
 			public string Path {
-				get {
-					return path;
-				}
+				get { return path; }
 			}
 		}
 
 		public IFile File(string path) {
 			IFileSystemObject fileSystemObject;
 			IFile file;
+			path = System.IO.Path.IsPathRooted(path) 
+				? path 
+				: System.IO.Path.Combine(GetCurrentDirectory().Path, path);
 			if (!files.TryGetValue(path, out fileSystemObject)) {
-				file = new StubFile(path);
+				file = new StubFile(this, path);
 				files.Add(path, file);
 			} else {
 				file = fileSystemObject as StubFile;
@@ -131,7 +141,7 @@ namespace Casper.IO {
 					if (fileSystemObject.Exists()) {
 						throw new Exception(string.Format("'{0}' is not a file", path));
 					} else {
-						file = new StubFile(path);
+						file = new StubFile(this, path);
 						files[path] = file;
 					}
 				}
@@ -142,6 +152,9 @@ namespace Casper.IO {
 		public IDirectory Directory(string path) {
 			IFileSystemObject fileSystemObject;
 			IDirectory directory;
+			path = System.IO.Path.IsPathRooted(path) 
+			             ? path 
+			             : System.IO.Path.Combine(GetCurrentDirectory().Path, path);
 			if (!files.TryGetValue(path, out fileSystemObject)) {
 				directory = new StubDirectory(this, path);
 				files.Add(path, directory);

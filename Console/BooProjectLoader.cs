@@ -3,37 +3,55 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Boo.Lang.Compiler;
-using Boo.Lang.Compiler.IO;
 using Boo.Lang.Compiler.Pipelines;
 using Casper.IO;
 
 namespace Casper {
 	public abstract class BooProjectLoader {
 
-		public static ProjectBase LoadProject(FileInfo scriptPath) {
-			return LoadProject(scriptPath, null);
+		public static ProjectBase LoadProject(string scriptPath) {
+			return LoadProject(scriptPath, (ProjectBase)null);
 		}
 
-		public static ProjectBase LoadProject(FileInfo scriptPath, ProjectBase parent) {
-			var loader = new BooProjectFileLoader(scriptPath, parent);
+		public static ProjectBase LoadProject(string scriptPath, IFileSystem fileSystem) {
+			return LoadProject(scriptPath, null, fileSystem);
+		}
+
+		public static ProjectBase LoadProject(string scriptPath, ProjectBase parent) {
+			return LoadProject(scriptPath, parent, new RealFileSystem());
+		}
+
+		private static ProjectBase LoadProject(string scriptPath, ProjectBase parent, IFileSystem fileSystem) {
+			var loader = new BooProjectFileLoader(fileSystem.File(scriptPath), parent, fileSystem);
 			return loader.Load();
 		}
 
-		public static ProjectBase LoadProject(TextReader scriptContents) {
-			var loader = new BooProjectStringLoader(scriptContents);
-			return loader.Load();
+		private class FileInput : ICompilerInput {
+			private readonly IFile file;
+
+			public FileInput(IFile file) {
+				this.file = file;
+			}
+			
+			public string Name {
+				get { return this.file.Path; }
+			}
+
+			public TextReader Open() {
+				return file.OpenText();
+			}
 		}
 
 		private class BooProjectFileLoader : BooProjectLoader {
-			private readonly FileInfo scriptPath;
+			private readonly IFile scriptPath;
 
-			public BooProjectFileLoader(FileInfo scriptPath, ProjectBase parent) 
-				: base(parent) {
-				this.scriptPath = scriptPath;
+			public BooProjectFileLoader(IFile scriptFile, ProjectBase parent, IFileSystem fileSystem) 
+				: base(parent, fileSystem) {
+				this.scriptPath = scriptFile;
 			}
 
 			protected override ICompilerInput GetCompilerInput() {
-				return new FileInput(scriptPath.ToString());
+				return new FileInput(scriptPath);
 			}
 
 			protected override BaseClassStep GetBaseClassStep() {
@@ -41,27 +59,12 @@ namespace Casper {
 			}
 		}
 
-		private class BooProjectStringLoader : BooProjectLoader {
-			private readonly TextReader scriptContents;
-
-			public BooProjectStringLoader(TextReader scriptContents)
-				: base(null) {
-				this.scriptContents = scriptContents;
-			}
-
-			protected override ICompilerInput GetCompilerInput() {
-				return new ReaderInput("content", scriptContents);
-			}
-
-			protected override BaseClassStep GetBaseClassStep() {
-				return new BaseClassStep(new DirectoryInfo(Directory.GetCurrentDirectory())); // HACK: current directory?
-			}
-		}
-
 		private readonly ProjectBase parent;
+		private readonly IFileSystem fileSystem;
 
-		public BooProjectLoader(ProjectBase parent) {
+		public BooProjectLoader(ProjectBase parent, IFileSystem fileSystem) {
 			this.parent = parent;
+			this.fileSystem = fileSystem;
 		}
 
 		public ProjectBase Load() {
@@ -81,10 +84,10 @@ namespace Casper {
 
 		protected abstract BaseClassStep GetBaseClassStep();
 
-		private static ProjectBase CreateProjectFromProjectType(ProjectBase parent, Type projectType) {
+		private ProjectBase CreateProjectFromProjectType(ProjectBase parent, Type projectType) {
 			var project = (ProjectBase)Activator.CreateInstance(projectType, new object[] {
 				parent,
-				new RealFileSystem(),
+				fileSystem,
 			});
 			return project;
 		}

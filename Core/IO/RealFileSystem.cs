@@ -17,11 +17,13 @@ namespace Casper.IO {
 			return Directory(System.IO.Directory.GetCurrentDirectory());
 		}
 
-		private class RealFile : IFile {
+		public class RealFile : IFile {
 			private readonly string path;
 
 			public RealFile(string path) {
-				this.path = path;
+				this.path = System.IO.Path.IsPathRooted(path) 
+					? path 
+					: System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), path);
 			}
 
 			public void WriteAllText(string text) {
@@ -59,19 +61,27 @@ namespace Casper.IO {
 			}
 
 			public void CreateDirectories() {
-				System.IO.Directory.CreateDirectory(System.IO.Path.GetDirectoryName(path));
+				System.IO.Directory.CreateDirectory(DirectoryPath);
+			}
+
+			public TextReader OpenText() {
+				return System.IO.File.OpenText(path);
+			}
+
+			private string DirectoryPath {
+				get { return System.IO.Path.GetDirectoryName(path); }
 			}
 
 			public DateTimeOffset LastWriteTimeUtc {
-				get {
-					return System.IO.File.GetLastWriteTimeUtc(path);
-				}
+				get { return System.IO.File.GetLastWriteTimeUtc(path); }
 			}
 
 			public string Path {
-				get {
-					return path;
-				}
+				get { return path; }
+			}
+
+			public IDirectory Directory {
+				get { return new RealDirectory(DirectoryPath); }
 			}
 		}
 
