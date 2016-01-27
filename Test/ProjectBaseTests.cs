@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Casper.IO;
 using NUnit.Framework;
 
@@ -9,6 +10,9 @@ namespace Casper {
 		private class TestProject : ProjectBase {
 
 			public TestProject(IFileSystem fileSystem) : this("Root", fileSystem) {}
+
+			public TestProject(IFileSystem fileSystem, IDirectory location) : base(null, location.Path, fileSystem) {
+			}
 
 			public TestProject(string name, IFileSystem fileSystem) : base(null, "test", fileSystem, name) {
 			}
@@ -153,6 +157,22 @@ namespace Casper {
 
 			CollectionAssert.AreEqual(new [] { "hello", "goodbye" }, results);
 			Assert.That(output.ToString(), Is.EqualTo("hello\ntestA:goodbye\n"));
+		}
+
+		[Test]
+		public void ExecuteTaskRelativeToProjectDirectory() {
+			IDirectory rootDirectory = fileSystem.GetCurrentDirectory();
+			IDirectory firstSubDirectory = rootDirectory.Directory("testA");;
+
+			IDirectory executeDirectory = null;
+			var task = new Task(() => { executeDirectory = fileSystem.GetCurrentDirectory(); throw new Exception(); });
+			var project = new TestProject(fileSystem, firstSubDirectory);
+			project.AddTask("test", task);
+
+			Assert.Throws<Exception>(() => project.Execute(task));
+
+			Assert.That(executeDirectory, Is.EqualTo(firstSubDirectory));
+			Assert.That(fileSystem.GetCurrentDirectory(), Is.EqualTo(rootDirectory));
 		}
 	}
 }
