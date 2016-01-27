@@ -12,7 +12,8 @@
     <tags>build casper</tags>
   </metadata>
   <files>
-  	<file src="bin/Debug/*.dll" target="tools" />
+    <file src="bin/Debug/*.dll" target="tools" />
+    <file src="bin/Debug/*.mdb" target="tools" />
     <file src="bin/Debug/*.exe" target="tools" />
   </files>
 </package>
