@@ -7,7 +7,7 @@ namespace Casper {
 	[TestFixture]
 	public class MSBuildTests {
 
-		IFileSystem fileSystem = new RealFileSystem();
+		IFileSystem fileSystem = RealFileSystem.Instance;
 
 		[Test]
 		public void MSBuild() {

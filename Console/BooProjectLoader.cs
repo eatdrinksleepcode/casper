@@ -18,7 +18,7 @@ namespace Casper {
 		}
 
 		public static ProjectBase LoadProject(string scriptPath, ProjectBase parent) {
-			return LoadProject(scriptPath, parent, new RealFileSystem());
+			return LoadProject(scriptPath, parent, RealFileSystem.Instance);
 		}
 
 		private static ProjectBase LoadProject(string scriptPath, ProjectBase parent, IFileSystem fileSystem) {

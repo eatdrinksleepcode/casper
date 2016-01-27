@@ -9,7 +9,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject(string location) : base(null, location, new RealFileSystem()) {
+			public TestProject(string location) : base(null, location, RealFileSystem.Instance) {
 			}
 
 			public override void Configure() {

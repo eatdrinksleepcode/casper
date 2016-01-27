@@ -7,7 +7,7 @@ namespace Casper {
 	public class NUnitTests {
 
 		private RedirectedStandardOutput error;
-		IFileSystem fileSystem = new RealFileSystem();
+		IFileSystem fileSystem = RealFileSystem.Instance;
 
 		[SetUp]
 		public void SetUp() {

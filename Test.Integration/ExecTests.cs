@@ -11,7 +11,7 @@ namespace Casper {
 		StreamReader outputReader;
 		TextWriter originalOutput;
 		TextWriter originalError;
-		IFileSystem fileSystem = new RealFileSystem();
+		IFileSystem fileSystem = RealFileSystem.Instance;
 
 		[SetUp]
 		public void SetUp() {

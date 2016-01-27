@@ -4,6 +4,10 @@ using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Casper.IO {
 	public class RealFileSystem : IFileSystem {
+
+		public static readonly RealFileSystem Instance = new RealFileSystem();
+
+		private RealFileSystem() { }
 		
 		public IFile File(string path) {
 			return new RealFile(path);
