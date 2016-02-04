@@ -23,8 +23,8 @@ namespace Casper {
 			};
 			var process = Process.Start(processStartInfo);
 			var allOutput = new StringBuilder();
-			process.ErrorDataReceived += (sender, e) => allOutput.AppendLine(e.Data);
-			process.OutputDataReceived += (sender, e) => allOutput.AppendLine(e.Data);
+			process.ErrorDataReceived += (sender, e) => { if(e.Data != null) allOutput.AppendLine(e.Data); };
+			process.OutputDataReceived += (sender, e) => { if(e.Data != null) allOutput.AppendLine(e.Data); };
 			process.BeginOutputReadLine();
 			process.BeginErrorReadLine();
 			process.WaitForExit();
