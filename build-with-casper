@@ -1,0 +1,6 @@
+#! /bin/sh
+
+myDir="`dirname \"$0\"`"
+
+rm -r $myDir/out
+$myDir/casper $@ || exit $?
