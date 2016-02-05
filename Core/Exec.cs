@@ -11,7 +11,7 @@ namespace Casper {
 
 		public override void Execute(IFileSystem fileSystem) {
 			if (null == Executable) {
-				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Source'");
+				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Executable'");
 			}
 			var processStartInfo = new ProcessStartInfo {
 				FileName = Executable,
@@ -30,7 +30,7 @@ namespace Casper {
 			process.WaitForExit();
 			if (0 != process.ExitCode) {
 				Console.Error.WriteLine(allOutput.ToString());
-				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "Process '{0}{1}' exited with code {2}", Executable, null == Arguments ? "" : " " + Arguments, process.ExitCode);
+				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "Process '{0}{1}'{2} exited with code {3}", Executable, null == Arguments ? "" : " " + Arguments, null == WorkingDirectory ? "" : " in '" + WorkingDirectory + "'", process.ExitCode);
 			}
 		}
 	}
