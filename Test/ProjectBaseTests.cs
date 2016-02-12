@@ -174,5 +174,17 @@ namespace Casper {
 			Assert.That(executeDirectory, Is.EqualTo(firstSubDirectory));
 			Assert.That(fileSystem.GetCurrentDirectory(), Is.EqualTo(rootDirectory));
 		}
+
+		[Test]
+		[Ignore("Need to detect cyclical dependencies")]
+		public void DetectCyclicalDependencies() {
+			var project = new TestProject(fileSystem);
+			var a = new Task(() => { });
+			var b = new Task(() => { }) { DependsOn = new[] { a } };
+			a.DependsOn = new[] { b };
+			project.AddTask("a", a);
+			project.AddTask("b", b);
+			Assert.Throws<CasperException>(() => project.ExecuteTasks("a"));
+		}
 	}
 }
