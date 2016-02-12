@@ -106,9 +106,31 @@ namespace Casper {
 		}
 
 		public void ExecuteTasks(IEnumerable<string> taskNamesToExecute) {
-			var tasksToExecute = taskNamesToExecute.Select(a => this.GetTaskByName(a)).ToArray();
-			var taskGraphClosure = tasksToExecute.SelectMany(t => t.AllDependencies()).Distinct().ToArray();
-			Array.Sort(taskGraphClosure, (t1, t2) => t1.AllDependencies().Contains(t2) ? 1 : t2.AllDependencies().Contains(t1) ? -1 : 0);
+			var tasksToExecute = ResolveTaskNames(taskNamesToExecute);
+			var taskGraphClosure = GenerateTaskGraphTraversalOrder(tasksToExecute);
+			ExecuteTasksInOrder(taskGraphClosure);
+		}
+
+		private IEnumerable<TaskBase> ResolveTaskNames(IEnumerable<string> taskNamesToExecute) {
+			return taskNamesToExecute.Select(a => this.GetTaskByName(a)).ToArray();
+		}
+
+		private IEnumerable<TaskBase> GenerateTaskGraphTraversalOrder(IEnumerable<TaskBase> tasksToExecute) {
+			var tasksInOrder = new List<TaskBase>();
+			AddTasksToExecutionPlan(tasksToExecute, tasksInOrder);
+			return tasksInOrder;
+		}
+
+		private void AddTasksToExecutionPlan(IEnumerable<TaskBase> tasksToExecute, List<TaskBase> tasksInOrder) {
+			foreach(var task in tasksToExecute) {
+				if(!tasksInOrder.Contains(task)) {
+					AddTasksToExecutionPlan(task.DependsOn.Cast<TaskBase>(), tasksInOrder);
+					tasksInOrder.Add(task);
+				}
+			}
+		}
+
+		private void ExecuteTasksInOrder(IEnumerable<TaskBase> taskGraphClosure) {
 			foreach(var task in taskGraphClosure) {
 				Console.WriteLine(task.Path);
 				// HACK: this is awkward

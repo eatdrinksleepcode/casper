@@ -23,8 +23,24 @@ namespace Casper {
 			public override void Configure() {
 			}
 
+			public TestTask AddTestTask(string taskName, params TestTask[] dependencies) {
+				var csharpCompile = new TestTask(dependencies);
+				AddTask(taskName, csharpCompile);
+				return csharpCompile;
+			}
+
 			public void ExecuteTasks(params string[] taskNamesToExecute) {
 				base.ExecuteTasks(taskNamesToExecute);
+			}
+		}
+
+		private class TestTask : TaskBase {
+
+			public TestTask(params TaskBase[] dependencies) {
+				DependsOn = dependencies;
+			}
+
+			public override void Execute(IFileSystem fileSystem) {
 			}
 		}
 
@@ -120,25 +136,37 @@ namespace Casper {
 		}
 
 		[Test]
-		public void ExecuteTaskWithDependencyGraph() {
-			var project = new TestProject(fileSystem);
-			var results = new List<string>();
-			var wake = new Task(() => results.Add("wake"));
-			project.AddTask("wake", wake);
-			var shower = new Task(() => results.Add("shower")) { DependsOn = new[] { wake	} };
-			project.AddTask("shower", shower);
-			var eat = new Task(() => results.Add("eat")) { DependsOn = new[] { wake	} };
-			project.AddTask("eat", eat);
-			var dress = new Task(() => results.Add("dress")) { DependsOn = new[] { shower }	};
-			project.AddTask("dress", dress);
-			project.AddTask("sleep", new Task(() => results.Add("sleep")));
-			var leave = new Task(() => results.Add("leave")) { DependsOn = new[] { dress, eat } };
-			project.AddTask("leave", leave);
+		public void ExecuteTaskWithComplexDependencyGraph() {
+			var rootProject = new TestProject(fileSystem);
 
-			project.ExecuteTasks("leave");
+			var coreProject = new TestProject(rootProject, "Core", fileSystem);
+			var coreCompile = coreProject.AddTestTask("Compile");
 
-			CollectionAssert.AreEqual(new [] { "wake", "shower", "dress", "eat", "leave" }, results);
-			Assert.That(output.ToString(), Is.EqualTo("wake\nshower\ndress\neat\nleave\n"));
+			var nunitProject = new TestProject(rootProject, "NUnit", fileSystem);
+			var nunitCompile = nunitProject.AddTestTask("Compile", coreCompile);
+
+			var msbuildProject = new TestProject(rootProject, "MSBuild", fileSystem);
+			var msbuildCompile = msbuildProject.AddTestTask("Compile", coreCompile);
+
+			var csharpProject = new TestProject(rootProject, "CSharp", fileSystem);
+			var csharpCompile = csharpProject.AddTestTask("Compile", coreCompile);
+
+			var consoleProject = new TestProject(rootProject, "Console", fileSystem);
+			var consoleCompile = consoleProject.AddTestTask("Compile", coreCompile, msbuildCompile, nunitCompile);
+			consoleProject.AddTestTask("Pack", consoleCompile);
+
+			var testProject = new TestProject(rootProject, "Test", fileSystem);
+			testProject.AddTestTask("Compile", consoleCompile);
+
+			var integrationProject = new TestProject(rootProject, "Test.Integration", fileSystem);
+			integrationProject.AddTestTask("Compile", consoleCompile, csharpCompile);
+
+			rootProject.ExecuteTasks(new[] { "Console:Pack", "Test:Compile", "Test.Integration:Compile" });
+
+			var result = output.ToString();
+			StringAssert.Contains("CSharp:Compile", result);
+			StringAssert.Contains("Test.Integration:Compile", result);
+			Assert.That(result.IndexOf("CSharp:Compile"), Is.LessThan(result.IndexOf("Test.Integration:Compile")));
 		}
 
 		[Test]
