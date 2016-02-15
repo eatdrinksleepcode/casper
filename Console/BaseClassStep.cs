@@ -1,11 +1,15 @@
-﻿using Boo.Lang.Compiler.Ast;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Boo.Lang.Compiler.Ast;
 using Boo.Lang.Compiler.Steps;
 using Casper.IO;
 
 namespace Casper {
 	public class BaseClassStep : AbstractTransformerCompilerStep {
-		private readonly IDirectory location;
 
+		private readonly IDirectory location;
+	
 		public BaseClassStep(IDirectory location) {
 			this.location = location;
 		}
@@ -25,26 +29,37 @@ namespace Casper {
 					Body = node.Globals,
 				};
 				baseClass.Members.Add(configureMethod);
-				var constructor = new Constructor(node.LexicalInfo);
-				constructor.Parameters.Add(new ParameterDeclaration(node.LexicalInfo) {
-					Name = "parent",
-					Type = TypeReference.Lift(typeof(ProjectBase))
-				});
-				constructor.Parameters.Add(new ParameterDeclaration(node.LexicalInfo) {
-					Name = "fileSystem",
-					Type = TypeReference.Lift(typeof(IFileSystem))
-				});
-				constructor.Body.Add(new MethodInvocationExpression(
-					node.LexicalInfo,
-					new SuperLiteralExpression(node.LexicalInfo),
-					new ReferenceExpression(node.LexicalInfo, "parent"),
-					Expression.Lift(this.location.Path),
-					new ReferenceExpression(node.LexicalInfo, "fileSystem")
-				));
-				baseClass.Members.Add(constructor);
+				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForRootProject(node)));
+				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForSubProject(node)));
 				node.Globals = null;
 				node.Members.Add(baseClass);
 			}
+		}
+
+		private Constructor CreateConstructor(Module node, ParameterDeclaration constructorParameter) {
+			var constructor = new Constructor(node.LexicalInfo);
+			constructor.Parameters.Add(constructorParameter);
+			constructor.Body.Add(new MethodInvocationExpression(
+				node.LexicalInfo,
+				new SuperLiteralExpression(node.LexicalInfo),
+				new ReferenceExpression(node.LexicalInfo, constructorParameter.Name),
+				Expression.Lift(this.location.Path)
+			));
+			return constructor;
+		}
+
+		private static ParameterDeclaration ConstructorParameterForRootProject(Module node) {
+			return new ParameterDeclaration(node.LexicalInfo) {
+				Name = "fileSystem",
+				Type = TypeReference.Lift(typeof(IFileSystem))
+			};
+		}
+
+		private static ParameterDeclaration ConstructorParameterForSubProject(Module node) {
+			return new ParameterDeclaration(node.LexicalInfo) {
+				Name = "parent",
+				Type = TypeReference.Lift(typeof(ProjectBase))
+			};
 		}
 	}
 }

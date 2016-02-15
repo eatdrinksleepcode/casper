@@ -11,13 +11,13 @@ namespace Casper {
 
 			public TestProject(IFileSystem fileSystem) : this("Root", fileSystem) {}
 
-			public TestProject(IFileSystem fileSystem, IDirectory location) : base(null, location.Path, fileSystem) {
+			public TestProject(IFileSystem fileSystem, IDirectory location) : base(fileSystem, location.Path) {
 			}
 
-			public TestProject(string name, IFileSystem fileSystem) : base(null, "test", fileSystem, name) {
+			public TestProject(string name, IFileSystem fileSystem) : base(fileSystem, "test", name) {
 			}
 
-			public TestProject(ProjectBase parent, string name, IFileSystem fileSystem) : base(parent, "test", fileSystem, name) {
+			public TestProject(ProjectBase parent, string name) : base(parent, "test", name) {
 			}
 
 			public override void Configure() {
@@ -94,7 +94,7 @@ namespace Casper {
 		[Test]
 		public void SubProjectNameDoesNotExistInSubProjectInTaskPath() {
 			var project = new TestProject(fileSystem);
-			new TestProject(project, "testA", fileSystem);
+			new TestProject(project, "testA");
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist:foo"));
 
@@ -104,8 +104,8 @@ namespace Casper {
 		[Test]
 		public void SubProjectNameDoesNotExistInMultiSubProjectInTaskPath() {
 			var project = new TestProject(fileSystem);
-			var subProject = new TestProject(project, "testA", fileSystem);
-			new TestProject(subProject, "testB", fileSystem);
+			var subProject = new TestProject(project, "testA");
+			new TestProject(subProject, "testB");
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:testB:doesNotExist:foo"));
 
@@ -115,7 +115,7 @@ namespace Casper {
 		[Test]
 		public void TaskNameDoesNotExistInSubProject() {
 			var project = new TestProject(fileSystem);
-			new TestProject(project, "testA", fileSystem);
+			new TestProject(project, "testA");
 
 			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist"));
 
@@ -139,26 +139,26 @@ namespace Casper {
 		public void ExecuteTaskWithComplexDependencyGraph() {
 			var rootProject = new TestProject(fileSystem);
 
-			var coreProject = new TestProject(rootProject, "Core", fileSystem);
+			var coreProject = new TestProject(rootProject, "Core");
 			var coreCompile = coreProject.AddTestTask("Compile");
 
-			var nunitProject = new TestProject(rootProject, "NUnit", fileSystem);
+			var nunitProject = new TestProject(rootProject, "NUnit");
 			var nunitCompile = nunitProject.AddTestTask("Compile", coreCompile);
 
-			var msbuildProject = new TestProject(rootProject, "MSBuild", fileSystem);
+			var msbuildProject = new TestProject(rootProject, "MSBuild");
 			var msbuildCompile = msbuildProject.AddTestTask("Compile", coreCompile);
 
-			var csharpProject = new TestProject(rootProject, "CSharp", fileSystem);
+			var csharpProject = new TestProject(rootProject, "CSharp");
 			var csharpCompile = csharpProject.AddTestTask("Compile", coreCompile);
 
-			var consoleProject = new TestProject(rootProject, "Console", fileSystem);
+			var consoleProject = new TestProject(rootProject, "Console");
 			var consoleCompile = consoleProject.AddTestTask("Compile", coreCompile, msbuildCompile, nunitCompile);
 			consoleProject.AddTestTask("Pack", consoleCompile);
 
-			var testProject = new TestProject(rootProject, "Test", fileSystem);
+			var testProject = new TestProject(rootProject, "Test");
 			testProject.AddTestTask("Compile", consoleCompile);
 
-			var integrationProject = new TestProject(rootProject, "Test.Integration", fileSystem);
+			var integrationProject = new TestProject(rootProject, "Test.Integration");
 			integrationProject.AddTestTask("Compile", consoleCompile, csharpCompile);
 
 			rootProject.ExecuteTasks(new[] { "Console:Pack", "Test:Compile", "Test.Integration:Compile" });
@@ -177,7 +177,7 @@ namespace Casper {
 			var project = new TestProject(fileSystem);
 			var hello = new Task(() => results.Add("hello"));
 			project.AddTask("hello", hello);
-			var subProject = new TestProject(project, "testA", fileSystem);
+			var subProject = new TestProject(project, "testA");
 			var goodbye = new Task(() => results.Add("goodbye")) { DependsOn = new [] { hello }};
 			subProject.AddTask("goodbye", goodbye);
 

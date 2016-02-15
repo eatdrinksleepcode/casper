@@ -13,10 +13,23 @@ namespace Casper {
 		private readonly Dictionary<string, TaskRecord> records;
 		private readonly IFile taskRecordCache;
 
-		protected ProjectBase(ProjectBase parent, string location, IFileSystem fileSystem) : this(parent, location, fileSystem, System.IO.Path.GetFileName(location)) {
+		protected ProjectBase(IFileSystem fileSystem, string location)
+			: this(fileSystem, location, System.IO.Path.GetFileName(location)) {
 		}
 
-		protected ProjectBase(ProjectBase parent, string location, IFileSystem fileSystem, string name) {
+		protected ProjectBase(IFileSystem fileSystem, string location, string name)
+			: this(null, location, fileSystem, name) {
+		}
+
+		protected ProjectBase(ProjectBase parent, string location)
+			: this(parent, location, System.IO.Path.GetFileName(location)) {
+		}
+
+		protected ProjectBase(ProjectBase parent, string location, string name)
+			: this(parent, location, parent.fileSystem, name) {
+		}
+
+		private ProjectBase(ProjectBase parent, string location, IFileSystem fileSystem, string name) {
 			this.parent = parent;
 			this.location = fileSystem.Directory(location);
 			this.Name = name;

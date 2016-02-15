@@ -21,7 +21,7 @@ namespace Casper {
 
 		private class TestProject : ProjectBase {
 
-			public TestProject(IFileSystem fileSystem) : base(null, "test", fileSystem, "Root") {}
+			public TestProject(IFileSystem fileSystem) : base(fileSystem, "test", "Root") {}
 
 			public override void Configure() {
 			}
