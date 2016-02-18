@@ -1,9 +1,8 @@
+using System.Collections;
 using System.Collections.Generic;
 
-namespace Casper
-{
-	public class ProjectCollection
-	{
+namespace Casper {
+	public class ProjectCollection : IEnumerable<ProjectBase> {
 		private readonly ProjectBase parent;
 		private readonly Dictionary<string, ProjectBase> subprojects = new Dictionary<string, ProjectBase>();
 
@@ -15,14 +14,26 @@ namespace Casper
 			this.subprojects.Add(project.Name, project);
 		}
 
+		public IEnumerator<ProjectBase> GetEnumerator() {
+			return subprojects.Values.GetEnumerator();
+		}
+
+		IEnumerator IEnumerable.GetEnumerator() {
+			return GetEnumerator();
+		}
+
 		public ProjectBase this[string name] {
 			get {
 				ProjectBase result;
-				if (!subprojects.TryGetValue(name, out result)) {
+				if(!subprojects.TryGetValue(name, out result)) {
 					throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Project '{0}' does not exist in {1}", name, parent.PathDescription);
 				}
 				return result;
 			}
+		}
+
+		public bool TryGet(string name, out ProjectBase value) {
+			return subprojects.TryGetValue(name, out value);
 		}
 	}
 }

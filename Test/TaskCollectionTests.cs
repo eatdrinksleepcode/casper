@@ -9,9 +9,6 @@ namespace Casper {
 
 			public TestProject() : base(new StubFileSystem(), "test", "Root") {
 			}
-			
-			public override void Configure() {
-			}
 		}
 
 		[Test]

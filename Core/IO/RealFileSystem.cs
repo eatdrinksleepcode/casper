@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -43,6 +44,10 @@ namespace Casper.IO {
 
 			public string ReadAllText() {
 				return System.IO.File.ReadAllText(path);
+			}
+
+			public IEnumerable<string> ReadAllLines() {
+				return System.IO.File.ReadAllLines(path);
 			}
 
 			public T ReadAll<T>() {

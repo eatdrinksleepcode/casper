@@ -24,6 +24,10 @@ namespace Casper {
 			}
 		}
 
+		public int Count {
+			get { return tasks.Count; }
+		}
+
 		public bool TryGetValue(string name, out TaskBase task) {
 			return tasks.TryGetValue(name, out task);
 		}

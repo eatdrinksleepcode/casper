@@ -1,17 +1,19 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace Casper.IO {
 	public interface IFile : IFileSystemObject {
 		void CopyTo(IFile destination);
 
-		void WriteAllText(string text);
 		void WriteAll<T>(T content);
+		void WriteAllText(string text);
 
 		TextReader OpenText();
 
-		string ReadAllText();
 		T ReadAll<T>();
+		string ReadAllText();
+		IEnumerable<string> ReadAllLines();
 
 		void CreateDirectories();
 

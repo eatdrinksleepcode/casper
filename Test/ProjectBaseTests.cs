@@ -20,9 +20,6 @@ namespace Casper {
 			public TestProject(ProjectBase parent, string name) : base(parent, "test", name) {
 			}
 
-			public override void Configure() {
-			}
-
 			public TestTask AddTestTask(string taskName, params TestTask[] dependencies) {
 				var csharpCompile = new TestTask(dependencies);
 				AddTask(taskName, csharpCompile);

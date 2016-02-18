@@ -1,10 +1,9 @@
-import Casper;
-
-task Compile(MSBuild,
-			 Properties: {"Configuration": "Release"})
+import Casper.Solution;
 
 task Build
 
 include 'Console/build.casper'
 include 'Test/build.casper'
 include 'Test.Integration/build.casper'
+
+ConfigureFromSolution('Casper.sln')

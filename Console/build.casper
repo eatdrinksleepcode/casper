@@ -4,7 +4,7 @@ task CreatePackagesDir:
 	System.IO.Directory.CreateDirectory("../out/packages")
 
 task Pack(Exec,
-		  DependsOn: [parent.Tasks['Compile'], CreatePackagesDir],
+		  DependsOn: [Tasks['Compile'], CreatePackagesDir],
 		  Executable: "nuget",
 		  Arguments: "pack Console.nuspec -OutputDirectory ../out/packages")
 

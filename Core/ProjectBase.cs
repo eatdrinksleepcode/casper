@@ -47,7 +47,14 @@ namespace Casper {
 			}
 		}
 
-		public abstract void Configure();
+		protected virtual void Configure() { }
+
+		public void ConfigureAll() {
+			Configure();
+			foreach(var project in subprojects) {
+				project.ConfigureAll();
+			}
+		}
 
 		public void AddTask(string name, TaskBase task) {
 			task.Name = name;
@@ -76,6 +83,10 @@ namespace Casper {
 
 		public TaskCollection Tasks {
 			get { return tasks; }
+		}
+
+		public ProjectCollection Projects {
+			get { return subprojects; }
 		}
 
 		[Serializable]

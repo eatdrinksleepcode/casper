@@ -23,9 +23,6 @@ namespace Casper {
 
 			public TestProject(IFileSystem fileSystem) : base(fileSystem, "test", "Root") {}
 
-			public override void Configure() {
-			}
-
 			public void ExecuteTasks(params string[] taskNamesToExecute) {
 				base.ExecuteTasks(taskNamesToExecute);
 			}

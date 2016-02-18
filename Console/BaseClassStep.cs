@@ -25,7 +25,7 @@ namespace Casper {
 				baseClass.BaseTypes.Add(TypeReference.Lift(typeof(ProjectBase)));
 				var configureMethod = new Method(node.LexicalInfo) {
 					Name = "Configure",
-					Modifiers = TypeMemberModifiers.Override | TypeMemberModifiers.Public,
+					Modifiers = TypeMemberModifiers.Override | TypeMemberModifiers.Protected,
 					Body = node.Globals,
 				};
 				baseClass.Members.Add(configureMethod);

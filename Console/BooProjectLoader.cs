@@ -11,7 +11,9 @@ namespace Casper {
 
 		public static ProjectBase LoadProject(string scriptPath, IFileSystem fileSystem) {
 			var loader = new BooProjectLoader(fileSystem.File(scriptPath), fileSystem);
-			return loader.Load();
+			var project = loader.Load();
+			project.ConfigureAll();
+			return project;
 		}
 
 		public static ProjectBase LoadProject(string scriptPath, ProjectBase parent) {
@@ -45,7 +47,6 @@ namespace Casper {
 
 		public ProjectBase Load() {
 			var project = CreateProjectFromProjectType(CompileToProjectType());
-			project.Configure();
 			return project;
 		}
 			
