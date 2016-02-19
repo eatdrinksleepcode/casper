@@ -2,9 +2,11 @@
 
 myDir="`dirname \"$0\"`"
 
-$myDir/build || exit $?
+$myDir/build DEBUG || exit $?
 rm -r $myDir/.msbuild
 mkdir $myDir/.msbuild
 echo "Installing casper..."
 $myDir/nuget install Casper.Console -OutputDirectory $myDir/.msbuild -pre -Verbosity quiet -Source "Casper Dev" || exit $?
+xbuild /t:Clean || exit $?
+xbuild /t:Clean /p:Configuration=Release || exit $?
 $myDir/build-with-casper $@ || exit $?
