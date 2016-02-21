@@ -35,7 +35,7 @@ task hello:
 
 			task.Execute(fileSystem);
 
-			Assert.That(output.ToString(), Is.EqualTo("Hello World!\n"));
+			Assert.That(output.ToString(), Is.EqualTo("Hello World!\n".NormalizeNewLines()));
 		}
 
 		[Test]
