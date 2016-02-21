@@ -69,7 +69,11 @@ namespace Casper.IO {
 
 			private void WriteContent(byte[] newContent) {
 				this.contentStream = new MemoryStream(newContent, 0, newContent.Length, true, true);
-				lastWriteTimeUtc = DateTimeOffset.UtcNow;
+                var newWriteTimeUtc = DateTimeOffset.UtcNow;
+                if(lastWriteTimeUtc == newWriteTimeUtc) {
+                    newWriteTimeUtc = newWriteTimeUtc.AddTicks(1);
+                }
+				lastWriteTimeUtc = newWriteTimeUtc;
 			}
 
 			public void CopyTo(IFile destination) {
