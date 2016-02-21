@@ -52,7 +52,7 @@ namespace Casper {
 			barFile.Delete();
 
 			var task = new Exec {
-				Executable = "mv",
+				Executable = "move",
 				Arguments = "foo.txt bar.txt",
 			};
 			task.Execute(fileSystem);
@@ -68,7 +68,7 @@ namespace Casper {
 			File.Delete("bar.txt");
 
 			var task = new Exec {
-				Executable = "mv",
+				Executable = "move",
 				Arguments = "foo.txt bar.txt",
 			};
 				

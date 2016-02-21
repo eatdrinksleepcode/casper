@@ -5,7 +5,7 @@ task CreatePackagesDir:
 
 task Pack(Exec,
 		  DependsOn: [Tasks['Compile'], CreatePackagesDir],
-		  Executable: 'nuget',
+		  Executable: '..\\nuget.exe',
 		  Arguments: 'pack Console.nuspec -OutputDirectory ../out/packages -Properties "Configuration=Release"')
 
 parent.Tasks['Build'].DependsOn.Add(Pack)

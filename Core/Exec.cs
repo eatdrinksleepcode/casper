@@ -14,12 +14,11 @@ namespace Casper {
 				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Executable'");
 			}
 			var processStartInfo = new ProcessStartInfo {
-				FileName = Executable,
-				Arguments = Arguments,
+				FileName = "cmd.exe",
 				UseShellExecute = false,
-				WorkingDirectory = WorkingDirectory,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
+                RedirectStandardInput = true,
 			};
 			var process = Process.Start(processStartInfo);
 			var allOutput = new StringBuilder();
@@ -27,6 +26,14 @@ namespace Casper {
 			process.OutputDataReceived += (sender, e) => { if(e.Data != null) allOutput.AppendLine(e.Data); };
 			process.BeginOutputReadLine();
 			process.BeginErrorReadLine();
+            if(null != WorkingDirectory)
+            {
+                process.StandardInput.WriteLine("cd \"{0}\"", WorkingDirectory);
+            }
+            process.StandardInput.WriteLine("{0} {1}", Executable, Arguments);
+            process.StandardInput.WriteLine("exit %errorlevel%");
+            process.StandardInput.Flush();
+            process.StandardInput.Close();
 			process.WaitForExit();
 			if (0 != process.ExitCode) {
 				Console.Error.WriteLine(allOutput.ToString());
