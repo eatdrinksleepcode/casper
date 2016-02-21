@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using Casper.IO;
-using Microsoft.Build.BuildEngine;
 
 namespace Casper {
 	public static class Solution {
@@ -62,15 +61,12 @@ namespace Casper {
 				return;
 			}
 
-			var engine = new Engine();
-			if(!engine.BuildProjectFile(projectFile.Path)) {
-				throw new System.Exception("Failed to build project file at " + projectFile.Path);
-			}
-			var projectModel = engine.GetLoadedProject(projectFile.Path);
-			var projectReferences = projectModel.GetEvaluatedItemsByName("ProjectReference");
+			var engine = new Microsoft.Build.Evaluation.ProjectCollection();
+            var projectModel = engine.LoadProject(projectFile.Path);
+			var projectReferences = projectModel.GetItems("ProjectReference");
 
-			var dependencies = (from r in projectReferences.Cast<BuildItem>()
-			                        join d in projects on r.GetMetadata("Name") equals d.Name
+			var dependencies = (from r in projectReferences
+			                        join d in projects on r.GetMetadataValue("Name") equals d.Name
 			                        select d).ToArray();
 
 			foreach(var d in dependencies) {
@@ -82,7 +78,6 @@ namespace Casper {
 				Properties = new Dictionary<string, object> {
 					{ "Configuration", "Release" },
 					{ "BuildProjectReferences", false },
-					{ "BuildingInsideVisualStudio", true },
 				}
 			});
 		}
