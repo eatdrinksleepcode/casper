@@ -43,7 +43,7 @@ Failing tests:
 
 Casper.NUnitTests.ShouldFail:
 Failed!
-at Casper.NUnitTests.ShouldFail ()"));
+at Casper.NUnitTests.ShouldFail".NormalizeNewLines()));
 		}
 
 		[Test]

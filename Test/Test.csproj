@@ -67,6 +67,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
+    <Compile Include="..\Test.Integration\StringTestExtensions.cs">
+      <Link>StringTestExtensions.cs</Link>
+    </Compile>
     <Compile Include="IO\StubFileSystem.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

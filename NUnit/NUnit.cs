@@ -31,9 +31,11 @@ namespace Casper {
 				Console.Error.WriteLine("Failing tests:");
 				Console.Error.WriteLine();
 				foreach (var error in failures) {
-					Console.Error.WriteLine("{0}:\n{1}\n{2}", error.Name, error.Message, error.StackTrace);
-				}
-				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures.Count);
+					Console.Error.WriteLine("{0}:", error.Name);
+                    Console.Error.WriteLine(error.Message);
+                    Console.Error.WriteLine(error.StackTrace);
+                }
+                throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures.Count);
 			}
 		}
 
