@@ -62,9 +62,8 @@ namespace Casper {
 				return;
 			}
 
-			var isNix = (Environment.OSVersion.Platform == PlatformID.MacOSX || Environment.OSVersion.Platform == PlatformID.Unix);
 			IEnumerable<ProjectInfo> dependencies;
-			if(isNix) {
+			if(Environment.IsUnix) {
 				var engine = new Microsoft.Build.BuildEngine.Engine();
 				if(!engine.BuildProjectFile(projectFile.Path)) {
 					throw new System.Exception("Failed to build project file at " + projectFile.Path);
@@ -93,7 +92,7 @@ namespace Casper {
 				DependsOn = dependencies.Select(d => d.Project.Tasks["Compile"]).ToList(),
 				Properties = new Dictionary<string, object> {
 					{ "Configuration", "Release" },
-					{ isNix ? "BuildingInsideVisualStudio" : "BuildProjectReferences", isNix },
+					{ Environment.IsUnix ? "BuildingInsideVisualStudio" : "BuildProjectReferences", Environment.IsUnix },
 				}
 			});
 		}
