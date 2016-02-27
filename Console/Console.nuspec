@@ -12,8 +12,8 @@
     <tags>build casper</tags>
   </metadata>
   <files>
-    <file src="bin/$CONFIGURATION$/*.dll" target="tools" />
-    <file src="bin/$CONFIGURATION$/*.mdb" target="tools" />
-    <file src="bin/$CONFIGURATION$/*.exe" target="tools" />
+    <file src="$BINPATH$*.dll" target="tools" />
+    <file src="$BINPATH$*.mdb" target="tools" />
+    <file src="$BINPATH$*.exe" target="tools" />
   </files>
 </package>

@@ -2,7 +2,7 @@
 
 myDir="`dirname \"$0\"`"
 
-$myDir/build DEBUG || exit $?
+$myDir/build Debug || exit $?
 rm -r $myDir/.msbuild
 mkdir $myDir/.msbuild
 echo "Installing casper..."

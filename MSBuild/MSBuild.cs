@@ -27,7 +27,7 @@ namespace Casper {
 
 			var exec = new Exec {
 				WorkingDirectory = WorkingDirectory,
-				Executable = "xbuild",
+				Executable = Environment.IsMono ? "xbuild" : "msbuild",
 				Arguments = string.Join(" ", args),
 			};
 			exec.Execute(fileSystem);

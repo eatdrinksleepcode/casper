@@ -52,7 +52,7 @@ namespace Casper {
 			barFile.Delete();
 
 			var task = new Exec {
-				Executable = "mv",
+				Executable = MoveCommand,
 				Arguments = "foo.txt bar.txt",
 			};
 			task.Execute(fileSystem);
@@ -68,7 +68,7 @@ namespace Casper {
 			File.Delete("bar.txt");
 
 			var task = new Exec {
-				Executable = "mv",
+				Executable = MoveCommand,
 				Arguments = "foo.txt bar.txt",
 			};
 				
@@ -87,6 +87,10 @@ namespace Casper {
 			};
 
 			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
+		}
+
+		string MoveCommand {
+			get { return Environment.IsUnix ? "mv" : "move"; }
 		}
 	}
 }
