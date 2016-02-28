@@ -108,12 +108,18 @@ namespace Casper {
 
 		[Test]
 		public void InputChanges() {
-			Assert.True(ExecuteTwice(inputFile, outputFile, () => { inputFile.WriteAllText("Changed Input"); }));
+			Assert.True(ExecuteTwice(inputFile, outputFile, () => { 
+				System.Threading.Tasks.Task.Delay(TimeSpan.FromMilliseconds(1)).Wait();
+				inputFile.WriteAllText("Changed Input");
+			}));
 		}
 
 		[Test]
 		public void OutputChanges() {
-			Assert.True(ExecuteTwice(inputFile, outputFile, () => { outputFile.WriteAllText("Changed Output"); }));
+			Assert.True(ExecuteTwice(inputFile, outputFile, () => { 
+				System.Threading.Tasks.Task.Delay(TimeSpan.FromMilliseconds(1)).Wait();
+				outputFile.WriteAllText("Changed Output");
+			}));
 		}
 
 		[Test]
