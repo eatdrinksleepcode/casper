@@ -3,7 +3,7 @@
 set myDir=%~dp0
 
 call %myDir%build DEBUG || goto :eof
-rmdir /S /Q %myDir%.msbuild || goto :eof
+if exist %myDir%.msbuild rmdir /S /Q %myDir%.msbuild || goto :eof
 mkdir %myDir%.msbuild || goto :eof
 echo Installing casper...
 %myDir%nuget install Casper.Console -OutputDirectory %myDir%.msbuild -pre -Verbosity quiet -Source "Casper Dev" || goto :eof
