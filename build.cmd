@@ -4,5 +4,6 @@ set myDir=%~dp0
 set configuration=%1
 if "%configuration%" == "" set configuration=RELEASE
 
-msbuild /p:Configuration=%configuration% || goto :eof
+set TargetFrameworkVersion=v4.5.1
+msbuild /p:Configuration=%configuration% /p:TargetFrameworkversion=v4.5.1 || goto :eof
 call %myDir%pack %configuration% || goto :eof
