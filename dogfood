@@ -9,11 +9,12 @@ $myDir/build Debug || exit $?
 rm -r $myDir/.msbuild
 mkdir $myDir/.msbuild
 echo "Installing casper..."
-$myDir/nuget sources Remove -Name "Casper Dev" -ConfigFile $localNugetConfig
-$myDir/nuget sources Add -Name "Casper Dev" -Source $packageDir -ConfigFile $localNugetConfig || exit $?
+$myDir/nuget sources Remove -Name "Casper Dev" -ConfigFile $localNugetConfig > /dev/null 2>&1
+$myDir/nuget sources Add -Name "Casper Dev" -Source $packageDir -ConfigFile $localNugetConfig > /dev/null || exit $?
 # Adding any source to a NuGet config also adds the default source, which we don't want for this operation
-$myDir/nuget sources Disable -Name "https://www.nuget.org/api/v2/" -ConfigFile $localNugetConfig || exit $?
+$myDir/nuget sources Disable -Name "https://www.nuget.org/api/v2/" -ConfigFile $localNugetConfig > /dev/null || exit $?
 $myDir/nuget install Casper.Console -OutputDirectory $myDir/.msbuild -pre -Verbosity quiet -Source "Casper Dev" -ConfigFile $localNugetConfig || exit $?
-xbuild /t:Clean || exit $?
-xbuild /t:Clean /p:Configuration=Release || exit $?
+echo Cleaning outputs...
+xbuild /t:Clean /verbosity:quiet /nologo || exit $?
+xbuild /t:Clean /p:Configuration=Release /verbosity:quiet /nologo || exit $?
 $myDir/build-with-casper $@ || exit $?

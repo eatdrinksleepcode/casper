@@ -5,4 +5,4 @@ configuration=${1:-Release}
 
 rm -r $myDir/out
 mkdir -p $myDir/out/packages
-$myDir/nuget pack $myDir/Console/Console.nuspec -OutputDirectory $myDir/out/packages -Properties "BINPATH=bin/$configuration/" || exit $?
+$myDir/nuget pack $myDir/Console/Console.nuspec -OutputDirectory $myDir/out/packages -Properties "BINPATH=bin/$configuration/" -NoPackageAnalysis || exit $?
