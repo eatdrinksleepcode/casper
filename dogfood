@@ -1,12 +1,19 @@
 #! /bin/sh
 
 myDir="`dirname \"$0\"`"
+packageDir="$(cd $myDir/out/packages; pwd)"
+localNugetConfig=$myDir/.local-nuget.config
+cp $myDir/local-nuget.config $localNugetConfig
 
 $myDir/build Debug || exit $?
 rm -r $myDir/.msbuild
 mkdir $myDir/.msbuild
 echo "Installing casper..."
-$myDir/nuget install Casper.Console -OutputDirectory $myDir/.msbuild -pre -Verbosity quiet -Source "Casper Dev" || exit $?
+$myDir/nuget sources Remove -Name "Casper Dev" -ConfigFile $localNugetConfig
+$myDir/nuget sources Add -Name "Casper Dev" -Source $packageDir -ConfigFile $localNugetConfig || exit $?
+# Adding any source to a NuGet config also adds the default source, which we don't want for this operation
+$myDir/nuget sources Disable -Name "https://www.nuget.org/api/v2/" -ConfigFile $localNugetConfig || exit $?
+$myDir/nuget install Casper.Console -OutputDirectory $myDir/.msbuild -pre -Verbosity quiet -Source "Casper Dev" -ConfigFile $localNugetConfig || exit $?
 xbuild /t:Clean || exit $?
 xbuild /t:Clean /p:Configuration=Release || exit $?
 $myDir/build-with-casper $@ || exit $?
