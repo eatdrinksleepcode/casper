@@ -7,40 +7,6 @@ namespace Casper {
 	[TestFixture]
 	public class ProjectBaseTests {
 
-		private class TestProject : ProjectBase {
-
-			public TestProject(IFileSystem fileSystem) : this("Root", fileSystem) {}
-
-			public TestProject(IFileSystem fileSystem, IDirectory location) : base(fileSystem, location.Path) {
-			}
-
-			public TestProject(string name, IFileSystem fileSystem) : base(fileSystem, "test", name) {
-			}
-
-			public TestProject(ProjectBase parent, string name) : base(parent, "test", name) {
-			}
-
-			public TestTask AddTestTask(string taskName, params TestTask[] dependencies) {
-				var csharpCompile = new TestTask(dependencies);
-				AddTask(taskName, csharpCompile);
-				return csharpCompile;
-			}
-
-			public void ExecuteTasks(params string[] taskNamesToExecute) {
-				base.ExecuteTasks(taskNamesToExecute);
-			}
-		}
-
-		private class TestTask : TaskBase {
-
-			public TestTask(params TaskBase[] dependencies) {
-				DependsOn = dependencies;
-			}
-
-			public override void Execute(IFileSystem fileSystem) {
-			}
-		}
-
 		private static RedirectedStandardOutput output;
 
 		private IFileSystem fileSystem;

@@ -19,43 +19,6 @@ namespace Casper {
 			outputFile.WriteAllText("Output");
 		}
 
-		private class TestProject : ProjectBase {
-
-			public TestProject(IFileSystem fileSystem) : base(fileSystem, "test", "Root") {}
-
-			public void ExecuteTasks(params string[] taskNamesToExecute) {
-				base.ExecuteTasks(taskNamesToExecute);
-			}
-		}
-
-		private class TestTask : TaskBase {
-			private readonly List<IFile> inputFiles = new List<IFile>();
-			private readonly List<IFile> outputFiles = new List<IFile>();
-
-			public void AddInput(IFile inputFile) {
-				inputFiles.Add(inputFile);
-			}
-
-			public void AddOutput(IFile inputFile) {
-				outputFiles.Add(inputFile);
-			}
-
-			public override void Execute(IFileSystem fileSystem) {
-			}
-
-			protected override IEnumerable<IFile> InputFiles {
-				get {
-					return inputFiles;
-				}
-			}
-
-			protected override IEnumerable<IFile> OutputFiles {
-				get {
-					return outputFiles;
-				}
-			}
-		}
-
 		private bool CreateUpToDateTask(IFile[] inputFiles, IFile[] outputFiles) {
 			var task = new TestTask();
 			foreach(var inputFile in inputFiles) {
