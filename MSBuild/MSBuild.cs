@@ -14,7 +14,7 @@ namespace Casper {
 
 			List<string> args = new List<string>();
 			if (null != ProjectFile) {
-				args.Add(ProjectFile);
+				args.Add("\"" + ProjectFile + "\"");
 			}
 			if (null != Targets) {
 				args.Add("/t:" + string.Join(";", Targets.Cast<object>().Select(t => t.ToString())));
