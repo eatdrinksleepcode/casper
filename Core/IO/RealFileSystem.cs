@@ -106,7 +106,7 @@ namespace Casper.IO {
 			}
 
 			public IDirectory Directory (string relativePath) {
-				return new RealDirectory(relativePath);
+				return new RealDirectory(System.IO.Path.Combine(this.path, relativePath));
 			}
 
 			public void SetAsCurrent() {

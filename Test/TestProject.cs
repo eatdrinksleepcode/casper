@@ -14,6 +14,9 @@ namespace Casper {
 		public TestProject(ProjectBase parent, string name) : base(parent, ".", name) {
 		}
 
+		public TestProject(ProjectBase parent, IDirectory location, string name) : base(parent, location.Path, name) {
+		}
+
 		public void ExecuteTasks(params string[] taskNamesToExecute) {
 			base.ExecuteTasks(taskNamesToExecute);
 		}

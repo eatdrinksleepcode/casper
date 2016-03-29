@@ -58,6 +58,12 @@
     <Compile Include="..\Test\RedirectedStandardOutput.cs">
       <Link>RedirectedStandardOutput.cs</Link>
     </Compile>
+    <Compile Include="..\Test\TestProject.cs">
+      <Link>TestProject.cs</Link>
+    </Compile>
+    <Compile Include="..\Test\TestTask.cs">
+      <Link>TestTask.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

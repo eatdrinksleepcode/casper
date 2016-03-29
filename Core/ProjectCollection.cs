@@ -22,6 +22,12 @@ namespace Casper {
 			return GetEnumerator();
 		}
 
+		public int Count {
+			get {
+				return subprojects.Count;
+			}
+		}
+
 		public ProjectBase this[string name] {
 			get {
 				ProjectBase result;
