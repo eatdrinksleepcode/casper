@@ -1,7 +1,6 @@
 #! /bin/sh
 
 myDir="`dirname \"$0\"`"
-packageDir="$(cd $myDir/out/packages; pwd)"
 localNugetConfig=$myDir/.local-nuget.config
 cp $myDir/local-nuget.config $localNugetConfig
 
@@ -9,6 +8,7 @@ $myDir/build Debug || exit $?
 rm -r $myDir/.msbuild
 mkdir $myDir/.msbuild
 echo "Installing casper..."
+packageDir="$(cd $myDir/out/packages; pwd)"
 $myDir/nuget sources Remove -Name "Casper Dev" -ConfigFile $localNugetConfig > /dev/null 2>&1
 $myDir/nuget sources Add -Name "Casper Dev" -Source "$packageDir" -ConfigFile $localNugetConfig > /dev/null || exit $?
 # Adding any source to a NuGet config also adds the default source, which we don't want for this operation
