@@ -42,6 +42,8 @@ namespace Casper {
 							let name = match.Groups["PROJECTNAME"].Value.Trim()
 							let projectFile = solutionFile.Directory.File(match.Groups["RELATIVEPATH"].Value.Trim().Replace('\\', System.IO.Path.DirectorySeparatorChar))
 			                where name != "Solution Items"
+			                // TODO: also filter out based on project type (GUID)
+			                where projectFile.Exists()
 			                select new ProjectInfo { Name = name, ProjectFile = projectFile, Project = GetOrCreateProject(rootProject, name, projectFile) }).ToArray();
 
 			foreach(var p in projects) {
