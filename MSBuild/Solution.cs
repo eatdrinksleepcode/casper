@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
 using Casper.IO;
 
 namespace Casper {
@@ -41,7 +41,7 @@ namespace Casper {
 							where match.Success
 							let name = match.Groups["PROJECTNAME"].Value.Trim()
 							let projectFile = solutionFile.Directory.File(match.Groups["RELATIVEPATH"].Value.Trim().Replace('\\', System.IO.Path.DirectorySeparatorChar))
-							where name != "Solution Items"
+			                where name != "Solution Items"
 			                select new ProjectInfo { Name = name, ProjectFile = projectFile, Project = GetOrCreateProject(rootProject, name, projectFile) }).ToArray();
 
 			foreach(var p in projects) {
@@ -62,27 +62,7 @@ namespace Casper {
 				return;
 			}
 
-			IEnumerable<ProjectInfo> dependencies;
-			if(Environment.IsUnix) {
-				var engine = new Microsoft.Build.BuildEngine.Engine();
-				if(!engine.BuildProjectFile(projectFile.Path)) {
-					throw new System.Exception("Failed to build project file at " + projectFile.Path);
-				}
-				var projectModel = engine.GetLoadedProject(projectFile.Path);
-				var projectReferences = projectModel.GetEvaluatedItemsByName("ProjectReference").Cast<Microsoft.Build.BuildEngine.BuildItem>();
-
-				dependencies = (from r in projectReferences
-									join d in projects on r.GetMetadata("Name") equals d.Name
-									select d).ToArray();
-			} else {
-				var engine = new Microsoft.Build.Evaluation.ProjectCollection();
-				var projectModel = engine.LoadProject(projectFile.Path);
-				var projectReferences = projectModel.GetItems("ProjectReference");
-
-				dependencies = (from r in projectReferences
-									join d in projects on r.GetMetadataValue("Name") equals d.Name
-									select d).ToArray();
-			}
+			IEnumerable<ProjectInfo> dependencies = LoadDependenciesFromProjectFile(projectFile, projects);
 
 			foreach(var d in dependencies) {
 				Configure(d.Project, d.ProjectFile, projects);
@@ -95,6 +75,26 @@ namespace Casper {
 					{ Environment.IsUnix ? "BuildingInsideVisualStudio" : "BuildProjectReferences", Environment.IsUnix },
 				}
 			});
+		}
+
+		static IEnumerable<ProjectInfo> LoadDependenciesFromProjectFile(IFile projectFile, IEnumerable<ProjectInfo> projects) {
+			IEnumerable<ProjectInfo> dependencies;
+			// Mono's ProjectCollection.LoadString(string fileName) has a bug that causes the project to never actually get loaded
+			Microsoft.Build.Evaluation.Project projectModel;
+			using(var engine = new Microsoft.Build.Evaluation.ProjectCollection()) {
+				using(var reader = XmlReader.Create(projectFile.Path)) {
+					projectModel = engine.LoadProject(reader);
+				}
+			}
+
+			var projectReferences = projectModel.GetItems("ProjectReference");
+
+			dependencies = (from r in projectReferences
+							join d in projects
+			                	// TODO: match on project file path instead of / in addition to name
+			                	on r.GetMetadataValue("Name") equals d.Name
+							select d).ToArray();
+			return dependencies;
 		}
 	}
 }
