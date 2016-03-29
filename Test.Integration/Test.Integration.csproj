@@ -28,6 +28,13 @@
     <ConsolePause>false</ConsolePause>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
+  <PropertyGroup>
+    <CustomCommands>
+      <CustomCommands>
+        <Command type="Execute" command="${SolutionDir}/.msbuild/Casper.Console.0.0.1-alpha/tools/casper.exe build.casper Test.Integration:Test" workingdir="${SolutionDir}" />
+      </CustomCommands>
+    </CustomCommands>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="nunit.framework">
