@@ -45,7 +45,10 @@ namespace Casper.IO {
 			public IEnumerable<string> ReadAllLines() {
 				contentStream.Seek(0, SeekOrigin.Begin);
 				using (var reader = new StreamReader(contentStream, Encoding.UTF8, false, 1024, true)) {
-					yield return reader.ReadLine();
+					string line;
+					while((line = reader.ReadLine()) != null) {
+						yield return line;
+					}
 				}
 			}
 

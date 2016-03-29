@@ -1,5 +1,4 @@
-﻿using System;
-using Casper.IO;
+﻿using Casper.IO;
 
 namespace Casper {
 	public class TestProject : ProjectBase {
@@ -9,10 +8,10 @@ namespace Casper {
 		public TestProject(IFileSystem fileSystem, IDirectory location) : base(fileSystem, location.Path) {
 		}
 
-		public TestProject(string name, IFileSystem fileSystem) : base(fileSystem, "test", name) {
+		public TestProject(string name, IFileSystem fileSystem) : base(fileSystem, ".", name) {
 		}
 
-		public TestProject(ProjectBase parent, string name) : base(parent, "test", name) {
+		public TestProject(ProjectBase parent, string name) : base(parent, ".", name) {
 		}
 
 		public void ExecuteTasks(params string[] taskNamesToExecute) {
