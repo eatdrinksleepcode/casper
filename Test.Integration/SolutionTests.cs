@@ -69,6 +69,7 @@ EndProject
 
 			Assert.That(rootProject.Projects.Count, Is.EqualTo(2));
 			Assert.That(libraryTestProject.Tasks["Compile"].DependsOn, Contains.Item(libraryProject.Tasks["Compile"]));
+			CollectionAssert.IsEmpty(libraryTestProject.Tasks["Clean"].DependsOn);
 		}
 	}
 }

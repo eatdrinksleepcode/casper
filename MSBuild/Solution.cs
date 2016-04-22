@@ -77,6 +77,13 @@ namespace Casper {
 					{ Environment.IsUnix ? "BuildingInsideVisualStudio" : "BuildProjectReferences", Environment.IsUnix },
 				}
 			});
+
+			project.AddTask("Clean", new MSBuild {
+				Targets = new[] { "Clean" },
+				Properties = new Dictionary<string, object> {
+					{ "Configuration", "Release" },
+				},
+			});
 		}
 
 		static IEnumerable<ProjectInfo> LoadDependenciesFromProjectFile(IFile projectFile, IEnumerable<ProjectInfo> projects) {
