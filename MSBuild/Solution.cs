@@ -36,7 +36,7 @@ namespace Casper {
 
 		public static void ConfigureFromSolution(this ProjectBase rootProject, string solutionFilePath) {
 			var solutionFile = rootProject.File(solutionFilePath);
-			var projects = (from line in solutionFile.ReadAllLines()
+			var projectInfos = (from line in solutionFile.ReadAllLines()
 							let match = crackProjectLine.Match(line)
 							where match.Success
 							let name = match.Groups["PROJECTNAME"].Value.Trim()
@@ -46,8 +46,10 @@ namespace Casper {
 			                where projectFile.Exists()
 			                select new ProjectInfo { Name = name, ProjectFile = projectFile, Project = GetOrCreateProject(rootProject, name, projectFile) }).ToArray();
 
-			foreach(var p in projects) {
-				Configure(p.Project, p.ProjectFile, projects);
+			using(var projects = new Microsoft.Build.Evaluation.ProjectCollection()) {
+				foreach(var p in projectInfos) {
+					Configure(p.Project, p.ProjectFile, projects, projectInfos);
+				}
 			}
 		}
 
@@ -59,15 +61,15 @@ namespace Casper {
 			return result;
 		}
 
-		private static void Configure(ProjectBase project, IFile projectFile, IEnumerable<ProjectInfo> projects) {
+		private static void Configure(ProjectBase project, IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection projects, IEnumerable<ProjectInfo> projectInfos) {
 			if(project.Tasks.Count > 0) {
 				return;
 			}
 
-			IEnumerable<ProjectInfo> dependencies = LoadDependenciesFromProjectFile(projectFile, projects);
+			IEnumerable<ProjectInfo> dependencies = LoadDependenciesFromProjectFile(projectFile, projects, projectInfos);
 
 			foreach(var d in dependencies) {
-				Configure(d.Project, d.ProjectFile, projects);
+				Configure(d.Project, d.ProjectFile, projects, projectInfos);
 			}
 
 			project.AddTask("Compile", new MSBuild {
@@ -86,24 +88,20 @@ namespace Casper {
 			});
 		}
 
-		static IEnumerable<ProjectInfo> LoadDependenciesFromProjectFile(IFile projectFile, IEnumerable<ProjectInfo> projects) {
-			IEnumerable<ProjectInfo> dependencies;
+		private static IEnumerable<ProjectInfo> LoadDependenciesFromProjectFile(IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection projects, IEnumerable<ProjectInfo> projectInfos) {
+			Microsoft.Build.Evaluation.Project projectModel = LoadProject(projectFile, projects);
+
+			return from r in projectModel.GetItems("ProjectReference") join d in projectInfos
+					// TODO: match on project file path instead of / in addition to name
+					on r.GetMetadataValue("Name") equals d.Name
+				   select d;
+		}
+
+		private static Microsoft.Build.Evaluation.Project LoadProject(IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection engine) {
 			// Mono's ProjectCollection.LoadString(string fileName) has a bug that causes the project to never actually get loaded
-			Microsoft.Build.Evaluation.Project projectModel;
-			using(var engine = new Microsoft.Build.Evaluation.ProjectCollection()) {
-				using(var reader = XmlReader.Create(projectFile.Path)) {
-					projectModel = engine.LoadProject(reader);
-				}
+			using(var reader = XmlReader.Create(projectFile.Path)) {
+				return engine.LoadProject(reader);
 			}
-
-			var projectReferences = projectModel.GetItems("ProjectReference");
-
-			dependencies = (from r in projectReferences
-							join d in projects
-			                	// TODO: match on project file path instead of / in addition to name
-			                	on r.GetMetadataValue("Name") equals d.Name
-							select d).ToArray();
-			return dependencies;
 		}
 	}
 }
