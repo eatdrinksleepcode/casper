@@ -40,7 +40,7 @@ namespace Casper {
 		public void TaskNameDoesNotExistInRoot() {
 			var project = new TestProject(fileSystem);
 
-			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist"));
+			var ex = Assert.Throws<UnknownTaskException>(() => project.BuildTaskExecutionGraph("doesNotExist"));
 
 			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist in root project"));
 		}
@@ -49,7 +49,7 @@ namespace Casper {
 		public void SubProjectNameDoesNotExistInTaskPath() {
 			var project = new TestProject(fileSystem);
 
-			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("doesNotExist:foo"));
+			var ex = Assert.Throws<CasperException>(() => project.BuildTaskExecutionGraph("doesNotExist:foo"));
 
 			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in root project"));
 		}
@@ -59,7 +59,7 @@ namespace Casper {
 			var project = new TestProject(fileSystem);
 			new TestProject(project, "testA");
 
-			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist:foo"));
+			var ex = Assert.Throws<CasperException>(() => project.BuildTaskExecutionGraph("testA:doesNotExist:foo"));
 
 			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project 'testA'"));
 		}
@@ -70,7 +70,7 @@ namespace Casper {
 			var subProject = new TestProject(project, "testA");
 			new TestProject(subProject, "testB");
 
-			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:testB:doesNotExist:foo"));
+			var ex = Assert.Throws<CasperException>(() => project.BuildTaskExecutionGraph("testA:testB:doesNotExist:foo"));
 
 			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project 'testA:testB'"));
 		}
@@ -80,10 +80,12 @@ namespace Casper {
 			var project = new TestProject(fileSystem);
 			new TestProject(project, "testA");
 
-			var ex = Assert.Throws<CasperException>(() => project.ExecuteTasks("testA:doesNotExist"));
+			var ex = Assert.Throws<UnknownTaskException>(() => project.BuildTaskExecutionGraph("testA:doesNotExist"));
 
 			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist in project 'testA'"));
 		}
+
+		// TODO: these should probably either test ProjectBase.BuildTaskExecutionGraph or TaskExecutionGraph.ExecuteTasks
 
 		[Test]
 		public void ExecuteTasksInOrder() {

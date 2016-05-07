@@ -16,6 +16,11 @@ namespace Casper {
 			this.exitCode = exitCode;
 		}
 
+		public CasperException(int exitCode, Exception innerException)
+			: base(innerException.Message, innerException) {
+			this.exitCode = exitCode;
+		}
+
 		public int ExitCode {
 			get {
 				return exitCode;
@@ -23,4 +28,3 @@ namespace Casper {
 		}
 	}
 }
-

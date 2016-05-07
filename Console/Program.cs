@@ -54,7 +54,13 @@ namespace Casper {
 					}
 				}
 				else {
-					project.ExecuteTasks(o.TasksToExecute);
+					TaskExecutionGraph taskGraph;
+					try {
+						taskGraph = project.BuildTaskExecutionGraph(o.TasksToExecute);
+					} catch(UnknownTaskException ex) {
+						throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, ex);
+					}
+					taskGraph.ExecuteTasks();
 					Console.WriteLine();
 					WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
 				}

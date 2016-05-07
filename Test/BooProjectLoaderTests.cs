@@ -46,7 +46,8 @@ task hello:
 		void ExecuteScript(string scriptContents, params string[] args) {
 			fileSystem.File("build.casper").WriteAllText(scriptContents);
 			var project = BooProjectLoader.LoadProject("build.casper", fileSystem);
-			project.ExecuteTasks(args);
+			var taskGraph = project.BuildTaskExecutionGraph(args);
+			taskGraph.ExecuteTasks();
 		}
 	}
 }

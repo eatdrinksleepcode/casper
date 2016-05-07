@@ -18,7 +18,7 @@ namespace Casper {
 			get {
 				TaskBase result;
 				if (!TryGetValue(name, out result)) {
-					throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, "Task '{0}' does not exist in {1}", name, project.PathDescription);
+					throw new UnknownTaskException(this.project, name);
 				}
 				return result;
 			}

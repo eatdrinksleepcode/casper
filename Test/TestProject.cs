@@ -18,7 +18,12 @@ namespace Casper {
 		}
 
 		public void ExecuteTasks(params string[] taskNamesToExecute) {
-			base.ExecuteTasks(taskNamesToExecute);
+			var taskGraph = BuildTaskExecutionGraph(taskNamesToExecute);
+			taskGraph.ExecuteTasks();
+		}
+
+		public TaskExecutionGraph BuildTaskExecutionGraph(params string[] taskNamesToExecute) {
+			return base.BuildTaskExecutionGraph(taskNamesToExecute);
 		}
 
 		public TestTask AddTestTask(string taskName, params TestTask[] dependencies) {

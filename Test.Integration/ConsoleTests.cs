@@ -53,7 +53,7 @@ task goodbye:
 task hello:
 	print 'Hello World!'
 ", "hello", "goodbye");
-			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(standardError.ReadLine(), Is.Empty);
 			Assert.That(standardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
 			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
 			Assert.That(standardError.ReadLine(), Is.EqualTo("* What went wrong:"));
