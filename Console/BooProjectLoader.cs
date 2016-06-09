@@ -21,6 +21,11 @@ namespace Casper {
 			return loader.Load();
 		}
 
+		public static ProjectBase LoadProject(string scriptPath, ProjectBase parent, string name) {
+			var loader = new BooProjectLoader(parent.File(scriptPath), parent, name);
+			return loader.Load();
+		}
+
 		private class FileInput : ICompilerInput {
 			private readonly IFile file;
 
