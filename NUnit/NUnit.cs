@@ -12,30 +12,36 @@ namespace Casper {
 		public string TestName { get; set; }
 
 		public override void Execute(IFileSystem fileSystem) {
-			if (null == TestAssembly) {
+			if(null == TestAssembly) {
 				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'TestAssembly'");
 			}
 
 			var filter = TestFilter.Empty;
-			if (null != TestName) {
-				filter = new TestFilter("<filter><tests><test>" + TestName + "</test></tests></filter>");
+			if(null != TestName) {
+				filter = new TestFilter("<filter><test>" + TestName + "</test></filter>");
 			}
-			
-			var engine = new TestEngine();
-			var runner = engine.GetRunner(new TestPackage(TestAssembly));
-			var result = runner.Run(null, filter);
+
+			XmlNode result;
+			using(var engine = new TestEngine())
+			using(var runner = engine.GetRunner(new TestPackage(TestAssembly))) {
+				result = runner.Run(null, filter);
+			}
+
+			using(var writer = XmlWriter.Create(fileSystem.File(TestAssembly).Directory.File(this.Name + (!string.IsNullOrEmpty(TestName) ? "." + TestName : "") + ".nunit").Path, new XmlWriterSettings { Indent = true })) {
+				result.WriteTo(writer);
+			}
 
 			var failures = TestResultVisitor.CollectErrors(result);
-			if (failures.Count > 0) {
+			if(failures.Count > 0) {
 				Console.Error.WriteLine();
 				Console.Error.WriteLine("Failing tests:");
 				Console.Error.WriteLine();
-				foreach (var error in failures) {
+				foreach(var error in failures) {
 					Console.Error.WriteLine("{0}:", error.Name);
-                    Console.Error.WriteLine(error.Message);
-                    Console.Error.WriteLine(error.StackTrace);
-                }
-                throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures.Count);
+					Console.Error.WriteLine(error.Message);
+					Console.Error.WriteLine(error.StackTrace);
+				}
+				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures.Count);
 			}
 		}
 
@@ -52,16 +58,29 @@ namespace Casper {
 				visitor.Visit(results);
 				return visitor.errors;
 			}
-			
+
 			private readonly List<TestError> errors = new List<TestError>();
 
 			private void Visit(XmlNode node) {
-				if (node.Name == "test-case" && GetAttribute(node, "result") == "Failed") {
+				if(node.Name == "test-suite" && GetAttribute(node, "result") == "Failed" && GetAttribute(node, "site") != "Child" && GetAttribute(node, "total") == "0") {
+					var error = new TestError { Name = GetAttribute(node, "name") };
+					if(GetAttribute(node, "label") == "Error") {
+						FindErrorForTestCase(node, error);
+					} else {
+						FindErrorForTestSuite(node, error);
+					}
+					errors.Add(error);
+				} else if(node.Name == "test-case" && GetAttribute(node, "result") == "Failed") {
 					var error = new TestError { Name = GetAttribute(node, "fullname") };
 					FindErrorForTestCase(node, error);
 					errors.Add(error);
 				}
 				Visit(node.ChildNodes);
+			}
+
+			private static void FindErrorForTestSuite(XmlNode node, TestError error) {
+				var failureNode = node.ChildNodes.Cast<XmlNode>().FirstOrDefault(n => n.Name == "reason");
+				error.Message = GetChildNode(failureNode, "message")?.InnerText;
 			}
 
 			private static void FindErrorForTestCase(XmlNode node, TestError error) {
@@ -71,12 +90,11 @@ namespace Casper {
 			}
 
 			static XmlNode GetChildNode(XmlNode parentNode, string childNodeName) {
-				return parentNode.ChildNodes.Cast<XmlNode>().FirstOrDefault(n => n.Name == childNodeName);
+				return parentNode?.ChildNodes?.Cast<XmlNode>()?.FirstOrDefault(n => n.Name == childNodeName);
 			}
 
-			private void Visit(XmlNodeList nodes)
-			{
-				foreach (var node in nodes.Cast<XmlNode>()) {
+			private void Visit(XmlNodeList nodes) {
+				foreach(var node in nodes.Cast<XmlNode>()) {
 					Visit(node);
 				}
 			}
