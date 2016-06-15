@@ -74,6 +74,7 @@ namespace Casper {
 
 			project.AddTask("Compile", new MSBuild {
 				DependsOn = dependencies.Select(d => d.Project.Tasks["Compile"]).ToList(),
+				ProjectFile = projectFile.Path,
 				Properties = new Dictionary<string, object> {
 					{ "Configuration", "Release" },
 					{ Environment.IsUnix ? "BuildingInsideVisualStudio" : "BuildProjectReferences", Environment.IsUnix },
@@ -82,6 +83,7 @@ namespace Casper {
 
 			project.AddTask("Clean", new MSBuild {
 				Targets = new[] { "Clean" },
+				ProjectFile = projectFile.Path,
 				Properties = new Dictionary<string, object> {
 					{ "Configuration", "Release" },
 				},
