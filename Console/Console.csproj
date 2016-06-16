@@ -61,6 +61,9 @@
     <Reference Include="nunit.engine">
       <HintPath>..\packages\NUnit.Engine.3.2.0\lib\nunit.engine.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.v2.driver">
+      <HintPath>..\packages\NUnit.Extension.NUnitV2Driver.3.2.0\tools\nunit.v2.driver.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
