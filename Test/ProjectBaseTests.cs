@@ -61,7 +61,7 @@ namespace Casper {
 
 			var ex = Assert.Throws<CasperException>(() => project.BuildTaskExecutionGraph("testA:doesNotExist:foo"));
 
-			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project 'testA'"));
+			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project ':testA'"));
 		}
 
 		[Test]
@@ -72,7 +72,7 @@ namespace Casper {
 
 			var ex = Assert.Throws<CasperException>(() => project.BuildTaskExecutionGraph("testA:testB:doesNotExist:foo"));
 
-			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project 'testA:testB'"));
+			Assert.That(ex.Message, Is.EqualTo("Project 'doesNotExist' does not exist in project ':testA:testB'"));
 		}
 
 		[Test]
@@ -82,7 +82,7 @@ namespace Casper {
 
 			var ex = Assert.Throws<UnknownTaskException>(() => project.BuildTaskExecutionGraph("testA:doesNotExist"));
 
-			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist in project 'testA'"));
+			Assert.That(ex.Message, Is.EqualTo("Task 'doesNotExist' does not exist in project ':testA'"));
 		}
 
 		// TODO: these should probably either test ProjectBase.BuildTaskExecutionGraph or TaskExecutionGraph.ExecuteTasks
@@ -97,7 +97,7 @@ namespace Casper {
 			project.ExecuteTasks("goodbye", "hello");
 
 			CollectionAssert.AreEqual(new [] { "goodbye", "hello" }, results);
-			Assert.That(output.ToString(), Is.EqualTo("goodbye\nhello\n".NormalizeNewLines()));
+			Assert.That(output.ToString(), Is.EqualTo(":goodbye\n:hello\n".NormalizeNewLines()));
 		}
 
 		[Test]
@@ -149,7 +149,7 @@ namespace Casper {
 			project.ExecuteTasks("testA:goodbye");
 
 			CollectionAssert.AreEqual(new [] { "hello", "goodbye" }, results);
-			Assert.That(output.ToString(), Is.EqualTo("hello\ntestA:goodbye\n".NormalizeNewLines()));
+			Assert.That(output.ToString(), Is.EqualTo(":hello\n:testA:goodbye\n".NormalizeNewLines()));
 		}
 
 		[Test]

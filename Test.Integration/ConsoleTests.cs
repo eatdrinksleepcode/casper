@@ -36,9 +36,9 @@ task goodbye:
 ", "goodbye", "hello");
 			Assert.That(standardError.ReadToEnd(), Is.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
-			Assert.That(standardOutput.ReadLine(), Is.EqualTo("goodbye"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":goodbye"));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
-			Assert.That(standardOutput.ReadLine(), Is.EqualTo("hello"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":hello"));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Hello World!"));
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
@@ -87,7 +87,7 @@ task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
 ", "move");
 			Assert.That(standardError.ReadToEnd(), Is.Not.Empty);
 			Assert.That(testProcess.ExitCode, Is.EqualTo(CasperException.EXIT_CODE_TASK_FAILED));
-			Assert.That(standardOutput.ReadLine(), Is.EqualTo("move"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":move"));
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
 			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
 			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
@@ -122,6 +122,25 @@ task goodbye(Description: 'Goodbye'):
 			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
+		[Test]
+		public void Projects() {
+			WriteScript("test.casper", @"
+include 'SubProject/test.casper'
+");
+
+			WriteScript("SubProject/test.casper", @"
+");
+
+			var testProcess = ExecuteCasper("test.casper --projects");
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
+			Assert.That(standardError.ReadLine(), Is.EqualTo("root project"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("project ':SubProject'"));
+			Assert.That(standardError.ReadToEnd(), Is.Empty);
+			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
+		}
+
 		Process ExecuteScript(string scriptName, string scriptContents, params string[] args) {
 			WriteScript(scriptName, scriptContents);
 			var arguments = scriptName + " " + string.Join(" ", args);
@@ -130,6 +149,10 @@ task goodbye(Description: 'Goodbye'):
 
 		void WriteScript(string scriptName, string scriptContents) {
 			scripts.Add(scriptName);
+			var directory = Path.GetDirectoryName(scriptName);
+			if(!string.IsNullOrEmpty(directory)) {
+				Directory.CreateDirectory(directory);
+			}
 			File.WriteAllText(scriptName, scriptContents);
 		}
 

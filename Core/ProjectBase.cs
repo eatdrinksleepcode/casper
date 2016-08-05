@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Casper.IO;
+using System.Diagnostics;
 
 namespace Casper {
+	[DebuggerDisplay("{PathDescription}")]
 	public abstract class ProjectBase {
 		private readonly TaskCollection tasks;
 		private readonly ProjectCollection subprojects;
@@ -33,7 +35,7 @@ namespace Casper {
 			this.parent = parent;
 			this.location = fileSystem.Directory(location);
 			this.Name = name;
-			this.PathPrefix = null == parent ? "" : parent.PathPrefix + this.Name + ":";
+			this.PathPrefix = (null == parent ? "" : parent.PathPrefix + this.Name) + ":";
 			this.PathDescription = null == parent ? "root project" : "project '" + parent.PathPrefix + this.Name + "'";
 			this.subprojects = new ProjectCollection(this);
 			this.tasks = new TaskCollection(this);
@@ -73,7 +75,7 @@ namespace Casper {
 
 		public string PathPrefix {
 			get;
-			set;
+			private set;
 		}
 
 		public string PathDescription {

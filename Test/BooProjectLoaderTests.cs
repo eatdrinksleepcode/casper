@@ -40,7 +40,7 @@ task hello:
 ", "hello"));
 			Assert.That(ex.GetType(), Is.EqualTo(typeof(Exception)));
 			Assert.That(ex.Message, Is.EqualTo("Task failure"));
-			Assert.That(output.ToString(), Is.EqualTo("hello\n".NormalizeNewLines()));
+			Assert.That(output.ToString(), Is.EqualTo(":hello\n".NormalizeNewLines()));
 		}
 
 		void ExecuteScript(string scriptContents, params string[] args) {

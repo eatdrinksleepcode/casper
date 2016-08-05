@@ -19,6 +19,9 @@ namespace Casper {
 			[Option]
 			public bool Tasks { get; set; }
 
+			[Option]
+			public bool Projects { get; set; }
+
 			[Usage]
 			public static IEnumerable<Example> Usage {
 				get {
@@ -48,12 +51,16 @@ namespace Casper {
 		static int Run(ParserResult<Options> arguments) {
 			return arguments.MapResult(o =>  {
 				var project = BooProjectLoader.LoadProject(o.ScriptPath, RealFileSystem.Instance);
-				if (o.Tasks) {
-					foreach (var task in project.Tasks) {
+				if(o.Tasks) {
+					foreach(var task in project.Tasks) {
 						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
 					}
-				}
-				else {
+				} else if(o.Projects) {
+					var allProjects = Enumerable.Repeat(project, 1).FindAllProjects();
+					foreach(var p in allProjects) {
+						Console.Error.WriteLine(p.PathDescription);
+					}
+				} else {
 					TaskExecutionGraph taskGraph;
 					try {
 						taskGraph = project.BuildTaskExecutionGraph(o.TasksToExecute);
@@ -68,6 +75,16 @@ namespace Casper {
 			}, errors =>  {
 				return errors.Any(e => e.Tag == ErrorType.HelpRequestedError) ? 0 : CasperException.EXIT_CODE_UNHANDLED_EXCEPTION;
 			});
+		}
+
+		public static IEnumerable<ProjectBase> FindAllProjects(this IEnumerable<ProjectBase> projects) {
+			var flattenedList = projects;
+			foreach(var element in projects) {
+				projects = flattenedList.Concat(
+					element.Projects.FindAllProjects()
+				);
+			}
+			return projects;
 		}
 
 		static void WriteError(object whatWentWrong) {
