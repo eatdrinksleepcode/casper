@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Casper.IO;
+using System.IO;
 
 namespace Casper {
 	public static class Solution {
@@ -48,7 +49,7 @@ namespace Casper {
 
 			using(var projects = new Microsoft.Build.Evaluation.ProjectCollection()) {
 				foreach(var p in projectInfos) {
-					Configure(p.Project, p.ProjectFile, projects, projectInfos);
+					Configure(p.Project, p.ProjectFile, projects, projectInfos, solutionFile.Directory);
 				}
 			}
 		}
@@ -61,15 +62,15 @@ namespace Casper {
 			return result;
 		}
 
-		private static void Configure(ProjectBase project, IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection projects, IEnumerable<ProjectInfo> projectInfos) {
+		private static void Configure(ProjectBase project, IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection projects, IEnumerable<ProjectInfo> projectInfos, IDirectory solutionDirectory) {
 			if(project.Tasks.Count > 0) {
 				return;
 			}
 
-			IEnumerable<ProjectInfo> dependencies = LoadDependenciesFromProjectFile(projectFile, projects, projectInfos);
+			IEnumerable<ProjectInfo> dependencies = LoadDependenciesFromProjectFile(projectFile, projects, projectInfos, solutionDirectory);
 
 			foreach(var d in dependencies) {
-				Configure(d.Project, d.ProjectFile, projects, projectInfos);
+				Configure(d.Project, d.ProjectFile, projects, projectInfos, solutionDirectory);
 			}
 
 			project.AddTask("Compile", new MSBuild {
@@ -90,8 +91,8 @@ namespace Casper {
 			});
 		}
 
-		private static IEnumerable<ProjectInfo> LoadDependenciesFromProjectFile(IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection projects, IEnumerable<ProjectInfo> projectInfos) {
-			Microsoft.Build.Evaluation.Project projectModel = LoadProject(projectFile, projects);
+		private static IEnumerable<ProjectInfo> LoadDependenciesFromProjectFile(IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection projects, IEnumerable<ProjectInfo> projectInfos, IDirectory solutionDirectory) {
+			Microsoft.Build.Evaluation.Project projectModel = LoadProject(projectFile, projects, solutionDirectory);
 
 			return from r in projectModel.GetItems("ProjectReference") join d in projectInfos
 					// TODO: match on project file path instead of / in addition to name
@@ -99,10 +100,14 @@ namespace Casper {
 				   select d;
 		}
 
-		private static Microsoft.Build.Evaluation.Project LoadProject(IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection engine) {
+		private static Microsoft.Build.Evaluation.Project LoadProject(IFile projectFile, Microsoft.Build.Evaluation.ProjectCollection engine, IDirectory solutionDir) {
 			// Mono's ProjectCollection.LoadString(string fileName) has a bug that causes the project to never actually get loaded
 			using(var reader = XmlReader.Create(projectFile.Path)) {
-				return engine.LoadProject(reader);
+				var properties = new Dictionary<string, string> {
+					// LoadProject does not resolve relative paths relative to the project directory the way that MSBuild does
+					{ "SolutionDir", solutionDir.Path + Path.DirectorySeparatorChar }
+				};
+				return engine.LoadProject(reader, properties, null );
 			}
 		}
 	}
