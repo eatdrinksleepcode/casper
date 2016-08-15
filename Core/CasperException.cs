@@ -11,9 +11,13 @@ namespace Casper {
 
 		private readonly int exitCode;
 
-		public CasperException(int exitCode, string message, params object[] args)
-			: base(string.Format(message, args)) {
+		public CasperException(int exitCode, string message)
+			: base(message) {
 			this.exitCode = exitCode;
+		}
+
+		public CasperException(int exitCode, string message, params object[] args)
+			: this(exitCode, string.Format(message, args)) {
 		}
 
 		public CasperException(int exitCode, Exception innerException)
