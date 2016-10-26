@@ -1,0 +1,11 @@
+{
+    "assemblies": [
+        "bin/Release/Casper.Test.dll",
+    ],
+    "methodBodyExcludes": [
+        {
+            "method": "",
+            "lines": []
+        }
+    ]
+}

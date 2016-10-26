@@ -1,7 +1,16 @@
 ﻿import Casper;
 
+task instrument(Exec,
+				Executable: System.IO.Path.Combine(Location, '../packages/Gaillard.SharpCover/tools/SharpCover.exe'),
+				Arguments: 'instrument sharpCover.json')
+
 task Test(NUnit,
 		  DependsOn: [Tasks['Compile']],
 		  TestAssembly: 'bin/Release/Casper.Test.dll')
 
+task check(Exec,
+		   Executable: System.IO.Path.Combine(Location, '../packages/Gaillard.SharpCover/tools/SharpCover.exe'),
+		   Arguments: 'check')
+
 parent.Tasks['Build'].DependsOn.Add(Test)
+
