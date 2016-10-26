@@ -11,7 +11,7 @@ namespace Casper {
 		private readonly ProjectCollection subprojects;
 		protected readonly ProjectBase parent;
 		private readonly IDirectory location;
-		private readonly IFileSystem fileSystem;
+		protected readonly IFileSystem fileSystem;
 		private readonly Dictionary<string, TaskRecord> records;
 		private readonly IFile taskRecordCache;
 
@@ -66,6 +66,10 @@ namespace Casper {
 
 		public IFile File(string path) {
 			return fileSystem.File(path);
+		}
+
+		public IDirectory Directory(string path) {
+			return fileSystem.Directory(path);
 		}
 
 		public string Name {

@@ -14,7 +14,9 @@ namespace Casper {
 			foreach(var task in tasksInOrder) {
 				Console.WriteLine(task.Path);
 				// HACK: this is awkward
-				task.Project.Execute(task);
+				if(!task.Project.Execute(task)) {
+					Console.WriteLine("<skipped>");
+				}
 			}
 		}
 	}

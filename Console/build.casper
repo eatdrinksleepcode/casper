@@ -1,14 +1,16 @@
 ﻿import Casper
 import System.IO
 
+packagesDir = Directory('..').Directory('out').Directory('packages')
+
 task CreatePackagesDir:
-	Directory.CreateDirectory("../out/packages")
+	packagesDir.Create()
 
 binPath = Path.Combine('bin', 'Release') + Path.DirectorySeparatorChar
 
 task Pack(Exec,
 		  DependsOn: [Tasks['Compile'], CreatePackagesDir],
 		  Executable: Path.Combine('..', 'nuget.exe'),
-		  Arguments: "pack Console.nuspec -OutputDirectory ../out/packages -Properties BINPATH=$(binPath)")
+		  Arguments: "pack Console.nuspec -OutputDirectory $(packagesDir.Path) -Properties BINPATH=$(binPath)")
 
 parent.Tasks['Build'].DependsOn.Add(Pack)

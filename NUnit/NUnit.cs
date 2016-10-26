@@ -32,6 +32,10 @@ namespace Casper {
 			}
 
 			var failures = TestResultVisitor.CollectErrors(result);
+			HandleFailures(failures);
+		}
+
+		private void HandleFailures(List<TestError> failures) {
 			if(failures.Count > 0) {
 				Console.Error.WriteLine();
 				Console.Error.WriteLine("Failing tests:");

@@ -121,6 +121,10 @@ namespace Casper.IO {
 				System.IO.Directory.Delete(path, true);
 			}
 
+			public void Create() {
+				System.IO.Directory.CreateDirectory(path);
+			}
+
 			public string Path {
 				get {
 					return path;

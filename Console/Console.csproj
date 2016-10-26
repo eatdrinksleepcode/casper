@@ -20,7 +20,7 @@
     <Prefer32Bit>true</Prefer32Bit>
     <CustomCommands>
       <CustomCommands>
-        <Command type="Execute" command="${TargetFile} build.casper --projects" workingdir="${SolutionDir}" externalConsole="True" />
+        <Command type="Execute" command="${TargetFile} build.casper BackupCommonVersionInfo" workingdir="/Users/danelson/Projects/scriptcs" externalConsole="True" />
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>

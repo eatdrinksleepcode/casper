@@ -131,6 +131,10 @@ namespace Casper.IO {
 				exists = false;
 			}
 
+			public void Create() {
+				exists = true;
+			}
+
 			public string Path {
 				get { return path; }
 			}
