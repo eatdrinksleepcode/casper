@@ -41,7 +41,7 @@ namespace Casper {
 				constructor.Parameters.Add(c);
 			}
 			var args = constructorParameters.Take(1).Select(p => new ReferenceExpression(node.LexicalInfo, p.Name))
-			                                .Concat(Enumerable.Repeat(Expression.Lift(this.location.Path), 1))
+			                                .Concat(Enumerable.Repeat(Expression.Lift(this.location.FullPath), 1))
 			                                .Concat(constructorParameters.Skip(1).Select(p => new ReferenceExpression(node.LexicalInfo, p.Name)));
 			constructor.Body.Add(new MethodInvocationExpression(
 				node.LexicalInfo,

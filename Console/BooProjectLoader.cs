@@ -34,7 +34,7 @@ namespace Casper {
 			}
 			
 			public string Name {
-				get { return this.file.Path; }
+				get { return this.file.FullPath; }
 			}
 
 			public TextReader Open() {

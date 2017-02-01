@@ -6,7 +6,7 @@ namespace Casper.IO
 		bool Exists();
 		void Delete();
 
-		string Path {
+		string FullPath {
 			get;
 		}
 	}

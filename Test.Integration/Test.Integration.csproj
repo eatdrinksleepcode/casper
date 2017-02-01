@@ -79,6 +79,14 @@
     <Compile Include="..\Test\TestTask.cs">
       <Link>TestTask.cs</Link>
     </Compile>
+    <Compile Include="..\Test\IO\DirectoryTests.cs">
+      <Link>IO\DirectoryTests.cs</Link>
+    </Compile>
+    <Compile Include="..\Test\IO\FileTests.cs">
+      <Link>IO\FileTests.cs</Link>
+    </Compile>
+    <Compile Include="IO\RealDirectoryTests.cs" />
+    <Compile Include="IO\RealFileTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
@@ -102,5 +110,8 @@
       <Project>{42CB5134-5D5F-4564-A548-6260352C0420}</Project>
       <Name>NUnit</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="IO\" />
   </ItemGroup>
 </Project>

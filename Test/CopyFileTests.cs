@@ -18,8 +18,8 @@ namespace Casper {
 			sourceFile.WriteAllText("Hello World!");
 			var destinationFile = fileSystem.File("Destination.txt");
 			var copyTask = new CopyFile {
-				Source = sourceFile.Path,
-				Destination = destinationFile.Path,
+				Source = sourceFile.FullPath,
+				Destination = destinationFile.FullPath,
 			};
 			copyTask.Execute(fileSystem);
 			Assert.True(destinationFile.Exists());

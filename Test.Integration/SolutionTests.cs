@@ -15,9 +15,9 @@ namespace Casper {
 			libraryProjectPath = projectRootPath.Directory("Library");
 			libraryUnitTestsProjectPath = projectRootPath.Directory("Library.UnitTests");
 
-			System.IO.Directory.CreateDirectory(projectRootPath.Path);
-			System.IO.Directory.CreateDirectory(libraryProjectPath.Path);
-			System.IO.Directory.CreateDirectory(libraryUnitTestsProjectPath.Path);
+			System.IO.Directory.CreateDirectory(projectRootPath.FullPath);
+			System.IO.Directory.CreateDirectory(libraryProjectPath.FullPath);
+			System.IO.Directory.CreateDirectory(libraryUnitTestsProjectPath.FullPath);
 		}
 
 		[TearDown]
@@ -57,7 +57,7 @@ EndProject
 );
 
 			var rootProject = new TestProject(fileSystem, projectRootPath);
-			rootProject.ConfigureFromSolution(slnFile.Path);
+			rootProject.ConfigureFromSolution(slnFile.FullPath);
 
 			Assert.That(rootProject.Projects.Count, Is.EqualTo(2));
 			var libraryProject = rootProject.Projects["My.Library"];
@@ -86,7 +86,7 @@ EndProject
 
 			var rootProject = new TestProject(fileSystem, projectRootPath);
 			var libraryProject = new TestProject(rootProject, projectRootPath.Directory("Library"), "My.Library");
-			rootProject.ConfigureFromSolution(slnFile.Path);
+			rootProject.ConfigureFromSolution(slnFile.FullPath);
 			libraryProject.AddTask("Task1", new TestTask());
 
 			Assert.That(rootProject.Projects.Count, Is.EqualTo(1));
@@ -118,7 +118,7 @@ EndProject
 ");
 
 			var rootProject = new TestProject(fileSystem, projectRootPath);
-			rootProject.ConfigureFromSolution(slnFile.Path);
+			rootProject.ConfigureFromSolution(slnFile.FullPath);
 
 			Assert.That(rootProject.Projects.Count, Is.EqualTo(1));
 		}
@@ -154,7 +154,7 @@ EndProject
 			projectRootPath.Directory("Library").File("My.Library.other.csproj").WriteAllText("");
 
 			var rootProject = new TestProject(fileSystem, projectRootPath);
-			rootProject.ConfigureFromSolution(slnFile.Path);
+			rootProject.ConfigureFromSolution(slnFile.FullPath);
 
 			Assert.That(rootProject.Projects.Count, Is.EqualTo(1));
 			Assert.DoesNotThrow(() => rootProject.ExecuteTasks("My.Library:Compile"));

@@ -92,12 +92,12 @@ namespace Casper.IO {
 				get { return lastWriteTimeUtc; }
 			}
 
-			public string Path {
+			public string FullPath {
 				get { return path; }
 			}
 
 			public IDirectory Directory {
-				get { return fileSystem.Directory(System.IO.Path.GetDirectoryName(Path)); }
+				get { return fileSystem.Directory(System.IO.Path.GetDirectoryName(FullPath)); }
 			}
 		}
 
@@ -131,8 +131,16 @@ namespace Casper.IO {
 				exists = false;
 			}
 
-			public string Path {
+			public void Create() {
+				exists = true;
+			}
+
+			public string FullPath {
 				get { return path; }
+			}
+
+			public IDirectory RootDirectory {
+				get { return new StubDirectory(fileSystem, System.IO.Path.GetPathRoot(path)); }
 			}
 		}
 
@@ -141,7 +149,7 @@ namespace Casper.IO {
 			IFile file;
 			path = System.IO.Path.IsPathRooted(path) 
 				? path 
-				: System.IO.Path.Combine(GetCurrentDirectory().Path, path);
+				: System.IO.Path.Combine(GetCurrentDirectory().FullPath, path);
 			if (!files.TryGetValue(path, out fileSystemObject)) {
 				file = new StubFile(this, path);
 				files.Add(path, file);
@@ -164,7 +172,7 @@ namespace Casper.IO {
 			IDirectory directory;
 			path = System.IO.Path.IsPathRooted(path) 
 			             ? path 
-			             : System.IO.Path.Combine(GetCurrentDirectory().Path, path);
+			             : System.IO.Path.Combine(GetCurrentDirectory().FullPath, path);
 			if (!files.TryGetValue(path, out fileSystemObject)) {
 				directory = new StubDirectory(this, path);
 				files.Add(path, directory);

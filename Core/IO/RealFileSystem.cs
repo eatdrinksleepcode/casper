@@ -66,7 +66,7 @@ namespace Casper.IO {
 			}
 
 			public void CopyTo(IFile destination) {
-				System.IO.File.Copy(path, destination.Path, true);
+				System.IO.File.Copy(path, destination.FullPath, true);
 			}
 
 			public void CreateDirectories() {
@@ -85,7 +85,7 @@ namespace Casper.IO {
 				get { return System.IO.File.GetLastWriteTimeUtc(path); }
 			}
 
-			public string Path {
+			public string FullPath {
 				get { return path; }
 			}
 
@@ -118,13 +118,24 @@ namespace Casper.IO {
 			}
 
 			public void Delete() {
-				System.IO.Directory.Delete(path, true);
+				try {
+					System.IO.Directory.Delete(path, true);
+				} catch(DirectoryNotFoundException) {
+					// Desired result is for directory to not exist, which is true
+					// Consider this successful
+				}
 			}
 
-			public string Path {
-				get {
-					return path;
-				}
+			public void Create() {
+				System.IO.Directory.CreateDirectory(path);
+			}
+
+			public string FullPath {
+				get { return path; }
+			}
+
+			public IDirectory RootDirectory {
+				get { return Directory(System.IO.Directory.GetDirectoryRoot(path)); }
 			}
 		}
 	}

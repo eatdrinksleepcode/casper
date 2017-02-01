@@ -5,7 +5,7 @@ namespace Casper {
 
 		public TestProject(IFileSystem fileSystem) : this("Root", fileSystem) {}
 
-		public TestProject(IFileSystem fileSystem, IDirectory location) : base(fileSystem, location.Path) {
+		public TestProject(IFileSystem fileSystem, IDirectory location) : base(fileSystem, location.FullPath) {
 		}
 
 		public TestProject(string name, IFileSystem fileSystem) : base(fileSystem, ".", name) {
@@ -14,7 +14,7 @@ namespace Casper {
 		public TestProject(ProjectBase parent, string name) : base(parent, ".", name) {
 		}
 
-		public TestProject(ProjectBase parent, IDirectory location, string name) : base(parent, location.Path, name) {
+		public TestProject(ProjectBase parent, IDirectory location, string name) : base(parent, location.FullPath, name) {
 		}
 
 		public void ExecuteTasks(params string[] taskNamesToExecute) {

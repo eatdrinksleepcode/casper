@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using Casper.IO;
 using NUnit.Framework;
 

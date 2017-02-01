@@ -118,12 +118,12 @@ namespace Casper {
 
 			public void RecordFiles(IEnumerable<IFile> files) {
 				foreach(var file in files) {
-					fileStamps[file.Path] = file.LastWriteTimeUtc;
+					fileStamps[file.FullPath] = file.LastWriteTimeUtc;
 				}
 			}
 
 			public bool UpToDate(IEnumerable<IFile> files) {
-				return ToHashSet(fileStamps.Select(x => new { Path = x.Key, TimeStamp = x.Value })).SetEquals(files.Select(x => new { Path = x.Path, TimeStamp = x.LastWriteTimeUtc }));
+				return ToHashSet(fileStamps.Select(x => new { Path = x.Key, TimeStamp = x.Value })).SetEquals(files.Select(x => new { Path = x.FullPath, TimeStamp = x.LastWriteTimeUtc }));
 			}
 
 			private static HashSet<T> ToHashSet<T>(IEnumerable<T> source) {

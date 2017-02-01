@@ -27,7 +27,7 @@ namespace Casper {
 				result = runner.Run(null, filter);
 			}
 
-			using(var writer = XmlWriter.Create(fileSystem.File(TestAssembly).Directory.File(this.Name + (!string.IsNullOrEmpty(TestName) ? "." + TestName : "") + ".nunit").Path, new XmlWriterSettings { Indent = true })) {
+			using(var writer = XmlWriter.Create(fileSystem.File(TestAssembly).Directory.File(this.Name + (!string.IsNullOrEmpty(TestName) ? "." + TestName : "") + ".nunit").FullPath, new XmlWriterSettings { Indent = true })) {
 				result.WriteTo(writer);
 			}
 

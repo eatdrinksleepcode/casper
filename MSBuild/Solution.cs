@@ -26,7 +26,7 @@ namespace Casper {
 		private class CSharpProject : ProjectBase {
 
 			public CSharpProject(ProjectBase parent, IFile projectFile, string name) 
-				: base(parent, projectFile.Directory.Path, name) {
+				: base(parent, projectFile.Directory.FullPath, name) {
 			}
 		}
 
@@ -91,7 +91,7 @@ namespace Casper {
 
 				project.AddTask("Compile", new MSBuild {
 					DependsOn = dependencies.Select(d => d.Project.Tasks["Compile"]).ToList(),
-					ProjectFile = projectFile.Path,
+					ProjectFile = projectFile.FullPath,
 					Properties = new Dictionary<string, object> {
 					{ "Configuration", "Release" },
 					{ Environment.IsUnix ? "BuildingInsideVisualStudio" : "BuildProjectReferences", Environment.IsUnix },
@@ -100,7 +100,7 @@ namespace Casper {
 
 				project.AddTask("Clean", new MSBuild {
 					Targets = new[] { "Clean" },
-					ProjectFile = projectFile.Path,
+					ProjectFile = projectFile.FullPath,
 					Properties = new Dictionary<string, object> {
 					{ "Configuration", "Release" },
 				},
@@ -118,10 +118,10 @@ namespace Casper {
 
 			private Microsoft.Build.Evaluation.Project LoadProject(IFile projectFile) {
 				// Mono's ProjectCollection.LoadString(string fileName) has a bug that causes the project to never actually get loaded
-				using(var reader = XmlReader.Create(projectFile.Path)) {
+				using(var reader = XmlReader.Create(projectFile.FullPath)) {
 					var properties = new Dictionary<string, string> {
 					// LoadProject does not resolve relative paths relative to the project directory the way that MSBuild does
-						{ "SolutionDir", solutionFile.Directory.Path + Path.DirectorySeparatorChar }
+						{ "SolutionDir", solutionFile.Directory.FullPath + Path.DirectorySeparatorChar }
 				};
 					return this.projects.LoadProject(reader, properties, null);
 				}
