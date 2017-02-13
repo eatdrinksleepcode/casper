@@ -4,7 +4,7 @@ using NUnit.Framework;
 
 namespace Casper {
 	[TestFixture]
-	public class BooProjectLoaderTests {
+	public class BooProjectLoaderTests : IDisposable {
 
 		private RedirectedStandardOutput output;
 		private IFileSystem fileSystem;
@@ -18,6 +18,10 @@ namespace Casper {
 		[TearDown]
 		public void TearDown() {
 			output.Clear();
+		}
+
+		void IDisposable.Dispose() {
+			output.Dispose();
 		}
 
 		[Test]

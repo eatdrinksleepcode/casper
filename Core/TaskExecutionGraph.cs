@@ -6,15 +6,25 @@ namespace Casper {
 
 		private readonly IEnumerable<TaskBase> tasksInOrder;
 
+		public TaskExecutionGraph(params TaskBase[] tasksInOrder)
+			: this((IEnumerable<TaskBase>)tasksInOrder) {
+		}
+
 		public TaskExecutionGraph(IEnumerable<TaskBase> tasksInOrder) {
 			this.tasksInOrder = tasksInOrder;
 		}
 
 		public void ExecuteTasks() {
 			foreach(var task in tasksInOrder) {
-				Console.WriteLine(task.Path);
-				// HACK: this is awkward
-				task.Project.Execute(task);
+				Console.Write(task.Path);
+				try {
+					// HACK: this is awkward
+					if(!task.Project.Execute(task)) {
+						Console.Write(" (UP-TO-DATE)");
+					}
+				} finally {
+					Console.WriteLine();
+				}
 			}
 		}
 	}
