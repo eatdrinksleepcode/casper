@@ -45,8 +45,8 @@ task hello:
 import System.IO
 import Casper
 task copy(CopyFile,
-		Source: 'Source.txt', 
-		Destination: 'Destination.txt')
+		Source: File('Source.txt'), 
+		Destination: File('Destination.txt'))
 ";
 
 			var project = LoadProject(scriptContents);
@@ -56,8 +56,8 @@ task copy(CopyFile,
 
 			CopyFile copyTask = (CopyFile)task;
 
-			Assert.That(copyTask.Source, Is.EqualTo("Source.txt"));
-			Assert.That(copyTask.Destination, Is.EqualTo("Destination.txt"));
+			Assert.That(copyTask.Source.FullPath, Is.EqualTo("/Source.txt"));
+			Assert.That(copyTask.Destination.FullPath, Is.EqualTo("/Destination.txt"));
 		}
 
 		private ProjectBase LoadProject(string scriptContents) {

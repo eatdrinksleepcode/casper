@@ -21,16 +21,12 @@ namespace Casper {
 		public override void Execute(IFileSystem fileSystem) {
 		}
 
-		protected override IEnumerable<IFile> InputFiles {
-			get {
-				return inputFiles;
-			}
+		public override IEnumerable<IFile> InputFiles {
+			get { return inputFiles; }
 		}
 
-		protected override IEnumerable<IFile> OutputFiles {
-			get {
-				return outputFiles;
-			}
+		public override IEnumerable<IFile> OutputFiles {
+			get { return outputFiles; }
 		}
 	}
 }

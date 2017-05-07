@@ -27,11 +27,11 @@ namespace Casper {
 
 		public ProjectBase Project { get; set; }
 
-		protected internal virtual IEnumerable<IFile> InputFiles {
+		public virtual IEnumerable<IFile> InputFiles {
 			get { return Enumerable.Empty<IFile>(); }
 		}
 
-		protected internal virtual IEnumerable<IFile> OutputFiles {
+		public virtual IEnumerable<IFile> OutputFiles {
 			get { return Enumerable.Empty<IFile>(); }
 		}
 	}
