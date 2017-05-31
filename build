@@ -3,6 +3,9 @@
 myDir="`dirname \"$0\"`"
 configuration=${1:-Release}
 
+echo Restoring dependencies...
+$myDir/nuget restore || exit $?
+
 echo Building with xbuild...
 xbuild /p:Configuration=$configuration /verbosity:quiet /nologo || exit $?
 $myDir/pack $configuration || exit $?
