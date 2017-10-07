@@ -8,6 +8,7 @@ namespace Casper.IO {
 		private IFileSystem fileSystem;
 		private IDirectory testParentDirectory;
 		private IDirectory testDirectory;
+		private IDirectory originalWorkingDirectory;
 
 		[TestFixtureSetUp]
 		public void SetUpOnce() {
@@ -29,7 +30,13 @@ namespace Casper.IO {
 
 		[SetUp]
 		public void SetUp() {
+			originalWorkingDirectory = fileSystem.GetCurrentDirectory();
 			testDirectory.SetAsCurrent();
+		}
+
+		[TearDown]
+		public void TearDown() {
+			originalWorkingDirectory.SetAsCurrent();
 		}
 
 		[Test]

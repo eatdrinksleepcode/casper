@@ -210,5 +210,10 @@ namespace Casper.IO {
 			this.currentDirectory = directory;
 		}
 
+		public IDirectory MakeTemporaryDirectory() {
+			var result = Directory(Path.GetRandomFileName());
+			result.Create();
+			return result;
+		}
 	}
 }

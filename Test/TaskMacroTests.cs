@@ -5,20 +5,26 @@ namespace Casper {
 	[TestFixture]
 	public class TaskMacroTests {
 
-		private RedirectedStandardOutput output;
+		private static RedirectedStandardOutput output;
+
 		private IFileSystem fileSystem;
+
+		[TestFixtureSetUp]
+		public static void OneTimeSetUp() {
+			output = RedirectedStandardOutput.RedirectOut();
+		}
 
 		[SetUp]
 		public void SetUp() {
-			output = RedirectedStandardOutput.RedirectOut();
+			output.Clear();
 			fileSystem = new StubFileSystem();
 		}
 
-		[TearDown]
-		public void TearDown() {
-			output.Clear();
+		[TestFixtureTearDown]
+		public void OneTimeTearDown() {
+			output.Dispose();
 		}
-		
+
 		[Test]
 		public void MakeTask() {
 

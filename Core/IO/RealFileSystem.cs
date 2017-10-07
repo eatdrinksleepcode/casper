@@ -22,6 +22,15 @@ namespace Casper.IO {
 			return Directory(System.IO.Directory.GetCurrentDirectory());
 		}
 
+		public IDirectory MakeTemporaryDirectory() {
+			string tempFolder = Path.GetTempFileName();
+			System.IO.File.Delete(tempFolder);
+			var result = Directory(tempFolder);
+			result.Create();
+
+			return result;
+		}
+
 		public class RealFile : IFile {
 			private readonly string path;
 

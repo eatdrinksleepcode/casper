@@ -2,27 +2,25 @@
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
-using System.Collections.Generic;
 using System.Text;
+using Casper.IO;
 
 namespace Casper {
 	[TestFixture]
 	public class ConsoleTests {
-		List<string> scripts = new List<string>();
+		IDirectory workingDirectory;
 
 		StringReader standardOutput;
 		StringReader standardError;
 
 		[SetUp]
 		public void SetUp() {
-			scripts.Clear();
+			workingDirectory = RealFileSystem.Instance.MakeTemporaryDirectory();
 		}
 
 		[TearDown]
 		public void TearDown() {
-			foreach (var script in scripts) {
-				File.Delete(script);
-			}
+			workingDirectory.Delete();
 		}
 
 		[Test]
@@ -128,8 +126,8 @@ task goodbye(Description: 'Goodbye'):
 include 'SubProject/test.casper'
 ");
 
-			WriteScript("SubProject/test.casper", @"
-");
+			WriteScript("test.casper", @"
+", "SubProject");
 
 			var testProcess = ExecuteCasper("test.casper --projects");
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
@@ -147,13 +145,14 @@ include 'SubProject/test.casper'
 			return ExecuteCasper(arguments);
 		}
 
-		void WriteScript(string scriptName, string scriptContents) {
-			scripts.Add(scriptName);
-			var directory = Path.GetDirectoryName(scriptName);
-			if(!string.IsNullOrEmpty(directory)) {
-				Directory.CreateDirectory(directory);
+		void WriteScript(string scriptName, string scriptContents, string subDirectory = null) {
+			var projectDir = workingDirectory;
+			if(null != subDirectory) {
+				projectDir = projectDir.Directory(subDirectory);
+				projectDir.Create();
 			}
-			File.WriteAllText(scriptName, scriptContents);
+			var scriptFile = projectDir.File(scriptName);
+			scriptFile.WriteAllText(scriptContents);
 		}
 
 		Process ExecuteCasper(string arguments) {
@@ -179,6 +178,7 @@ include 'SubProject/test.casper'
 				UseShellExecute = false,
 				RedirectStandardOutput = true,
 				RedirectStandardError = true,
+				WorkingDirectory = workingDirectory.FullPath,
 			};
 			testProcess.Start();
 			testProcess.BeginErrorReadLine();

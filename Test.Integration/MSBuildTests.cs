@@ -11,15 +11,16 @@ namespace Casper {
 
 		[Test]
 		public void MSBuild() {
-			var consoleProjDir = typeof(TaskBase).Assembly.Location.Parent(4).SubDirectory("Core");
+			var projectDirectory = typeof(TaskBase).Assembly.Location.Parent(4).SubDirectory("Core");
 
-			var outputDirectory = consoleProjDir.SubDirectory("bin").SubDirectory("Release");
+			var outputDirectory = projectDirectory.SubDirectory("bin").SubDirectory("Release");
 			if (Directory.Exists(outputDirectory)) {
 				Directory.Delete(outputDirectory, true);
 			}
 
 			var msbuild = new MSBuild {
-				ProjectFile = consoleProjDir.File("Core.csproj"),
+				WorkingDirectory = projectDirectory,
+				ProjectFile = projectDirectory.File("Core.csproj"),
 				Targets = new [] { "Build" },
 				Properties = new Dictionary<string, string> { { "Configuration", "Release" } },
 			};

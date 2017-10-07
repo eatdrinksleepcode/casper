@@ -1,34 +1,38 @@
-﻿using NUnit.Framework;
-using System.IO;
-using System;
-using Casper.IO;
+﻿using Casper.IO;
+using NUnit.Framework;
 
 namespace Casper {
 	[TestFixture]
 	public class ExecTests {
 
-		MemoryStream output;
-		StreamReader outputReader;
-		TextWriter originalOutput;
-		TextWriter originalError;
+		private static RedirectedStandardOutput output;
+		private static RedirectedStandardOutput error;
+
 		IFileSystem fileSystem = RealFileSystem.Instance;
+		IDirectory workingDirectory;
+
+		[TestFixtureSetUp]
+		public static void OneTimeSetUp() {
+			output = RedirectedStandardOutput.RedirectOut();
+			error = RedirectedStandardOutput.RedirectError();
+		}
 
 		[SetUp]
 		public void SetUp() {
-			output = new MemoryStream();
-			outputReader = new StreamReader(output);
-			
-			originalOutput = Console.Out;
-			originalError = Console.Error;
-
-			Console.SetOut(new StreamWriter(output) { AutoFlush = true });
-			Console.SetError(new StreamWriter(output) { AutoFlush = true });
+			output.Clear();
+			error.Clear();
+			workingDirectory = fileSystem.MakeTemporaryDirectory();
 		}
 
 		[TearDown]
 		public void TearDown() {
-			Console.SetOut(originalOutput);
-			Console.SetError(originalError);
+			workingDirectory.Delete();
+		}
+
+		[TestFixtureTearDown]
+		public void OneTimeTearDown() {
+			output.Dispose();
+			error.Dispose();
 		}
 
 		[Test]
@@ -39,19 +43,19 @@ namespace Casper {
 			};
 			task.Execute(fileSystem);
 
-			output.Seek(0, SeekOrigin.Begin);
-			Assert.That(outputReader.ReadLine(), Is.Null.Or.Empty);
+			Assert.That(output.ToString(), Is.Null.Or.Empty);
 		}
 
 		[Test]
 		public void ExecAndArguments() {
-			var fooFile = fileSystem.File("foo.txt");
-			var barFile = fileSystem.File("bar.txt");
+			var fooFile = workingDirectory.File("foo.txt");
+			var barFile = workingDirectory.File("bar.txt");
 
 			fooFile.WriteAllText("Hello World!");
 			barFile.Delete();
 
 			var task = new Exec {
+				WorkingDirectory = workingDirectory.FullPath,
 				Executable = MoveCommand,
 				Arguments = "foo.txt bar.txt",
 			};
@@ -64,25 +68,28 @@ namespace Casper {
 
 		[Test]
 		public void Fail() {
-			File.Delete("foo.txt");
-			File.Delete("bar.txt");
+			var fooFile = workingDirectory.File("foo.txt");
+			var barFile = workingDirectory.File("bar.txt");
+			fooFile.Delete();
+			barFile.Delete();
 
 			var task = new Exec {
+				WorkingDirectory = workingDirectory.FullPath,
 				Executable = MoveCommand,
 				Arguments = "foo.txt bar.txt",
 			};
-				
-			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
-			Assert.False(File.Exists("foo.txt"));
-			Assert.False(File.Exists("bar.txt"));
 
-			output.Seek(0, SeekOrigin.Begin);
-			Assert.That(outputReader.ReadLine(), Is.Not.Null.And.Not.Empty);
+			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
+			Assert.False(fooFile.Exists());
+			Assert.False(barFile.Exists());
+
+			Assert.That(error.ToString(), Is.Not.Null.And.Not.Empty);
 		}
 
 		[Test]
 		public void MissingExecutable() {
 			var task = new Exec {
+				WorkingDirectory = workingDirectory.FullPath,
 				Arguments = "foo.txt bar.txt",
 			};
 

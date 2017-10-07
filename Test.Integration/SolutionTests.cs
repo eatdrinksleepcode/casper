@@ -4,14 +4,14 @@ using NUnit.Framework;
 namespace Casper {
 	[TestFixture]
 	public class SolutionTests {
-		private readonly IFileSystem fileSystem = RealFileSystem.Instance;
-		private IDirectory projectRootPath;
-		private IDirectory libraryProjectPath;
-		private IDirectory libraryUnitTestsProjectPath;
+		readonly IFileSystem fileSystem = RealFileSystem.Instance;
+		IDirectory projectRootPath;
+		IDirectory libraryProjectPath;
+		IDirectory libraryUnitTestsProjectPath;
 
 		[SetUp]
 		public void SetUp() {
-			projectRootPath = fileSystem.Directory(System.IO.Path.GetRandomFileName());
+			projectRootPath = fileSystem.MakeTemporaryDirectory();
 			libraryProjectPath = projectRootPath.Directory("Library");
 			libraryUnitTestsProjectPath = projectRootPath.Directory("Library.UnitTests");
 

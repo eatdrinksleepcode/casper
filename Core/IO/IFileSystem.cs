@@ -1,7 +1,8 @@
-﻿namespace Casper.IO {
+namespace Casper.IO {
 	public interface IFileSystem {
 		IFile File(string path);
 		IDirectory Directory(string path);
 		IDirectory GetCurrentDirectory();
+		IDirectory MakeTemporaryDirectory();
 	}
 }

@@ -1,27 +1,27 @@
-﻿using System;
-using Casper.IO;
+﻿using Casper.IO;
 using NUnit.Framework;
 
 namespace Casper {
-	public class TaskExecutionGraphTests : IDisposable {
-		private RedirectedStandardOutput output;
+	public class TaskExecutionGraphTests {
+		private static RedirectedStandardOutput output;
 		private IFileSystem fileSystem;
 		private IFile outputFile;
 
+		[TestFixtureSetUp]
+		public static void OneTimeSetUp() {
+			output = RedirectedStandardOutput.RedirectOut();
+		}
+
 		[SetUp]
 		public void SetUp() {
-			output = RedirectedStandardOutput.RedirectOut();
+			output.Clear();
 			fileSystem = new StubFileSystem();
 			outputFile = fileSystem.File("output.txt");
 			outputFile.WriteAllText("Output");
 		}
 
-		[TearDown]
-		public void TearDown() {
-			output.Clear();
-		}
-
-		void IDisposable.Dispose() {
+		[TestFixtureTearDown]
+		public void OneTimeTearDown() {
 			output.Dispose();
 		}
 
