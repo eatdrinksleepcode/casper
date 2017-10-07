@@ -1,0 +1,5 @@
+install:
+ - cmd: nuget restore
+
+build_script:
+ - cmd: .\dogfood.cmd Console:Pack Test:Compile Test.Integration:Compile

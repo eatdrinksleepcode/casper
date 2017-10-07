@@ -1,6 +1,6 @@
 @echo off
 
-set task=%1
+set task=%*
 if "%task%" == "" set task=Build
 
 set myDir=%~dp0
