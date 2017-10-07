@@ -4,3 +4,8 @@ mono:
 script:
   - git fetch --unshallow
   - ./dogfood
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then ./push "MyGet - Casper"; fi
+  - if [[ "$TRAVIS_BRANCH" == "master" ]]; then ./push "MyGet - Casper (Travis)"; fi
+env:
+  global:
+    secure: kbPDo+aU1GAnaBIRoG+E6TodCXWf1jejvmAtCZUBCxiYvB2LmPC8ty+Y4XxV2GIxJMF6nSCtVLaEjI7D+86BkcECNog2SuNMNf5hSyo5HWPojtrGsVeI/TyIlqiZeDzHzgNbQEgBvH84GeYrCuzjVT70HQq3PMp0c6qgFZEJ0zLtccx95OUCdoqsZOIMRgSM647WsbQiLuMzwoVDQZ2P8cgBOrKQVJ0F3xuJjZ/yw1eaCEM1fXqwLYaLtiNhTPCgEWUNIy7K04P4fVpOqFqNIQu22VyU5Cv23dWr4UNFiA06K5+8BtZn6auRZq1Ik/Pt9pWRp2i/HIMivBbOfSSAQwBGXRMrIaXPosj6Z7ONUlbCttWoe6BHBgp2EybwBMAonL6plKxFV5z2Zgj4NyK0zC/rC+jNvvKuy+02ZbQnT0ncqIx8xFzaCRuDFltQmizx3iQ8DkoJ+j98aYdY8IXjzqEFc8D0uIhGJ2o9iEFBHHABuA+ljNeo+/b7c5sXKfgHmCNhAwcrhgg1e6Iy7O2HSMXOMFhRkX9Gnn+gKnX9LBifpit9w4bDbyLLSgKszTfdba2suhCb+fOxz+zGmiX77j8xABMG7Z3wme0mhx4V9fI8z1vnaAx8XnKCSnsdodRZc1qUqppS9sejCUGG87MOv5JYwXzxHr954Sy3fvy7zS4=

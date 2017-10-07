@@ -1,5 +1,24 @@
-install:
- - cmd: nuget restore
+-
+  install:
+    - cmd: nuget restore
 
-build_script:
- - cmd: .\dogfood.cmd Console:Pack Test:Compile Test.Integration:Compile
+  build_script:
+    - cmd: .\dogfood.cmd Console:Pack Test:Compile Test.Integration:Compile
+
+-
+  environment:
+    MYGET_API_KEY:
+      secure: CcB8bliXM24AjTLTpLuw+fmo3he7VCnZzUWleNxN2bvbYLvrRMl9EellX5jMLqTG
+
+  branches:
+    only:
+    - master
+
+  install:
+    - cmd: nuget restore
+
+  build_script:
+    - cmd: .\dogfood.cmd Console:Pack Test:Compile Test.Integration:Compile
+
+  on_success:
+    - cmd: .\push.cmd "MyGet - Casper (AppVeyor)"

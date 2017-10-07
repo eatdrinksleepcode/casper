@@ -11,7 +11,6 @@ echo Installing casper...
 "%myDir%nuget" sources Remove -Name "Casper Dev" -ConfigFile "%localNugetConfig%" >NUL 2>&1
 "%myDir%nuget" sources Add -Name "Casper Dev" -Source "%myDir%out\packages" -ConfigFile "%localNugetConfig%" >NUL || goto :eof
 "%myDir%nuget" install Casper.Console -OutputDirectory "%myDir%.msbuild" -pre -Verbosity quiet -Source "Casper Dev" -ConfigFile "%localNugetConfig%" -ExcludeVersion || goto :eof
-del "%localNugetConfig%"
 echo Cleaning outputs...
 msbuild /t:Clean /verbosity:quiet /nologo || goto :eof
 msbuild /t:Clean /p:Configuration=Release /verbosity:quiet /nologo || goto :eof
