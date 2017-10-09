@@ -70,9 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="*.cs" />
-    <Compile Include="..\Test\RedirectedStandardOutput.cs">
-      <Link>RedirectedStandardOutput.cs</Link>
-    </Compile>
+    <Compile Include="IO\*.cs" />
     <Compile Include="..\Test\TestProject.cs">
       <Link>TestProject.cs</Link>
     </Compile>
@@ -85,8 +83,6 @@
     <Compile Include="..\Test\IO\FileTests.cs">
       <Link>IO\FileTests.cs</Link>
     </Compile>
-    <Compile Include="IO\RealDirectoryTests.cs" />
-    <Compile Include="IO\RealFileTests.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -68,7 +68,6 @@ namespace Casper {
 						throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, ex);
 					}
 					taskGraph.ExecuteTasks();
-					Console.WriteLine();
 					WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
 				}
 				return 0;

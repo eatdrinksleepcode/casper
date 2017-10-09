@@ -12,6 +12,11 @@ namespace Casper {
 			Set(new StringWriter(output));
 		}
 
+		private RedirectedStandardOutput(Func<TextWriter, TextWriter> redirectTarget) {
+			this.originalOutput = Get();
+			Set(redirectTarget(this.originalOutput));
+		}
+
 		public void Clear() {
 			output.Clear();
 		}
@@ -32,11 +37,27 @@ namespace Casper {
 			return new Out();
 		}
 
+		public static IDisposable RedirectOut(Func<TextWriter, TextWriter> redirectTarget) {
+			return new Out(redirectTarget);
+		}
+
 		public static RedirectedStandardOutput RedirectError() {
 			return new Error();
 		}
+
+		public static IDisposable RedirectError(Func<TextWriter, TextWriter> redirectTarget) {
+			return new Error(redirectTarget);
+		}
 			
 		private class Out : RedirectedStandardOutput {
+
+			public Out() {
+			}
+
+			public Out(Func<TextWriter, TextWriter> redirectTarget)
+				: base(redirectTarget) {
+			}
+
 			protected override TextWriter Get() {
 				return Console.Out;
 			}
@@ -47,6 +68,14 @@ namespace Casper {
 		}
 
 		private class Error : RedirectedStandardOutput {
+
+			public Error() {
+			}
+
+			public Error(Func<TextWriter, TextWriter> redirectTarget)
+				: base(redirectTarget) {
+			}
+
 			protected override TextWriter Get() {
 				return Console.Error;
 			}

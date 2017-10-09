@@ -66,15 +66,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="*.cs" />
     <Compile Include="..\Test.Integration\StringTestExtensions.cs">
       <Link>StringTestExtensions.cs</Link>
     </Compile>
-    <Compile Include="IO\StubFileSystem.cs" />
-    <Compile Include="IO\DirectoryTests.cs" />
-    <Compile Include="IO\FileTests.cs" />
-    <Compile Include="IO\StubDirectoryTests.cs" />
-    <Compile Include="IO\StubFileTests.cs" />
+    <Compile Include="*.cs" />
+    <Compile Include="IO\*.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

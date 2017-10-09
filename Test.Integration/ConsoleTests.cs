@@ -24,7 +24,7 @@ namespace Casper {
 		}
 
 		[Test]
-		public void ExecuteTasksInOrder() {
+		public void ExecuteTasksWithOutputInOrder() {
 			var testProcess = ExecuteScript("Test1.casper", @"
 task hello:
 	print 'Hello World!'
@@ -36,6 +36,43 @@ task goodbye:
 			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":goodbye"));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Goodbye World!"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":hello"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Hello World!"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
+		}
+
+		[Test]
+		[Ignore("Use pre-write spacing instead of post-write spacing")]
+		public void ExecuteSimpleTasksInOrder() {
+			var testProcess = ExecuteScript("Test1.casper", @"
+task hello
+task goodbye
+", "goodbye", "hello");
+			Assert.That(standardError.ReadToEnd(), Is.Empty);
+			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":goodbye"));
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":hello"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Is.EqualTo("BUILD SUCCESS"));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
+		}
+
+		[Test]
+		[Ignore("Detect incomplete task writes")]
+		public void TaskWithIncompleteOutput() {
+			var testProcess = ExecuteScript("Test1.casper", @"
+task hello:
+	System.Console.Write(""Hello World!"");
+", "goodbye", "hello");
+			Assert.That(standardError.ReadToEnd(), Is.Empty);
+			Assert.That(testProcess.ExitCode, Is.EqualTo(0));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":hello"));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo("Hello World!"));
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
