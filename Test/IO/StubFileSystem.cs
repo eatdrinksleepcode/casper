@@ -97,7 +97,13 @@ namespace Casper.IO {
 			}
 
 			public IDirectory Directory {
-				get { return fileSystem.Directory(System.IO.Path.GetDirectoryName(FullPath)); }
+				get { return fileSystem.Directory(System.IO.Path.GetDirectoryName(path)); }
+			}
+
+			public string Name {
+				get {
+					return System.IO.Path.GetFileName(path);
+				}
 			}
 		}
 
@@ -141,6 +147,12 @@ namespace Casper.IO {
 
 			public IDirectory RootDirectory {
 				get { return new StubDirectory(fileSystem, System.IO.Path.GetPathRoot(path)); }
+			}
+
+			public string Name {
+				get {
+					return System.IO.Path.GetDirectoryName(System.IO.Path.Combine(path, "a"));
+				}
 			}
 		}
 

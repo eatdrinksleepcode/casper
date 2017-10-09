@@ -47,6 +47,22 @@ at Casper.NUnitTests.ShouldFail".NormalizeNewLines()));
 		}
 
 		[Test]
+		public void NonExistingTestAssembly() {
+			var testAssemblyLocation = fileSystem.File(Assembly.GetExecutingAssembly().Location + "foo");
+			var task = new NUnit {
+				TestAssembly = testAssemblyLocation.FullPath,
+			};
+
+			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
+
+			Assert.That(error.ToString(), Does.StartWith($@"
+Failing tests:
+
+{testAssemblyLocation.Name}:
+File not found: {testAssemblyLocation.FullPath}".NormalizeNewLines()));
+		}
+
+		[Test]
 		public void MissingTestAssembly() {
 			var task = new NUnit();
 

@@ -62,7 +62,7 @@ namespace Casper {
 			private readonly List<TestError> errors = new List<TestError>();
 
 			private void Visit(XmlNode node) {
-				if(node.Name == "test-suite" && GetAttribute(node, "result") == "Failed" && GetAttribute(node, "site") != "Child" && GetAttribute(node, "total") == "0") {
+				if(node.Name == "test-suite" && GetAttribute(node, "result") == "Failed" && GetAttribute(node, "site") != "Child"	) {
 					var error = new TestError { Name = GetAttribute(node, "name") };
 					if(GetAttribute(node, "label") == "Error") {
 						FindErrorForTestCase(node, error);

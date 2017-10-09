@@ -92,6 +92,12 @@ namespace Casper.IO {
 			public IDirectory Directory {
 				get { return new RealDirectory(DirectoryPath); }
 			}
+
+			public string Name {
+				get {
+					return System.IO.Path.GetFileName(path);
+				}
+			}
 		}
 
 		private class RealDirectory : IDirectory {
@@ -136,6 +142,13 @@ namespace Casper.IO {
 
 			public IDirectory RootDirectory {
 				get { return Directory(System.IO.Directory.GetDirectoryRoot(path)); }
+			}
+
+			public string Name {
+				get {
+					// HACK: the path may or may not end with a path separator
+					return System.IO.Path.GetDirectoryName(System.IO.Path.Combine(path, "a"));
+				}
 			}
 		}
 	}
