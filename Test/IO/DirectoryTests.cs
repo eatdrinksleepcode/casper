@@ -9,7 +9,7 @@ namespace Casper.IO {
 		[TestFixtureSetUp]
 		public void SetUpOnce() {
 			fileSystem = GetFileSystemInstance();
-			testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().CodeBase).Directory;
+			testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().Location).Directory;
 		}
 
 		protected abstract IFileSystem GetFileSystemInstance();

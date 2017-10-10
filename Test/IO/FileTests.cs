@@ -13,7 +13,7 @@ namespace Casper.IO {
 		[TestFixtureSetUp]
 		public void SetUpOnce() {
 			fileSystem = GetFileSystemInstance();
-			testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().CodeBase).Directory;
+			testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().Location).Directory;
 			testDirectory = testParentDirectory.Directory(typeof(FileTests).Name);
 			if(testDirectory.Exists()) {
 				testDirectory.Delete();
