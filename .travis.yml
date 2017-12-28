@@ -2,4 +2,5 @@ language: csharp
 mono:
   - 4.8.1
 script:
+  - git fetch --unshallow
   - ./dogfood
