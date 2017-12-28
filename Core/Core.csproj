@@ -35,6 +35,12 @@
     <Compile Include="*.cs" />
     <Compile Include="IO\*.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\AssemblyInfo.Product.cs">
+      <Link>Properties\AssemblyInfo.Product.cs</Link>
+    </Compile>
+    <Compile Include="..\AssemblyInfo.Version.cs">
+      <Link>Properties\AssemblyInfo.Version.cs</Link>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
