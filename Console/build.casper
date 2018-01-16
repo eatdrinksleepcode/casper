@@ -9,6 +9,6 @@ binPath = Path.Combine('bin', 'Release') + Path.DirectorySeparatorChar
 task Pack(Exec,
 		  DependsOn: [Tasks['Compile'], CreatePackagesDir],
 		  Executable: Path.Combine('..', 'nuget.exe'),
-		  Arguments: "pack Console.nuspec -OutputDirectory ../out/packages -Properties BINPATH=$(binPath)")
+		  Arguments: "pack -OutputDirectory ../out/packages -Properties Configuration=Release;BINPATH=$(binPath)")
 
 parent.Tasks['Build'].DependsOn.Add(Pack)

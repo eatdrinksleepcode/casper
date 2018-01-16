@@ -35,6 +35,13 @@
       </CustomCommands>
     </CustomCommands>
   </PropertyGroup>
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Default' ">
+    <StartAction>Program</StartAction>
+    <StartProgram>%24{SolutionDir}\.msbuild\Casper.Console.0.0.1-alpha\tools\casper.exe</StartProgram>
+    <StartArguments>build.casper Test.Integration:Test</StartArguments>
+    <StartWorkingDirectory>%24{SolutionDir}</StartWorkingDirectory>
+    <ConsolePause>false</ConsolePause>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Boo.Lang">
