@@ -1,0 +1,5 @@
+#! /bin/sh
+
+myDir="`dirname \"$0\"`"
+
+mono $myDir/packages/GitVersion.CommandLine.3.6.5/tools/GitVersion.exe /updateAssemblyInfo AssemblyInfo.Version.cs /ensureAssemblyInfo /output json /showVariable NuGetVersionV2 || exit $?

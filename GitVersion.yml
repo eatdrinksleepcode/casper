@@ -2,3 +2,4 @@ mode: ContinuousDeployment
 branches: {}
 ignore:
   sha: []
+assembly-informational-format: '{NuGetVersionV2}'

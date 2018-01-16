@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>Casper.Console</id>
-    <version>0.0.1-alpha</version>
+    <version>$version$</version>
     <title>Casper.Console</title>
     <authors>David Nelson</authors>
     <owners>David Nelson</owners>
