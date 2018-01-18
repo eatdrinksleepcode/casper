@@ -94,7 +94,7 @@ namespace Casper {
 					ProjectFile = projectFile.FullPath,
 					Properties = new Dictionary<string, object> {
 					{ "Configuration", "Release" },
-					{ Environment.IsUnix ? "BuildingInsideVisualStudio" : "BuildProjectReferences", Environment.IsUnix },
+					{ "BuildProjectReferences", false },
 				}
 				});
 
