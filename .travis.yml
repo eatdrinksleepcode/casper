@@ -1,7 +1,7 @@
 language: csharp
 os: osx
 mono:
-  - 4.8.1
+  - 5.4.1 
 script:
   - git fetch --unshallow
   - ./dogfood
