@@ -40,9 +40,10 @@ namespace Casper {
 			foreach(var c in constructorParameters) {
 				constructor.Parameters.Add(c);
 			}
-			var args = constructorParameters.Take(1).Select(p => new ReferenceExpression(node.LexicalInfo, p.Name))
-			                                .Concat(Enumerable.Repeat(Expression.Lift(this.location.FullPath), 1))
-			                                .Concat(constructorParameters.Skip(1).Select(p => new ReferenceExpression(node.LexicalInfo, p.Name)));
+
+			var args = constructorParameters.Select(p => new ReferenceExpression(node.LexicalInfo, p.Name)).Cast<Expression>().ToList();
+			args.Insert(1, Expression.Lift(this.location.FullPath));
+
 			constructor.Body.Add(new MethodInvocationExpression(
 				node.LexicalInfo,
 				new SuperLiteralExpression(node.LexicalInfo),
