@@ -4,15 +4,25 @@ myDir="`dirname \"$0\"`"
 localNugetConfig=$myDir/.local-nuget.config
 cp $myDir/local-nuget.config $localNugetConfig
 
-$myDir/build Debug || exit $?
-rm -r $myDir/.msbuild
-mkdir $myDir/.msbuild
-echo "Installing casper..."
-packageDir="$(cd $myDir/out/packages; pwd)"
-$myDir/nuget sources Remove -Name "Casper Dev" -ConfigFile $localNugetConfig > /dev/null 2>&1
-$myDir/nuget sources Add -Name "Casper Dev" -Source "$packageDir" -ConfigFile $localNugetConfig > /dev/null || exit $?
-$myDir/nuget install Casper.Console -OutputDirectory $myDir/.msbuild -pre -Verbosity quiet -Source "Casper Dev" -ConfigFile $localNugetConfig || exit $?
+#$myDir/build Debug || exit $?
+echo Installing old Casper...
+oldPackageDir=$myDir/.casper/old
+mkdir -p $oldPackageDir
+$myDir/nuget install Casper.Console -Version 0.1.0-ci0146 -OutputDirectory $oldPackageDir -pre -Verbosity quiet -Source "MyGet" -ConfigFile $localNugetConfig -ExcludeVersion || exit $?
+
+echo Building new Casper with old Casper...
+mono --debug $oldPackageDir/Casper.Console/tools/casper.exe build.casper Build || exit $?
+
+echo Installing new Casper...
+newPackageDir=$myDir/.casper/new
+rm -r $newPackageDir
+mkdir -p $newPackageDir
+$myDir/nuget install Casper.Console -ExcludeVersion -OutputDirectory $newPackageDir -pre -Verbosity quiet -Source "Casper Dev" -ConfigFile $localNugetConfig || exit $?
+
 echo Cleaning outputs...
 msbuild /t:Clean /verbosity:quiet /nologo || exit $?
 msbuild /t:Clean /p:Configuration=Release /verbosity:quiet /nologo || exit $?
-$myDir/build-with-casper $@ || exit $?
+
+echo Building with new Casper...
+rm -r $myDir/out
+$myDir/casper $@ || exit $?
