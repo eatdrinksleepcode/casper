@@ -1,6 +1,8 @@
 #! /bin/sh
 
 task=${@:-Build}
-
 myDir="`dirname \"$0\"`"
-mono --debug $myDir/.casper/new/Casper.Console/tools/casper.exe build.casper $task || exit $?
+
+$myDir/bootstrap || exit $?
+
+mono --debug $myDir/.casper/old/Casper.Console/tools/casper.exe build.casper Build || exit $?

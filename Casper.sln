@@ -13,22 +13,23 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NUnit", "NUnit\NUnit.csproj
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{125E3DB8-8D26-43FF-8AD3-D0C8FC0DD0E8}"
 	ProjectSection(SolutionItems) = preProject
-		build = build
 		build.casper = build.casper
-		build.cmd = build.cmd
 		casper = casper
 		casper.cmd = casper.cmd
 		dogfood = dogfood
 		dogfood.cmd = dogfood.cmd
 		nuget = nuget
-		pack = pack
-		pack.cmd = pack.cmd
 		GitVersion.yml = GitVersion.yml
 		appveyor.yml = appveyor.yml
 		.travis.yml = .travis.yml
 		push = push
 		push.cmd = push.cmd
 		local-nuget.config = local-nuget.config
+		bootstrap = bootstrap
+		bootstrap.cmd = bootstrap.cmd
+		dogfood.casper = dogfood.casper
+		LICENSE = LICENSE
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test.Integration", "Test.Integration\Test.Integration.csproj", "{3C4A6731-C785-4D14-BE04-8BDA4C4E7E33}"

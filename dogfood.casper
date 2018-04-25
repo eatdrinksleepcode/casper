@@ -1,0 +1,36 @@
+import Casper
+import System.IO
+
+casperDir = '.casper'
+oldCasperDir = Path.Combine(casperDir, 'old')
+newCasperDir = Path.Combine(casperDir, 'new')
+localNugetConfig = 'local-nuget.config'
+
+task Restore(Exec,
+    Executable: 'nuget.exe',
+    Arguments: 'restore')
+
+task Build(Exec,
+    DependsOn: [Tasks['Restore']],
+    Executable: Path.Combine(oldCasperDir, 'Casper.Console', 'tools', 'casper.exe'),
+    Arguments: 'build.casper Build')
+
+task CleanNewCasperDir:
+    if Directory.Exists(newCasperDir):
+        Directory.Delete(newCasperDir, true)
+    Directory.CreateDirectory(newCasperDir)
+
+task InstallNew(Exec,
+    DependsOn: [Tasks['Build'], Tasks['CleanNewCasperDir']],
+    Executable: 'nuget.exe',
+    Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory $(newCasperDir) -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
+
+task CleanOutputs(Exec,
+    DependsOn: [Tasks['InstallNew']],
+    Executable: 'msbuild',
+    Arguments: '/t:Clean /p:Configuration=Release /verbosity:quiet /nologo')
+
+task Dogfood(Exec,
+    DependsOn: [Tasks['InstallNew'], Tasks['CleanOutputs']],
+    Executable: Path.Combine(newCasperDir, 'Casper.Console', 'tools', 'casper.exe'),
+    Arguments: 'build.casper Build')
