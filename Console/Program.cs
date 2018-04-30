@@ -56,7 +56,7 @@ namespace Casper {
 						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
 					}
 				} else if(o.Projects) {
-					var allProjects = Enumerable.Repeat(project, 1).FindAllProjects();
+					var allProjects = new List<ProjectBase> { project }.FindAllProjects();
 					foreach(var p in allProjects) {
 						Console.Error.WriteLine(p.PathDescription);
 					}
@@ -76,14 +76,8 @@ namespace Casper {
 			});
 		}
 
-		public static IEnumerable<ProjectBase> FindAllProjects(this IEnumerable<ProjectBase> projects) {
-			var flattenedList = projects;
-			foreach(var element in projects) {
-				projects = flattenedList.Concat(
-					element.Projects.FindAllProjects()
-				);
-			}
-			return projects;
+		private static IEnumerable<ProjectBase> FindAllProjects(this IReadOnlyCollection<ProjectBase> projects) {
+			return projects.Concat(projects.SelectMany(p => p.Projects.FindAllProjects()));
 		}
 
 		static void WriteError(object whatWentWrong) {

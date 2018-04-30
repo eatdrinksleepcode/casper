@@ -33,9 +33,7 @@ namespace Casper {
 				this.file = file;
 			}
 			
-			public string Name {
-				get { return this.file.FullPath; }
-			}
+			public string Name => file.FullPath;
 
 			public TextReader Open() {
 				return file.OpenText();
@@ -54,7 +52,7 @@ namespace Casper {
 			var project = CreateProjectFromProjectType(CompileToProjectType());
 			return project;
 		}
-			
+
 		private Type CompileToProjectType() {
 			var projectInput = new FileInput(scriptPath);
 			var baseClassStep = new BaseClassStep(scriptPath.Directory);

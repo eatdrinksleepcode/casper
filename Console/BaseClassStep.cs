@@ -13,7 +13,7 @@ namespace Casper {
 		}
 
 		public override void Run() {
-			base.Visit(CompileUnit);
+			Visit(CompileUnit);
 		}
 
 		public override void OnModule(Module node) {
@@ -42,7 +42,7 @@ namespace Casper {
 			}
 
 			var args = constructorParameters.Select(p => new ReferenceExpression(node.LexicalInfo, p.Name)).Cast<Expression>().ToList();
-			args.Insert(1, Expression.Lift(this.location.FullPath));
+			args.Insert(1, Expression.Lift(location.FullPath));
 
 			constructor.Body.Add(new MethodInvocationExpression(
 				node.LexicalInfo,

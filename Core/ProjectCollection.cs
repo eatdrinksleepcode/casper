@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 
 namespace Casper {
-	public class ProjectCollection : IEnumerable<ProjectBase> {
+	public class ProjectCollection : IReadOnlyCollection<ProjectBase> {
 		private readonly ProjectBase parent;
 		private readonly Dictionary<string, ProjectBase> subprojects = new Dictionary<string, ProjectBase>();
 
