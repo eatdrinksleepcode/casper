@@ -27,7 +27,8 @@ namespace Casper {
 				result = runner.Run(null, filter);
 			}
 
-			using(var writer = XmlWriter.Create(fileSystem.File(TestAssembly).Directory.File(this.Name + (!string.IsNullOrEmpty(TestName) ? "." + TestName : "") + ".nunit").FullPath, new XmlWriterSettings { Indent = true })) {
+			var outputFileName = fileSystem.File(TestAssembly).Directory.File(Name + (!string.IsNullOrEmpty(TestName) ? "." + TestName : "") + ".nunit").FullPath;
+			using(var writer = XmlWriter.Create(outputFileName, new XmlWriterSettings { Indent = true })) {
 				result.WriteTo(writer);
 			}
 
@@ -90,7 +91,7 @@ namespace Casper {
 			}
 
 			static XmlNode GetChildNode(XmlNode parentNode, string childNodeName) {
-				return parentNode?.ChildNodes?.Cast<XmlNode>()?.FirstOrDefault(n => n.Name == childNodeName);
+				return parentNode?.ChildNodes.Cast<XmlNode>().FirstOrDefault(n => n.Name == childNodeName);
 			}
 
 			private void Visit(XmlNodeList nodes) {
@@ -100,8 +101,7 @@ namespace Casper {
 			}
 
 			private static string GetAttribute(XmlNode node, string attributeName) {
-				var attr = node.Attributes[attributeName];
-				return attr == null ? null : attr.Value;
+				return node.Attributes?[attributeName]?.Value;
 			}
 		}
 	}
