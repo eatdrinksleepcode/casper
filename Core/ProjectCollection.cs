@@ -32,7 +32,7 @@ namespace Casper {
 			get {
 				ProjectBase result;
 				if(!subprojects.TryGetValue(name, out result)) {
-					throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Project '{0}' does not exist in {1}", name, parent.PathDescription);
+					throw new CasperException(CasperException.KnownExitCode.ConfigurationError, "Project '{0}' does not exist in {1}", name, parent.PathDescription);
 				}
 				return result;
 			}

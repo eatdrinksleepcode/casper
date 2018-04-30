@@ -13,7 +13,7 @@ namespace Casper {
 
 		public override void Execute(IFileSystem fileSystem) {
 			if(null == TestAssembly) {
-				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'TestAssembly'");
+				throw new CasperException(CasperException.KnownExitCode.ConfigurationError, "Must set 'TestAssembly'");
 			}
 
 			var filter = TestFilter.Empty;
@@ -41,7 +41,7 @@ namespace Casper {
 					Console.Error.WriteLine(error.Message);
 					Console.Error.WriteLine(error.StackTrace);
 				}
-				throw new CasperException(CasperException.EXIT_CODE_TASK_FAILED, "{0} tests failed", failures.Count);
+				throw new CasperException(CasperException.KnownExitCode.TaskFailed, "{0} tests failed", failures.Count);
 			}
 		}
 

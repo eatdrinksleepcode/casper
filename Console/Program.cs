@@ -35,48 +35,54 @@ namespace Casper {
 			var timer = Stopwatch.StartNew();
 			try {
 				var arguments = Parser.Default.ParseArguments<Options>(args);
-				return Run(arguments);
+				return (byte) Run(arguments);
 			} catch (CasperException ex) {
 				WriteError(ex.Message);
-				return ex.ExitCode;
+				return (byte) ex.ExitCode;
 			} catch (Exception ex) {
 				WriteError(ex);
-				return CasperException.EXIT_CODE_UNHANDLED_EXCEPTION;
+				return (byte) CasperException.KnownExitCode.UnhandledException;
 			} finally {
 				Console.WriteLine();
 				Console.WriteLine("Total time: {0}", timer.Elapsed);
 			}
 		}
 
-		static int Run(ParserResult<Options> arguments) {
-			return arguments.MapResult(o =>  {
-				var project = BooProjectLoader.LoadProject(o.ScriptPath, RealFileSystem.Instance);
-				if(o.Tasks) {
-					foreach(var task in project.Tasks) {
-						Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
-					}
-				} else if(o.Projects) {
-					var allProjects = new List<ProjectBase> { project }.FindAllProjects();
-					foreach(var p in allProjects) {
-						Console.Error.WriteLine(p.PathDescription);
-					}
-				} else {
-					TaskExecutionGraph taskGraph;
-					try {
-						taskGraph = project.BuildTaskExecutionGraph(o.TasksToExecute);
-					} catch(UnknownTaskException ex) {
-						throw new CasperException(CasperException.EXIT_CODE_MISSING_TASK, ex);
-					}
-					taskGraph.ExecuteTasks();
-					WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
-				}
-				return 0;
-			}, errors =>  {
-				return errors.Any(e => e.Tag == ErrorType.HelpRequestedError) ? 0 : CasperException.EXIT_CODE_UNHANDLED_EXCEPTION;
+		static CasperException.KnownExitCode Run(ParserResult<Options> arguments) {
+			return arguments.MapResult(Run, errors =>  {
+				return errors.Any(e => e.Tag == ErrorType.HelpRequestedError)
+										? CasperException.KnownExitCode.None
+										: CasperException.KnownExitCode.UnhandledException;
 			});
 		}
 
-		private static IEnumerable<ProjectBase> FindAllProjects(this IReadOnlyCollection<ProjectBase> projects) {
+		static CasperException.KnownExitCode Run(Options o) {
+			var project = BooProjectLoader.LoadProject(o.ScriptPath, RealFileSystem.Instance);
+			if (o.Tasks) {
+				foreach (var task in project.Tasks) {
+					Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
+				}
+			} else if (o.Projects) {
+				var allProjects = new List<ProjectBase> {project}.FindAllProjects();
+				foreach (var p in allProjects) {
+					Console.Error.WriteLine(p.PathDescription);
+				}
+			} else {
+				TaskExecutionGraph taskGraph;
+				try {
+					taskGraph = project.BuildTaskExecutionGraph(o.TasksToExecute);
+				} catch (UnknownTaskException ex) {
+					throw new CasperException(CasperException.KnownExitCode.MissingTask, ex);
+				}
+
+				taskGraph.ExecuteTasks();
+				WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
+			}
+
+			return CasperException.KnownExitCode.None;
+		}
+
+		static IEnumerable<ProjectBase> FindAllProjects(this IReadOnlyCollection<ProjectBase> projects) {
 			return projects.Concat(projects.SelectMany(p => p.Projects.FindAllProjects()));
 		}
 

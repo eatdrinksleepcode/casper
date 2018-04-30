@@ -3,32 +3,30 @@
 namespace Casper {
 
 	public class CasperException : Exception {
-		public const int EXIT_CODE_COMPILATION_ERROR = 1;
-		public const int EXIT_CODE_MISSING_TASK = 2;
-		public const int EXIT_CODE_CONFIGURATION_ERROR = 3;
-		public const int EXIT_CODE_TASK_FAILED = 4;
-		public const int EXIT_CODE_UNHANDLED_EXCEPTION = 255;
 
-		private readonly int exitCode;
-
-		public CasperException(int exitCode, string message)
-			: base(message) {
-			this.exitCode = exitCode;
+		public enum KnownExitCode : byte {
+			None = 0,
+			CompilationError = 1,
+			MissingTask = 2,
+			ConfigurationError = 3,
+			TaskFailed = 4,
+			UnhandledException = 255,
 		}
 
-		public CasperException(int exitCode, string message, params object[] args)
+		public CasperException(KnownExitCode exitCode, string message)
+			: base(message) {
+			ExitCode = exitCode;
+		}
+
+		public CasperException(KnownExitCode exitCode, string message, params object[] args)
 			: this(exitCode, string.Format(message, args)) {
 		}
 
-		public CasperException(int exitCode, Exception innerException)
+		public CasperException(KnownExitCode exitCode, Exception innerException)
 			: base(innerException.Message, innerException) {
-			this.exitCode = exitCode;
+			ExitCode = exitCode;
 		}
 
-		public int ExitCode {
-			get {
-				return exitCode;
-			}
-		}
+		public KnownExitCode ExitCode { get; }
 	}
 }

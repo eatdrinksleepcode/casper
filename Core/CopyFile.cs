@@ -7,10 +7,10 @@ namespace Casper {
 
 		public override void Execute(IFileSystem fileSystem) {
 			if (null == Source) {
-				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Source'");
+				throw new CasperException(CasperException.KnownExitCode.ConfigurationError, "Must set 'Source'");
 			}
 			if (null == Destination) {
-				throw new CasperException(CasperException.EXIT_CODE_CONFIGURATION_ERROR, "Must set 'Destination'");
+				throw new CasperException(CasperException.KnownExitCode.ConfigurationError, "Must set 'Destination'");
 			}
 			fileSystem.File(Source).CopyTo(fileSystem.File(Destination));
 		}

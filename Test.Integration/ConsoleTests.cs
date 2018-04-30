@@ -121,7 +121,7 @@ import Casper;
 task move(Exec, Executable: 'mv', Arguments: 'foo.txt bar.txt')
 ", "move");
 			Assert.That(standardError.ReadToEnd(), Is.Not.Empty);
-			Assert.That(testProcess.ExitCode, Is.EqualTo(CasperException.EXIT_CODE_TASK_FAILED));
+			Assert.That(testProcess.ExitCode, Is.EqualTo((int)CasperException.KnownExitCode.TaskFailed));
 			Assert.That(standardOutput.ReadLine(), Is.EqualTo(":move"));
 			Assert.That(standardOutput.ReadLine(), Is.Empty);
 			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));

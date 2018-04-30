@@ -79,7 +79,7 @@ namespace Casper {
 			pipeline.Insert(1, baseClassStep);
 			pipeline.Run(context);
 			if (context.Errors.Count > 0) {
-				throw new CasperException(CasperException.EXIT_CODE_COMPILATION_ERROR, context.Errors.ToString());
+				throw new CasperException(CasperException.KnownExitCode.CompilationError, context.Errors.ToString());
 			}
 			var projectType = context.GeneratedAssembly.GetTypes().First();
 			return projectType;
