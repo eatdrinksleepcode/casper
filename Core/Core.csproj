@@ -46,4 +46,7 @@
   <ItemGroup>
     <Folder Include="IO\" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="build.casper" />
+  </ItemGroup>
 </Project>
