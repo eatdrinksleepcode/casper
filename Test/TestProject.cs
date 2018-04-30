@@ -26,7 +26,7 @@ namespace Casper {
 			return base.BuildTaskExecutionGraph(taskNamesToExecute);
 		}
 
-		public TestTask AddTestTask(string taskName, params TestTask[] dependencies) {
+		public TestTask AddTestTask(string taskName, params TaskBase[] dependencies) {
 			var csharpCompile = new TestTask(dependencies);
 			AddTask(taskName, csharpCompile);
 			return csharpCompile;

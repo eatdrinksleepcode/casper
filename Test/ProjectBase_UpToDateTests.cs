@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Casper.IO;
 using NUnit.Framework;
 
@@ -6,28 +7,28 @@ namespace Casper {
 	public class ProjectBase_UpToDateTests {
 
 		private IFileSystem fileSystem;
-		private IFile inputFile;
-		private IFile outputFile;
+		private IFile testInputFile;
+		private IFile testOutputFile;
 
 		[SetUp]
 		public void SetUp() {
 			fileSystem = new StubFileSystem();
-			inputFile = fileSystem.File("input.txt");
-			inputFile.WriteAllText("Input");
-			outputFile = fileSystem.File("output.txt");
-			outputFile.WriteAllText("Output");
+			testInputFile = fileSystem.File("input.txt");
+			testInputFile.WriteAllText("Input");
+			testOutputFile = fileSystem.File("output.txt");
+			testOutputFile.WriteAllText("Output");
 		}
 
-		private bool CreateUpToDateTask(IFile[] inputFiles, IFile[] outputFiles) {
+		private bool CreateUpToDateTask(IEnumerable<IFile> inputFiles, IEnumerable<IFile> outputFiles) {
 			var task = new TestTask();
-			foreach(var inputFile in inputFiles) {
-				if(null != inputFile) {
-					task.AddInput(inputFile);
+			foreach(var file in inputFiles) {
+				if(null != file) {
+					task.AddInput(file);
 				}
 			}
-			foreach(var outputFile in outputFiles) {
-				if(null != outputFile) {
-					task.AddOutput(outputFile);
+			foreach(var file in outputFiles) {
+				if(null != file) {
+					task.AddOutput(file);
 				}
 			}
 
@@ -36,21 +37,19 @@ namespace Casper {
 			return project.Execute(project.Tasks["up-to-date"]);
 		}
 
-		private bool ExecuteTwice(IFile inputFile, IFile outputFile, Action between = null) {
-			var inputFiles = new[] { inputFile };
-			var outputFiles = new[] { outputFile };
+		private bool ExecuteTwice(IFile taskInputFile, IFile taskOutputFile, Action between = null) {
+			var inputFiles = new[] { taskInputFile };
+			var outputFiles = new[] { taskOutputFile };
 			Assert.True(CreateUpToDateTask(inputFiles, outputFiles));
 
-			if(null != between) {
-				between();
-			}
+			between?.Invoke();
 
 			return CreateUpToDateTask(inputFiles, outputFiles);
 		}
 
 		[Test]
 		public void InputsAndOutputsExist() {
-			Assert.False(ExecuteTwice(inputFile, outputFile));
+			Assert.False(ExecuteTwice(testInputFile, testOutputFile));
 		}
 
 		[Test]
@@ -60,62 +59,62 @@ namespace Casper {
 
 		[Test]
 		public void NoInput() {
-			Assert.False(ExecuteTwice(null, outputFile));
+			Assert.False(ExecuteTwice(null, testOutputFile));
 		}
 
 		[Test]
 		public void NoOutput() {
-			Assert.True(ExecuteTwice(inputFile, null));
+			Assert.True(ExecuteTwice(testInputFile, null));
 		}
 
 		[Test]
 		public void InputChanges() {
-			Assert.True(ExecuteTwice(inputFile, outputFile, () => { 
+			Assert.True(ExecuteTwice(testInputFile, testOutputFile, () => { 
 				System.Threading.Tasks.Task.Delay(TimeSpan.FromMilliseconds(1)).Wait();
-				inputFile.WriteAllText("Changed Input");
+				testInputFile.WriteAllText("Changed Input");
 			}));
 		}
 
 		[Test]
 		public void OutputChanges() {
-			Assert.True(ExecuteTwice(inputFile, outputFile, () => { 
+			Assert.True(ExecuteTwice(testInputFile, testOutputFile, () => { 
 				System.Threading.Tasks.Task.Delay(TimeSpan.FromMilliseconds(1)).Wait();
-				outputFile.WriteAllText("Changed Output");
+				testOutputFile.WriteAllText("Changed Output");
 			}));
 		}
 
 		[Test]
 		public void InputGoesMissing() {
-			Assert.True(ExecuteTwice(inputFile, outputFile, () => { inputFile.Delete(); }));
+			Assert.True(ExecuteTwice(testInputFile, testOutputFile, () => { testInputFile.Delete(); }));
 		}
 
 		[Test]
 		public void OutputGoesMissing() {
-			Assert.True(ExecuteTwice(inputFile, outputFile, () => { outputFile.Delete(); }));
+			Assert.True(ExecuteTwice(testInputFile, testOutputFile, () => { testOutputFile.Delete(); }));
 		}
 
 		[Test]
 		public void InputAdded() {
-			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
-			Assert.True(CreateUpToDateTask(new[] { inputFile, fileSystem.File("new-input.txt") }, new[] { outputFile }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile }, new[] { testOutputFile }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile, fileSystem.File("new-input.txt") }, new[] { testOutputFile }));
 		}
 
 		[Test]
 		public void OutputAdded() {
-			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
-			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile, fileSystem.File("new-output.txt") }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile }, new[] { testOutputFile }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile }, new[] { testOutputFile, fileSystem.File("new-output.txt") }));
 		}
 
 		[Test]
 		public void InputRemoved() {
-			Assert.True(CreateUpToDateTask(new[] { inputFile, fileSystem.File("new-input.txt") }, new[] { outputFile }));
-			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile, fileSystem.File("new-input.txt") }, new[] { testOutputFile }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile }, new[] { testOutputFile }));
 		}
 
 		[Test]
 		public void OutputRemoved() {
-			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile, fileSystem.File("new-output.txt") }));
-			Assert.True(CreateUpToDateTask(new[] { inputFile }, new[] { outputFile }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile }, new[] { testOutputFile, fileSystem.File("new-output.txt") }));
+			Assert.True(CreateUpToDateTask(new[] { testInputFile }, new[] { testOutputFile }));
 		}
 	}
 }

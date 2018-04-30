@@ -126,7 +126,7 @@ namespace Casper {
 			var integrationProject = new TestProject(rootProject, "Test.Integration");
 			integrationProject.AddTestTask("Compile", consoleCompile, csharpCompile);
 
-			rootProject.ExecuteTasks(new[] { "Console:Pack", "Test:Compile", "Test.Integration:Compile" });
+			rootProject.ExecuteTasks("Console:Pack", "Test:Compile", "Test.Integration:Compile");
 
 			var result = output.ToString();
 			StringAssert.Contains("CSharp:Compile", result);
@@ -154,8 +154,8 @@ namespace Casper {
 
 		[Test]
 		public void ExecuteTaskRelativeToProjectDirectory() {
-			IDirectory rootDirectory = fileSystem.GetCurrentDirectory();
-			IDirectory firstSubDirectory = rootDirectory.Directory("testA");;
+			var rootDirectory = fileSystem.GetCurrentDirectory();
+			var firstSubDirectory = rootDirectory.Directory("testA");
 
 			IDirectory executeDirectory = null;
 			var task = new Task(() => { executeDirectory = fileSystem.GetCurrentDirectory(); throw new Exception(); });

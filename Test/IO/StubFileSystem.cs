@@ -12,18 +12,16 @@ namespace Casper.IO {
 		private IDirectory currentDirectory;
 
 		public StubFileSystem() { 
-			this.currentDirectory = Directory(System.IO.Path.DirectorySeparatorChar.ToString());
+			currentDirectory = Directory(System.IO.Path.DirectorySeparatorChar.ToString());
 		}
 
 		public class StubFile : IFile {
 			private readonly StubFileSystem fileSystem;
-			private readonly string path;
-			private DateTimeOffset lastWriteTimeUtc;
 			private MemoryStream contentStream;
 
 			public StubFile(StubFileSystem fileSystem, string path) {
 				this.fileSystem = fileSystem;
-				this.path = path;
+				this.FullPath = path;
 			}
 
 			public bool Exists() {
@@ -31,7 +29,7 @@ namespace Casper.IO {
 			}
 
 			public void Delete() {
-				lastWriteTimeUtc = DateTimeOffset.MinValue;
+				LastWriteTimeUtc = DateTimeOffset.MinValue;
 				contentStream = null;
 			}
 
@@ -53,7 +51,7 @@ namespace Casper.IO {
 			}
 
 			public T ReadAll<T>() {
-				BinaryFormatter formatter = new BinaryFormatter();
+				var formatter = new BinaryFormatter();
 				contentStream.Seek(0, SeekOrigin.Begin);
 				return (T)formatter.Deserialize(contentStream);
 			}
@@ -64,15 +62,15 @@ namespace Casper.IO {
 			}
 
 			public void WriteAll<T>(T content) {
-				BinaryFormatter formatter = new BinaryFormatter();
+				var formatter = new BinaryFormatter();
 				var newContentStream = new MemoryStream();
 				formatter.Serialize(newContentStream, content);
 				WriteContent(newContentStream.ToArray());
 			}
 
 			private void WriteContent(byte[] newContent) {
-				this.contentStream = new MemoryStream(newContent, 0, newContent.Length, true, true);
-				lastWriteTimeUtc = DateTimeOffset.UtcNow;
+				contentStream = new MemoryStream(newContent, 0, newContent.Length, true, true);
+				LastWriteTimeUtc = DateTimeOffset.UtcNow;
 			}
 
 			public void CopyTo(IFile destination) {
@@ -88,29 +86,19 @@ namespace Casper.IO {
 				return new StreamReader(contentStream);
 			}
 
-			public DateTimeOffset LastWriteTimeUtc {
-				get { return lastWriteTimeUtc; }
-			}
+			public DateTimeOffset LastWriteTimeUtc { get; private set; }
 
-			public string FullPath {
-				get { return path; }
-			}
+			public string FullPath { get; }
 
-			public IDirectory Directory {
-				get { return fileSystem.Directory(System.IO.Path.GetDirectoryName(path)); }
-			}
+			public IDirectory Directory => fileSystem.Directory(System.IO.Path.GetDirectoryName(FullPath));
 
-			public string Name {
-				get {
-					return System.IO.Path.GetFileName(path);
-				}
-			}
+			public string Name => System.IO.Path.GetFileName(FullPath);
 		}
 
 		private class StubDirectory : IDirectory {
-			private StubFileSystem fileSystem;
+			private readonly StubFileSystem fileSystem;
 			private readonly string path;
-			private bool exists = false;
+			private bool exists;
 
 			public StubDirectory(StubFileSystem fileSystem, string path) {
 				this.fileSystem = fileSystem;
@@ -141,28 +129,19 @@ namespace Casper.IO {
 				exists = true;
 			}
 
-			public string FullPath {
-				get { return path; }
-			}
+			public string FullPath => path;
 
-			public IDirectory RootDirectory {
-				get { return new StubDirectory(fileSystem, System.IO.Path.GetPathRoot(path)); }
-			}
+			public IDirectory RootDirectory => new StubDirectory(fileSystem, System.IO.Path.GetPathRoot(path));
 
-			public string Name {
-				get {
-					return System.IO.Path.GetDirectoryName(System.IO.Path.Combine(path, "a"));
-				}
-			}
+			public string Name => System.IO.Path.GetDirectoryName(System.IO.Path.Combine(path, "a"));
 		}
 
 		public IFile File(string path) {
-			IFileSystemObject fileSystemObject;
 			IFile file;
 			path = System.IO.Path.IsPathRooted(path) 
 				? path 
 				: System.IO.Path.Combine(GetCurrentDirectory().FullPath, path);
-			if (!files.TryGetValue(path, out fileSystemObject)) {
+			if (!files.TryGetValue(path, out var fileSystemObject)) {
 				file = new StubFile(this, path);
 				files.Add(path, file);
 			} else {
@@ -180,12 +159,11 @@ namespace Casper.IO {
 		}
 
 		public IDirectory Directory(string path) {
-			IFileSystemObject fileSystemObject;
 			IDirectory directory;
 			path = System.IO.Path.IsPathRooted(path) 
 			             ? path 
 			             : System.IO.Path.Combine(GetCurrentDirectory().FullPath, path);
-			if (!files.TryGetValue(path, out fileSystemObject)) {
+			if (!files.TryGetValue(path, out var fileSystemObject)) {
 				directory = new StubDirectory(this, path);
 				files.Add(path, directory);
 			} else {
@@ -203,11 +181,11 @@ namespace Casper.IO {
 		}
 
 		public IDirectory GetCurrentDirectory() {
-			return this.currentDirectory;
+			return currentDirectory;
 		}
 
 		public void SetCurrentDirectory(IDirectory directory) {
-			this.currentDirectory = directory;
+			currentDirectory = directory;
 		}
 
 		public IDirectory MakeTemporaryDirectory() {
