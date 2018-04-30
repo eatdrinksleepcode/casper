@@ -11,7 +11,7 @@ namespace Casper {
 		}
 
 		public void Add(ProjectBase project) {
-			this.subprojects.Add(project.Name, project);
+			subprojects.Add(project.Name, project);
 		}
 
 		public IEnumerator<ProjectBase> GetEnumerator() {
@@ -22,16 +22,11 @@ namespace Casper {
 			return GetEnumerator();
 		}
 
-		public int Count {
-			get {
-				return subprojects.Count;
-			}
-		}
+		public int Count => subprojects.Count;
 
 		public ProjectBase this[string name] {
 			get {
-				ProjectBase result;
-				if(!subprojects.TryGetValue(name, out result)) {
+				if(!subprojects.TryGetValue(name, out var result)) {
 					throw new CasperException(CasperException.KnownExitCode.ConfigurationError, "Project '{0}' does not exist in {1}", name, parent.PathDescription);
 				}
 				return result;

@@ -8,13 +8,13 @@ namespace Casper {
 		private readonly StringBuilder output = new StringBuilder();
 
 		private RedirectedStandardOutput() {
-			this.originalOutput = Get();
+			originalOutput = Get();
 			Set(new StringWriter(output));
 		}
 
 		private RedirectedStandardOutput(Func<TextWriter, TextWriter> redirectTarget) {
-			this.originalOutput = Get();
-			Set(redirectTarget(this.originalOutput));
+			originalOutput = Get();
+			Set(redirectTarget(originalOutput));
 		}
 
 		public void Clear() {

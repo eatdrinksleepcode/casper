@@ -10,7 +10,7 @@ namespace Casper {
 		}
 
 		public override void Execute(IFileSystem fileSystem) {
-			this.body();
+			body();
 		}
 	}
 }

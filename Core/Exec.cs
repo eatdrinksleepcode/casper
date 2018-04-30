@@ -50,7 +50,8 @@ namespace Casper {
 		}
 
 		static Process StartProcessAndWatch(StringBuilder allOutput, ProcessStartInfo processStartInfo) {
-			Process process = Process.Start(processStartInfo);
+			var process = Process.Start(processStartInfo);
+			Debug.Assert(process != null, nameof(process) + " != null", "The started process should never be null since UseShellExecute is false.");
 			process.ErrorDataReceived += (sender, e) => { if(e.Data != null) allOutput.AppendLine(e.Data); };
 			process.OutputDataReceived += (sender, e) => { if(e.Data != null) allOutput.AppendLine(e.Data); };
 			process.BeginOutputReadLine();

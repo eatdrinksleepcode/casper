@@ -15,24 +15,20 @@ namespace Casper {
 		}
 
 		public IList DependsOn { 
-			get { return (IList)dependencies; }
-			set { dependencies = value.Cast<TaskBase>().ToList() ?? new List<TaskBase>(); }
+			get => (IList)dependencies;
+			set => dependencies = value?.Cast<TaskBase>().ToList() ?? new List<TaskBase>();
 		}
 
 		public string Description { get; set; }
 
 		public string Name { get; internal set; }
 
-		public string Path { get { return Project.PathPrefix + Name ; } }
+		public string Path => Project.PathPrefix + Name;
 
 		public ProjectBase Project { get; set; }
 
-		protected internal virtual IEnumerable<IFile> InputFiles {
-			get { return Enumerable.Empty<IFile>(); }
-		}
+		protected internal virtual IEnumerable<IFile> InputFiles => Enumerable.Empty<IFile>();
 
-		protected internal virtual IEnumerable<IFile> OutputFiles {
-			get { return Enumerable.Empty<IFile>(); }
-		}
+		protected internal virtual IEnumerable<IFile> OutputFiles => Enumerable.Empty<IFile>();
 	}
 }

@@ -23,7 +23,7 @@ namespace Casper.IO {
 		}
 
 		public IDirectory MakeTemporaryDirectory() {
-			string tempFolder = Path.GetTempFileName();
+			var tempFolder = Path.GetTempFileName();
 			System.IO.File.Delete(tempFolder);
 			var result = Directory(tempFolder);
 			result.Create();
@@ -32,50 +32,48 @@ namespace Casper.IO {
 		}
 
 		public class RealFile : IFile {
-			private readonly string path;
-
 			public RealFile(string path) {
-				this.path = System.IO.Path.IsPathRooted(path) 
+				FullPath = System.IO.Path.IsPathRooted(path) 
 					? path 
 					: System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), path);
 			}
 
 			public void WriteAllText(string text) {
-				System.IO.File.WriteAllText(path, text);
+				System.IO.File.WriteAllText(FullPath, text);
 			}
 
 			public void WriteAll<T>(T content) {
 				var formatter = new BinaryFormatter();
-				using (var stream = System.IO.File.OpenWrite(path)) {
+				using (var stream = System.IO.File.OpenWrite(FullPath)) {
 					formatter.Serialize(stream, content);
 				}
 			}
 
 			public string ReadAllText() {
-				return System.IO.File.ReadAllText(path);
+				return System.IO.File.ReadAllText(FullPath);
 			}
 
 			public IEnumerable<string> ReadAllLines() {
-				return System.IO.File.ReadAllLines(path);
+				return System.IO.File.ReadAllLines(FullPath);
 			}
 
 			public T ReadAll<T>() {
 				var formatter = new BinaryFormatter();
-				using (var stream = System.IO.File.OpenRead(path)) {
+				using (var stream = System.IO.File.OpenRead(FullPath)) {
 					return (T)formatter.Deserialize(stream);
 				}
 			}
 
 			public bool Exists() {
-				return System.IO.File.Exists(path);
+				return System.IO.File.Exists(FullPath);
 			}
 
 			public void Delete() {
-				System.IO.File.Delete(path);
+				System.IO.File.Delete(FullPath);
 			}
 
 			public void CopyTo(IFile destination) {
-				System.IO.File.Copy(path, destination.FullPath, true);
+				System.IO.File.Copy(FullPath, destination.FullPath, true);
 			}
 
 			public void CreateDirectories() {
@@ -83,58 +81,44 @@ namespace Casper.IO {
 			}
 
 			public TextReader OpenText() {
-				return System.IO.File.OpenText(path);
+				return System.IO.File.OpenText(FullPath);
 			}
 
-			private string DirectoryPath {
-				get { return System.IO.Path.GetDirectoryName(path); }
-			}
+			private string DirectoryPath => System.IO.Path.GetDirectoryName(FullPath);
 
-			public DateTimeOffset LastWriteTimeUtc {
-				get { return System.IO.File.GetLastWriteTimeUtc(path); }
-			}
+			public DateTimeOffset LastWriteTimeUtc => System.IO.File.GetLastWriteTimeUtc(FullPath);
 
-			public string FullPath {
-				get { return path; }
-			}
+			public string FullPath { get; }
 
-			public IDirectory Directory {
-				get { return new RealDirectory(DirectoryPath); }
-			}
+			public IDirectory Directory => new RealDirectory(DirectoryPath);
 
-			public string Name {
-				get {
-					return System.IO.Path.GetFileName(path);
-				}
-			}
+			public string Name => System.IO.Path.GetFileName(FullPath);
 		}
 
 		private class RealDirectory : IDirectory {
-			private readonly string path;
-
 			public RealDirectory(string path) {
-				this.path = path;
+				FullPath = path;
 			}
 
 			public IFile File(string relativePath) {
-				return new RealFile(System.IO.Path.Combine(path, relativePath));
+				return new RealFile(System.IO.Path.Combine(FullPath, relativePath));
 			}
 
 			public IDirectory Directory (string relativePath) {
-				return new RealDirectory(System.IO.Path.Combine(this.path, relativePath));
+				return new RealDirectory(System.IO.Path.Combine(FullPath, relativePath));
 			}
 
 			public void SetAsCurrent() {
-				System.IO.Directory.SetCurrentDirectory(path);
+				System.IO.Directory.SetCurrentDirectory(FullPath);
 			}
 
 			public bool Exists() {
-				return System.IO.Directory.Exists(path);
+				return System.IO.Directory.Exists(FullPath);
 			}
 
 			public void Delete() {
 				try {
-					System.IO.Directory.Delete(path, true);
+					System.IO.Directory.Delete(FullPath, true);
 				} catch(DirectoryNotFoundException) {
 					// Desired result is for directory to not exist, which is true
 					// Consider this successful
@@ -142,21 +126,17 @@ namespace Casper.IO {
 			}
 
 			public void Create() {
-				System.IO.Directory.CreateDirectory(path);
+				System.IO.Directory.CreateDirectory(FullPath);
 			}
 
-			public string FullPath {
-				get { return path; }
-			}
+			public string FullPath { get; }
 
-			public IDirectory RootDirectory {
-				get { return Directory(System.IO.Directory.GetDirectoryRoot(path)); }
-			}
+			public IDirectory RootDirectory => Directory(System.IO.Directory.GetDirectoryRoot(FullPath));
 
 			public string Name {
 				get {
 					// HACK: the path may or may not end with a path separator
-					return System.IO.Path.GetDirectoryName(System.IO.Path.Combine(path, "a"));
+					return System.IO.Path.GetDirectoryName(System.IO.Path.Combine(FullPath, "a"));
 				}
 			}
 		}

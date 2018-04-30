@@ -25,7 +25,7 @@ namespace Casper {
 			readonly Action setHasWritten;
 			readonly TextWriter target;
 
-			public TaskTextWriter(TextWriter target, Func<bool> getHasWritten, Action setHasWritten) : base() {
+			public TaskTextWriter(TextWriter target, Func<bool> getHasWritten, Action setHasWritten) {
 				this.target = target;
 				this.getHasWritten = getHasWritten;
 				this.setHasWritten = setHasWritten;

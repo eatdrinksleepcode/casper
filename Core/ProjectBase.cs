@@ -5,10 +5,8 @@ using Casper.IO;
 using System.Diagnostics;
 
 namespace Casper {
-	[DebuggerDisplay("{PathDescription}")]
+	[DebuggerDisplay("{" + nameof(PathDescription) + "}")]
 	public abstract class ProjectBase {
-		private readonly TaskCollection tasks;
-		private readonly ProjectCollection subprojects;
 		protected readonly ProjectBase parent;
 		private readonly IDirectory location;
 		private readonly IFileSystem fileSystem;
@@ -37,23 +35,21 @@ namespace Casper {
 			this.Name = name;
 			this.PathPrefix = (null == parent ? "" : parent.PathPrefix + this.Name) + ":";
 			this.PathDescription = null == parent ? "root project" : "project '" + parent.PathPrefix + this.Name + "'";
-			this.subprojects = new ProjectCollection(this);
-			this.tasks = new TaskCollection(this);
+			this.Projects = new ProjectCollection(this);
+			this.Tasks = new TaskCollection(this);
 			this.fileSystem = fileSystem;
 			this.taskRecordCache = fileSystem.Directory(location).Directory(".casper").File("tasks");
 			this.records = taskRecordCache.Exists()
 						? taskRecordCache.ReadAll<Dictionary<string, TaskRecord>>()
 						: new Dictionary<string, TaskRecord>();
-			if(null != parent) {
-				parent.subprojects.Add(this);
-			}
+			parent?.Projects.Add(this);
 		}
 
 		protected virtual void Configure() { }
 
 		public void ConfigureAll() {
 			Configure();
-			foreach(var project in subprojects) {
+			foreach(var project in Projects) {
 				project.ConfigureAll();
 			}
 		}
@@ -61,7 +57,7 @@ namespace Casper {
 		public void AddTask(string name, TaskBase task) {
 			task.Name = name;
 			task.Project = this;
-			tasks.Add(task);
+			Tasks.Add(task);
 		}
 
 		public IFile File(string path) {
@@ -70,31 +66,24 @@ namespace Casper {
 
 		public string Name {
 			get;
-			private set;
 		}
 
 		public string PathPrefix {
 			get;
-			private set;
 		}
 
 		public string PathDescription {
 			get;
-			private set;
 		}
 
-		public TaskCollection Tasks {
-			get { return tasks; }
-		}
+		public TaskCollection Tasks { get; }
 
-		public ProjectCollection Projects {
-			get { return subprojects; }
-		}
+		public ProjectCollection Projects { get; }
 
 		[Serializable]
 		private class TaskRecord {
-			private TaskState input = new TaskState();
-			private TaskState output = new TaskState();
+			private readonly TaskState input = new TaskState();
+			private readonly TaskState output = new TaskState();
 
 			public void RecordInputs(TaskBase task) {
 				input.RecordFiles(task.InputFiles);
@@ -105,7 +94,7 @@ namespace Casper {
 			}
 
 			public bool IsUpToDate(TaskBase task) {
-				var hasOutputs = task.OutputFiles.Count() > 0;
+				var hasOutputs = task.OutputFiles.Any();
 				var inputsUpToDate = input.UpToDate(task.InputFiles);
 				var outputsUpToDate = output.UpToDate(task.OutputFiles);
 				return hasOutputs && inputsUpToDate && outputsUpToDate;
@@ -114,7 +103,7 @@ namespace Casper {
 
 		[Serializable]
 		private class TaskState {
-			private Dictionary<string, DateTimeOffset> fileStamps = new Dictionary<string, DateTimeOffset>();
+			private readonly Dictionary<string, DateTimeOffset> fileStamps = new Dictionary<string, DateTimeOffset>();
 
 			public void RecordFiles(IEnumerable<IFile> files) {
 				foreach(var file in files) {
@@ -138,7 +127,7 @@ namespace Casper {
 		}
 
 		private IEnumerable<TaskBase> ResolveTaskNames(IEnumerable<string> taskNamesToExecute) {
-			return taskNamesToExecute.Select(a => this.GetTaskByName(a)).ToArray();
+			return taskNamesToExecute.Select(GetTaskByName).ToArray();
 		}
 
 		private TaskExecutionGraph GenerateTaskGraphTraversalOrder(IEnumerable<TaskBase> tasksToExecute) {
@@ -169,8 +158,7 @@ namespace Casper {
 		}
 
 		private bool IsUpToDate(TaskBase task) {
-			TaskRecord oldRecord;
-			return records.TryGetValue(task.Name, out oldRecord) && oldRecord.IsUpToDate(task);
+			return records.TryGetValue(task.Name, out var oldRecord) && oldRecord.IsUpToDate(task);
 		}
 
 		private void SaveTaskState(TaskBase task, TaskRecord record) {
@@ -180,17 +168,15 @@ namespace Casper {
 		}
 
 		private TaskBase GetTaskByName(string name) {
-			string[] path = name.Split(':');
+			var path = name.Split(':');
 			return GetTaskByPath(new Queue<string>(path));
 		}
 
 		private TaskBase GetTaskByPath(Queue<string> path) {
-			if(path.Count > 1) {
-				var projectName = path.Dequeue();
-				return this.subprojects[projectName].GetTaskByPath(path);
-			} else {
-				return this.tasks[path.Dequeue()];
-			}
+			var pathPart = path.Dequeue();
+			return path.Count > 0
+				? Projects[pathPart].GetTaskByPath(path)
+				: Tasks[pathPart];
 		}
 
 		private void ExecuteInProjectDirectory(TaskBase task) {
