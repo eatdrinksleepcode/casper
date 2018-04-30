@@ -41,7 +41,6 @@ namespace Casper {
 			private readonly IFile solutionFile;
 			private readonly Microsoft.Build.Evaluation.ProjectCollection projects;
 
-
 			public SolutionConfigurator(ProjectBase rootProject, string solutionFilePath) {
 				this.rootProject = rootProject;
 				this.solutionFile = rootProject.File(solutionFilePath);
@@ -49,9 +48,7 @@ namespace Casper {
 			}
 
 			public void Dispose() {
-				if(null != this.projects) {
-					this.projects.Dispose();
-				}
+				projects?.Dispose();
 			}
 
 			public void Configure() {
@@ -71,19 +68,18 @@ namespace Casper {
 			}
 
 			private static ProjectBase GetOrCreateProject(ProjectBase parent, string name, IFile projectFile) {
-				ProjectBase result;
-				if(!parent.Projects.TryGet(name, out result)) {
+				if(!parent.Projects.TryGet(name, out var result)) {
 					result = new CSharpProject(parent, projectFile, name);
 				}
 				return result;
 			}
 
-			private void Configure(ProjectBase project, IFile projectFile, IEnumerable<ProjectInfo> projectInfos) {
+			private void Configure(ProjectBase project, IFile projectFile, IReadOnlyCollection<ProjectInfo> projectInfos) {
 				if(project.Tasks.Count > 0) {
 					return;
 				}
 
-				IEnumerable<ProjectInfo> dependencies = LoadDependenciesFromProjectFile(projectFile, projectInfos);
+				var dependencies = LoadDependenciesFromProjectFile(projectFile, projectInfos).ToList();
 
 				foreach(var d in dependencies) {
 					Configure(d.Project, d.ProjectFile, projectInfos);
@@ -108,7 +104,7 @@ namespace Casper {
 			}
 
 			private IEnumerable<ProjectInfo> LoadDependenciesFromProjectFile(IFile projectFile, IEnumerable<ProjectInfo> projectInfos) {
-				Microsoft.Build.Evaluation.Project projectModel = LoadProject(projectFile);
+				var projectModel = LoadProject(projectFile);
 
 				return from r in projectModel.GetItems("ProjectReference") join d in projectInfos
 						// TODO: match on project file path instead of / in addition to name
@@ -123,7 +119,7 @@ namespace Casper {
 					// LoadProject does not resolve relative paths relative to the project directory the way that MSBuild does
 						{ "SolutionDir", solutionFile.Directory.FullPath + Path.DirectorySeparatorChar }
 				};
-					return this.projects.LoadProject(reader, properties, null);
+					return projects.LoadProject(reader, properties, null);
 				}
 			}
 		}
