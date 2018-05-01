@@ -26,6 +26,7 @@ namespace Casper {
 					Modifiers = TypeMemberModifiers.Override | TypeMemberModifiers.Protected,
 					Body = node.Globals,
 				};
+				configureMethod.Parameters.Add(new ParameterDeclaration("loader", TypeReference.Lift(typeof(IProjectLoader))));
 				baseClass.Members.Add(configureMethod);
 				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForRootProject(node)));
 				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForSubProject(node)));

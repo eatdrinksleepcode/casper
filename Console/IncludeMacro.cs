@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Boo.Lang.Compiler.Ast;
-using Casper;
 
 public class IncludeMacro : Boo.Lang.Compiler.AbstractAstMacro {
 	public override Statement Expand(MacroStatement macro) {
@@ -12,13 +11,13 @@ public class IncludeMacro : Boo.Lang.Compiler.AbstractAstMacro {
 			arguments.Add(macro.Arguments[1]);
 		}
 		return new ExpressionStatement(macro.LexicalInfo, 
-		                               new MethodInvocationExpression(macro.LexicalInfo,
-		                                                              new MemberReferenceExpression(macro.LexicalInfo,
-		                                                                                            Expression.Lift(typeof(BooProjectLoader)),
-		                                                                                            "LoadProject"
-		                                                                                           ),
-		                                                              arguments.ToArray()
-		                                                             )
-		                              );
+			new MethodInvocationExpression(macro.LexicalInfo,
+				new MemberReferenceExpression(macro.LexicalInfo,
+					new ReferenceExpression { Name = "loader" },  
+					"LoadProject"
+				),
+				arguments.ToArray()
+			)
+		);
 	}
 }

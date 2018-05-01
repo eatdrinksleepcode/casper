@@ -57,7 +57,8 @@ namespace Casper {
 		}
 
 		static CasperException.KnownExitCode Run(Options o) {
-			var project = BooProjectLoader.LoadProject(o.ScriptPath, RealFileSystem.Instance);
+			var loader = new BooProjectLoader(RealFileSystem.Instance);
+			var project = loader.LoadProject(o.ScriptPath);
 			if (o.Tasks) {
 				foreach (var task in project.Tasks) {
 					Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);

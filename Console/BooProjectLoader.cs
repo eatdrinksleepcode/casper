@@ -7,24 +7,7 @@ using Boo.Lang.Compiler.Pipelines;
 using Casper.IO;
 
 namespace Casper {
-	public class BooProjectLoader {
-
-		public static ProjectBase LoadProject(string scriptPath, IFileSystem fileSystem) {
-			var loader = new BooProjectLoader(fileSystem.File(scriptPath), fileSystem);
-			var project = loader.Load();
-			project.ConfigureAll();
-			return project;
-		}
-
-		public static ProjectBase LoadProject(string scriptPath, ProjectBase parent) {
-			var loader = new BooProjectLoader(parent.File(scriptPath), parent);
-			return loader.Load();
-		}
-
-		public static ProjectBase LoadProject(string scriptPath, ProjectBase parent, string name) {
-			var loader = new BooProjectLoader(parent.File(scriptPath), parent, name);
-			return loader.Load();
-		}
+	public class BooProjectLoader : IProjectLoader {
 
 		private class FileInput : ICompilerInput {
 			private readonly IFile file;
@@ -40,27 +23,39 @@ namespace Casper {
 			}
 		}
 
-		private readonly IFile scriptPath;
-		private readonly object[] args;
+		private readonly IFileSystem fileSystem;
 
-		private BooProjectLoader(IFile scriptPath, params object[] args) {
-			this.scriptPath = scriptPath;
-			this.args = args;
+		public BooProjectLoader(IFileSystem fileSystem) {
+			this.fileSystem = fileSystem;
 		}
 
-		public ProjectBase Load() {
-			var project = CreateProjectFromProjectType(CompileToProjectType());
+		public ProjectBase LoadProject(string scriptPath) {
+			var project = Load(fileSystem.File(scriptPath), fileSystem);
+			project.ConfigureAll(this);
 			return project;
 		}
 
-		private Type CompileToProjectType() {
+		public ProjectBase LoadProject(string scriptPath, ProjectBase parent) {
+			return Load(parent.File(scriptPath), parent);
+		}
+
+		public ProjectBase LoadProject(string scriptPath, ProjectBase parent, string name) {
+			return Load(parent.File(scriptPath), parent, name);
+		}
+
+		private ProjectBase Load(IFile scriptPath, params object[] args) {
+			var project = CreateProjectFromProjectType(CompileToProjectType(scriptPath), args);
+			return project;
+		}
+
+		private Type CompileToProjectType(IFile scriptPath) {
 			var projectInput = new FileInput(scriptPath);
 			var baseClassStep = new BaseClassStep(scriptPath.Directory);
 
 			return CompileToProjectType(projectInput, baseClassStep);
 		}
 
-		private ProjectBase CreateProjectFromProjectType(Type projectType) {
+		private ProjectBase CreateProjectFromProjectType(Type projectType, object[] args) {
 			var project = (ProjectBase)Activator.CreateInstance(projectType, args);
 			return project;
 		}

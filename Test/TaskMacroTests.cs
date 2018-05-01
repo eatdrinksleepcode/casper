@@ -68,7 +68,7 @@ task copy(CopyFile,
 
 		private ProjectBase LoadProject(string scriptContents) {
 			fileSystem.File("build.casper").WriteAllText(scriptContents);
-			return BooProjectLoader.LoadProject("build.casper", fileSystem);
+			return new BooProjectLoader(fileSystem).LoadProject("build.casper");
 		}
 	}
 }

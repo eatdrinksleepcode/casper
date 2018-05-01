@@ -45,12 +45,12 @@ namespace Casper {
 			parent?.Projects.Add(this);
 		}
 
-		protected virtual void Configure() { }
+		protected virtual void Configure(IProjectLoader loader) { }
 
-		public void ConfigureAll() {
-			Configure();
+		public void ConfigureAll(IProjectLoader loader) {
+			Configure(loader);
 			foreach(var project in Projects) {
-				project.ConfigureAll();
+				project.ConfigureAll(loader);
 			}
 		}
 
