@@ -15,7 +15,7 @@ namespace Casper.IO {
 			currentDirectory = Directory(System.IO.Path.DirectorySeparatorChar.ToString());
 		}
 
-		public class StubFile : IFile {
+		private class StubFile : IFile {
 			private readonly StubFileSystem fileSystem;
 			private MemoryStream contentStream;
 
@@ -97,20 +97,19 @@ namespace Casper.IO {
 
 		private class StubDirectory : IDirectory {
 			private readonly StubFileSystem fileSystem;
-			private readonly string path;
 			private bool exists;
 
 			public StubDirectory(StubFileSystem fileSystem, string path) {
 				this.fileSystem = fileSystem;
-				this.path = path;
+				this.FullPath = path;
 			}
 
 			public IFile File(string relativePath) {
-				return fileSystem.File(System.IO.Path.Combine(path, relativePath));
+				return fileSystem.File(System.IO.Path.Combine(FullPath, relativePath));
 			}
 
 			public IDirectory Directory(string relativePath) {
-				return fileSystem.Directory(System.IO.Path.Combine(path, relativePath));
+				return fileSystem.Directory(System.IO.Path.Combine(FullPath, relativePath));
 			}
 
 			public void SetAsCurrent() {
@@ -129,11 +128,11 @@ namespace Casper.IO {
 				exists = true;
 			}
 
-			public string FullPath => path;
+			public string FullPath { get; }
 
-			public IDirectory RootDirectory => new StubDirectory(fileSystem, System.IO.Path.GetPathRoot(path));
+			public IDirectory RootDirectory => new StubDirectory(fileSystem, System.IO.Path.GetPathRoot(FullPath));
 
-			public string Name => System.IO.Path.GetDirectoryName(System.IO.Path.Combine(path, "a"));
+			public string Name => System.IO.Path.GetDirectoryName(System.IO.Path.Combine(FullPath, "a"));
 		}
 
 		public IFile File(string path) {
@@ -148,7 +147,7 @@ namespace Casper.IO {
 				file = fileSystemObject as StubFile;
 				if (null == file) {
 					if (fileSystemObject.Exists()) {
-						throw new Exception(string.Format("'{0}' is not a file", path));
+						throw new Exception($"'{path}' is not a file");
 					} else {
 						file = new StubFile(this, path);
 						files[path] = file;
@@ -170,7 +169,7 @@ namespace Casper.IO {
 				directory = fileSystemObject as StubDirectory;
 				if (null == directory) {
 					if (fileSystemObject.Exists()) {
-						throw new Exception(string.Format("'{0}' is not a directory", path));
+						throw new Exception($"'{path}' is not a directory");
 					} else {
 						directory = new StubDirectory(this, path);
 						files[path] = directory;
@@ -184,7 +183,7 @@ namespace Casper.IO {
 			return currentDirectory;
 		}
 
-		public void SetCurrentDirectory(IDirectory directory) {
+		private void SetCurrentDirectory(IDirectory directory) {
 			currentDirectory = directory;
 		}
 

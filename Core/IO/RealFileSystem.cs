@@ -31,7 +31,7 @@ namespace Casper.IO {
 			return result;
 		}
 
-		public class RealFile : IFile {
+		private class RealFile : IFile {
 			public RealFile(string path) {
 				FullPath = System.IO.Path.IsPathRooted(path) 
 					? path 
