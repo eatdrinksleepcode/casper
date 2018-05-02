@@ -30,13 +30,13 @@ namespace Casper {
 		}
 
 		public ProjectBase LoadProject(string scriptPath) {
-			var project = Load(fileSystem.File(scriptPath), fileSystem);
+			var project = Load(fileSystem.File(scriptPath), fileSystem, null);
 			project.ConfigureAll(this);
 			return project;
 		}
 
 		public ProjectBase LoadProject(string scriptPath, ProjectBase parent) {
-			return Load(parent.File(scriptPath), parent);
+			return Load(parent.File(scriptPath), parent, null);
 		}
 
 		public ProjectBase LoadProject(string scriptPath, ProjectBase parent, string name) {

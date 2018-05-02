@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.InteropServices;
 using Boo.Lang.Compiler.Ast;
 using Boo.Lang.Compiler.Steps;
 using Casper.IO;
@@ -28,8 +29,7 @@ namespace Casper {
 				};
 				configureMethod.Parameters.Add(new ParameterDeclaration("loader", TypeReference.Lift(typeof(IProjectLoader))));
 				baseClass.Members.Add(configureMethod);
-				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForRootProject(node)));
-				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForSubProject(node)));
+				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForRootProject(node), ConstructorParameterForName(node)));
 				baseClass.Members.Add(CreateConstructor(node, ConstructorParameterForSubProject(node), ConstructorParameterForName(node)));
 				node.Globals = null;
 				node.Members.Add(baseClass);
@@ -68,10 +68,14 @@ namespace Casper {
 		}
 
 		private static ParameterDeclaration ConstructorParameterForName(Module node) {
-			return new ParameterDeclaration(node.LexicalInfo) {
+			var parameter = new ParameterDeclaration(node.LexicalInfo) {
 				Name = "name",
-				Type = TypeReference.Lift(typeof(string))
+				Type = TypeReference.Lift(typeof(string)),
 			};
+			var defaultAttribute = new Attribute(typeof(DefaultParameterValueAttribute).FullName);
+			defaultAttribute.Arguments.Add(new NullLiteralExpression());
+			parameter.Attributes.Add(defaultAttribute);
+			return parameter;
 		}
 	}
 }
