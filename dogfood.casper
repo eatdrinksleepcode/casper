@@ -6,6 +6,8 @@ oldCasperDir = Path.Combine(casperDir, 'old')
 newCasperDir = Path.Combine(casperDir, 'new')
 localNugetConfig = 'local-nuget.config'
 
+buildDogfoodFile = File('build.dogfood.casper')
+
 task Restore(Exec,
     Executable: 'nuget.exe',
     Arguments: 'restore')
@@ -13,7 +15,7 @@ task Restore(Exec,
 task Build(Exec,
     DependsOn: [Tasks['Restore']],
     Executable: Path.Combine(oldCasperDir, 'Casper.Console', 'tools', 'casper.exe'),
-    Arguments: 'build.casper Build')
+    Arguments: (buildDogfoodFile.FullPath if buildDogfoodFile.Exists() else 'build.casper') + ' Build')
 
 task CleanNewCasperDir:
     if Directory.Exists(newCasperDir):
