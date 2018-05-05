@@ -132,7 +132,7 @@ namespace Casper.IO {
 
 			public IDirectory RootDirectory => new StubDirectory(fileSystem, System.IO.Path.GetPathRoot(FullPath));
 
-			public string Name => System.IO.Path.GetDirectoryName(System.IO.Path.Combine(FullPath, "a"));
+			public string Name => System.IO.Path.GetFileName(FullPath);
 		}
 
 		public IFile File(string path) {

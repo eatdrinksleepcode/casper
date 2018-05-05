@@ -6,18 +6,15 @@ namespace Casper.IO {
 	public abstract class FileTests {
 
 		private IFileSystem fileSystem;
-		private IDirectory testParentDirectory;
 		private IDirectory testDirectory;
 		private IDirectory originalWorkingDirectory;
 
 		[TestFixtureSetUp]
 		public void SetUpOnce() {
 			fileSystem = GetFileSystemInstance();
-			testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().Location).Directory;
+			var testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().Location).Directory;
 			testDirectory = testParentDirectory.Directory(typeof(FileTests).Name);
-			if(testDirectory.Exists()) {
-				testDirectory.Delete();
-			}
+			testDirectory.Delete();
 			testDirectory.Create();
 		}
 
@@ -41,35 +38,37 @@ namespace Casper.IO {
 
 		[Test]
 		public void RelativeFile() {
-			var fileName = "foo.txt";
+			var fileName = $"${nameof(AbsoluteFile)}.file";
 			var file = fileSystem.File(fileName);
-			Assert.That(file.FullPath, Is.EqualTo(Combine(testParentDirectory.FullPath, typeof(FileTests).Name, fileName)));
-			Assert.That(file.Directory.FullPath, Is.EqualTo(Combine(testParentDirectory.FullPath, typeof(FileTests).Name)));
+			Assert.That(file.Name, Is.EqualTo(fileName));
+			Assert.That(file.FullPath, Is.EqualTo(Combine(testDirectory.FullPath, fileName)));
+			Assert.That(file.Directory.FullPath, Is.EqualTo(Combine(testDirectory.FullPath)));
 		}
 
 		[Test]
 		public void AbsoluteFile() {
 			var rootPath = testDirectory.RootDirectory.FullPath;
-			var fileName = Combine(rootPath, "foo.txt");
-			var file = fileSystem.File(fileName);
-			Assert.That(file.FullPath, Is.EqualTo(Combine(rootPath, fileName)));
+			var fileName = $"${nameof(AbsoluteFile)}.file";
+			var filePath = Combine(rootPath, fileName);
+			var file = fileSystem.File(filePath);
+			Assert.That(file.Name, Is.EqualTo(fileName));
+			Assert.That(file.FullPath, Is.EqualTo(Combine(rootPath, filePath)));
 			Assert.That(file.Directory.FullPath, Is.EqualTo(rootPath));
 		}
 
 		[Test]
-		public void File() {
-			var fileName = "foo.txt";
-			var file = fileSystem.File(fileName);
+		public void CreateDelete() {
+			var testFile = fileSystem.File($"{nameof(CreateDelete)}.test");
 
-			Assert.That(file.Exists, Is.False);
+			Assert.That(testFile.Exists, Is.False);
 
-			file.WriteAllText("foo");
+			testFile.WriteAllText("foo");
 
-			Assert.That(file.Exists, Is.True);
+			Assert.That(testFile.Exists, Is.True);
 
-			file.Delete();
+			testFile.Delete();
 
-			Assert.That(file.Exists, Is.False);
+			Assert.That(testFile.Exists, Is.False);
 		}
 	}
 }

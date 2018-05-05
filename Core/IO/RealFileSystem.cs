@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 
@@ -97,7 +98,9 @@ namespace Casper.IO {
 
 		private class RealDirectory : IDirectory {
 			public RealDirectory(string path) {
-				FullPath = path;
+				FullPath = System.IO.Path.IsPathRooted(path) 
+					? path 
+					: System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), path);
 			}
 
 			public IFile File(string relativePath) {
@@ -133,12 +136,7 @@ namespace Casper.IO {
 
 			public IDirectory RootDirectory => Directory(System.IO.Directory.GetDirectoryRoot(FullPath));
 
-			public string Name {
-				get {
-					// HACK: the path may or may not end with a path separator
-					return System.IO.Path.GetDirectoryName(System.IO.Path.Combine(FullPath, "a"));
-				}
-			}
+			public string Name => System.IO.Path.GetFileName(FullPath);
 		}
 	}
 }
