@@ -1,4 +1,5 @@
 import Casper;
+import Casper.Solution;
 import System.IO;
 
 include 'Console/build.casper'
@@ -6,7 +7,7 @@ include 'Core/build.casper'
 include 'Test/build.casper'
 include 'Test.Integration/build.casper'
 
-solution 'Casper.sln'
+ConfigureFromSolution('Casper.sln')
 
 task GitVersion(Exec,
     Executable: Path.Combine('packages', 'GitVersion.CommandLine.3.6.5', 'tools', 'GitVersion.exe'),
