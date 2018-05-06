@@ -34,7 +34,8 @@ namespace Casper {
 		public static int Main(string[] args) {
 			var timer = Stopwatch.StartNew();
 			try {
-				var arguments = Parser.Default.ParseArguments<Options>(args);
+				var parser = new Parser(settings => { settings.HelpWriter = Console.Error; });
+				var arguments = parser.ParseArguments<Options>(args);
 				return (byte) Run(arguments);
 			} catch (CasperException ex) {
 				WriteError(ex.Message);

@@ -17,6 +17,10 @@ namespace Casper {
 			Set(redirectTarget(originalOutput));
 		}
 
+		public TextReader Read() {
+			return new StringReader(output.ToString()); 
+		}
+
 		public void Clear() {
 			output.Clear();
 		}
