@@ -56,6 +56,10 @@ namespace Casper {
 			return fileSystem.File(path);
 		}
 
+		public IDirectory Directory(string path) {
+			return fileSystem.Directory(path);
+		}
+
 		public string Name {
 			get;
 		}

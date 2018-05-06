@@ -1,0 +1,15 @@
+import Casper;
+import System.IO;
+
+include 'Console/build.dogfood.casper'
+include 'Core/build.casper'
+include 'Test/build.casper'
+include 'Test.Integration/build.casper'
+
+solution 'Casper.sln'
+
+task GitVersion(Exec,
+    Executable: Path.Combine('packages', 'GitVersion.CommandLine.3.6.5', 'tools', 'GitVersion.exe'),
+    Arguments: '/updateAssemblyInfo AssemblyInfo.Version.cs /ensureAssemblyInfo /output json /showVariable NuGetVersionV2')
+
+task Build
