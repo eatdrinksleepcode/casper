@@ -1,9 +1,9 @@
 import Casper
 import System.IO
 
-casperDir = '.casper'
-oldCasperDir = Path.Combine(casperDir, 'old')
-newCasperDir = Path.Combine(casperDir, 'new')
+casperDir = Directory('.casper')
+oldCasperDir = casperDir.Directory('old')
+newCasperDir = casperDir.Directory('new')
 localNugetConfig = 'local-nuget.config'
 
 buildDogfoodFile = File('build.dogfood.casper')
@@ -14,18 +14,17 @@ task Restore(Exec,
 
 task Build(Exec,
     DependsOn: [Tasks['Restore']],
-    Executable: Path.Combine(oldCasperDir, 'Casper.Console', 'tools', 'casper.exe'),
+    Executable: oldCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe').FullPath,
     Arguments: 'build.casper Build')
 
 task CleanNewCasperDir:
-    if Directory.Exists(newCasperDir):
-        Directory.Delete(newCasperDir, true)
-    Directory.CreateDirectory(newCasperDir)
+    newCasperDir.Delete()
+    newCasperDir.Create()
 
 task InstallNew(Exec,
     DependsOn: [Tasks['Build'], Tasks['CleanNewCasperDir']],
     Executable: 'nuget.exe',
-    Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory $(newCasperDir) -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
+    Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory $(newCasperDir.FullPath) -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
 
 task CleanOutputs(Exec,
     DependsOn: [Tasks['InstallNew']],
@@ -34,5 +33,5 @@ task CleanOutputs(Exec,
 
 task Dogfood(Exec,
     DependsOn: [Tasks['InstallNew'], Tasks['CleanOutputs']],
-    Executable: Path.Combine(newCasperDir, 'Casper.Console', 'tools', 'casper.exe'),
+    Executable: newCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe').FullPath,
     Arguments: (buildDogfoodFile.Name if buildDogfoodFile.Exists() else 'build.casper') + ' Build')

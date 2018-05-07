@@ -1,10 +1,10 @@
 import Casper;
 import System.IO;
 
-include 'Console/build.casper'
-include 'Core/build.casper'
-include 'Test/build.casper'
-include 'Test.Integration/build.casper'
+include 'Console'
+include 'Core'
+include 'Test'
+include 'Test.Integration'
 
 solution 'Casper.sln'
 

@@ -2,7 +2,7 @@
 import System.IO
 
 task CreatePackagesDir:
-	Directory.CreateDirectory("../out/packages")
+	Directory("../out/packages").Create()
 
 binPath = Path.Combine('bin', 'Release') + Path.DirectorySeparatorChar
 
