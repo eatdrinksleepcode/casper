@@ -1,4 +1,5 @@
-﻿using Casper.IO;
+﻿using System;
+using Casper.IO;
 
 namespace Casper {
 	public class TestProject : ProjectBase {
@@ -30,6 +31,16 @@ namespace Casper {
 			var csharpCompile = new TestTask(dependencies);
 			AddTask(taskName, csharpCompile);
 			return csharpCompile;
+		}
+
+		private Action<ProjectBase, IProjectLoader> configure;
+
+		public void ConfigureWith(Action<ProjectBase, IProjectLoader> configure) {
+			this.configure = configure;
+		}
+
+		protected override void Configure(IProjectLoader loader) {
+			configure(this, loader);
 		}
 	}
 }

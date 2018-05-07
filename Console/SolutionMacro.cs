@@ -10,7 +10,7 @@ namespace Casper {
                         new ReferenceExpression { Name = typeof(Solution).FullName },
                         "ConfigureFromSolution"
                     ),
-                    macro.Arguments.Prepend(new SelfLiteralExpression(macro.LexicalInfo)).ToArray()
+                    macro.Arguments.Prepend(new SelfLiteralExpression(macro.LexicalInfo)).Append(new ReferenceExpression(macro.LexicalInfo) { Name = "loader"}).ToArray()
                 )
             );            
         }

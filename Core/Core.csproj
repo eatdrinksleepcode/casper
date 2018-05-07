@@ -48,5 +48,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="build.casper" />
+    <None Include="build.dogfood.casper" />
   </ItemGroup>
 </Project>
