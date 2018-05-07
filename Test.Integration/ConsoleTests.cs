@@ -169,7 +169,7 @@ task goodbye(Description: 'Goodbye'):
 		[Test]
 		public void Projects() {
 			WriteScript("test.casper", @"
-include 'SubProject/test.casper'
+include 'SubProject'
 ");
 
 			WriteScript("test.casper", @"
@@ -183,6 +183,24 @@ include 'SubProject/test.casper'
 			Assert.That(standardError.ReadLine(), Is.EqualTo("project ':SubProject'"));
 			Assert.That(standardError.ReadToEnd(), Is.Empty);
 			Assert.That(exitCode, Is.EqualTo(0));
+		}
+
+		[Test]
+		public void AbsoluteScriptPath() {
+			WriteScript("test.casper", @"
+");
+
+			var exitCode = ExecuteCasper(workingDirectory.File("test1.casper").FullPath);
+
+			Assert.That(standardError.ReadLine(), Is.Empty);
+			Assert.That(standardError.ReadLine(), Is.EqualTo("BUILD FAILURE"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo(""));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("* What went wrong:"));
+			Assert.That(standardError.ReadLine(), Is.EqualTo("ScriptFile must be a relative path"));
+			Assert.That(exitCode, Is.EqualTo(5));
+			Assert.That(standardOutput.ReadLine(), Is.Empty);
+			Assert.That(standardOutput.ReadLine(), Does.StartWith("Total time: "));
+			Assert.That(standardOutput.ReadToEnd(), Is.Empty);
 		}
 
 		int ExecuteScript(string scriptName, string scriptContents, params string[] args) {

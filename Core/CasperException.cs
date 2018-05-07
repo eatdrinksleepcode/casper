@@ -10,6 +10,7 @@ namespace Casper {
 			MissingTask = 2,
 			ConfigurationError = 3,
 			TaskFailed = 4,
+			InvocationgError = 5,
 			UnhandledException = 255,
 		}
 
@@ -20,6 +21,11 @@ namespace Casper {
 
 		public CasperException(KnownExitCode exitCode, string message, params object[] args)
 			: this(exitCode, string.Format(message, args)) {
+		}
+
+		public CasperException(KnownExitCode exitCode, Exception innerException, string message)
+			: base(message, innerException) {
+			ExitCode = exitCode;
 		}
 
 		public CasperException(KnownExitCode exitCode, Exception innerException)

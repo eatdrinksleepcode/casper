@@ -24,23 +24,25 @@ namespace Casper {
 		}
 
 		private readonly IFileSystem fileSystem;
+		private readonly string scriptFile;
 
-		public BooProjectLoader(IFileSystem fileSystem) {
+		public BooProjectLoader(IFileSystem fileSystem, string scriptFile) {
 			this.fileSystem = fileSystem;
+			this.scriptFile = scriptFile;
 		}
 
-		public ProjectBase LoadProject(string scriptPath) {
-			var project = Load(fileSystem.File(scriptPath), fileSystem, null);
+		public ProjectBase LoadProject(string projectPath) {
+			var project = Load(fileSystem.Directory(projectPath).File(scriptFile), fileSystem, null);
 			project.ConfigureAll(this);
 			return project;
 		}
 
-		public ProjectBase LoadProject(string scriptPath, ProjectBase parent) {
-			return Load(parent.File(scriptPath), parent, null);
+		public ProjectBase LoadProject(string projectPath, ProjectBase parent) {
+			return Load(parent.Directory(projectPath).File(scriptFile), parent, null);
 		}
 
-		public ProjectBase LoadProject(string scriptPath, ProjectBase parent, string name) {
-			return Load(parent.File(scriptPath), parent, name);
+		public ProjectBase LoadProject(string projectPath, ProjectBase parent, string name) {
+			return Load(parent.Directory(projectPath).File(scriptFile), parent, name);
 		}
 
 		private ProjectBase Load(IFile scriptPath, params object[] args) {

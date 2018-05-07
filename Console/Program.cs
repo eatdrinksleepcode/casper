@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using Casper.IO;
 using CommandLine;
@@ -11,7 +12,7 @@ namespace Casper {
 
 		class Options {
 			[Value(0, Required = true, MetaName = "script", HelpText = "The relative path of the Casper script to execute")]
-			public string ScriptPath { get; set; }
+			public string ScriptFile { get; set; }
 
 			[Value(1, Required = false, MetaName = "task1 [task2 ...]", HelpText = "The tasks to execute")]
 			public IEnumerable<string> TasksToExecute { get; set; }
@@ -25,8 +26,8 @@ namespace Casper {
 			[Usage]
 			public static IEnumerable<Example> Usage {
 				get {
-					yield return new Example("Execute a task", new Options { ScriptPath = "script", TasksToExecute = new [] { "task1" } } );
-					yield return new Example("Execute multiple tasks", new Options { ScriptPath = "script", TasksToExecute = new [] { "task1", "task2" } } );
+					yield return new Example("Execute a task", new Options { ScriptFile = "script", TasksToExecute = new [] { "task1" } } );
+					yield return new Example("Execute multiple tasks", new Options { ScriptFile = "script", TasksToExecute = new [] { "task1", "task2" } } );
 				}
 			}
 		}
@@ -53,13 +54,17 @@ namespace Casper {
 			return arguments.MapResult(Run, errors =>  {
 				return errors.Any(e => e.Tag == ErrorType.HelpRequestedError)
 										? CasperException.KnownExitCode.None
-										: CasperException.KnownExitCode.UnhandledException;
+										: CasperException.KnownExitCode.InvocationgError;
 			});
 		}
 
 		static CasperException.KnownExitCode Run(Options o) {
-			var loader = new BooProjectLoader(RealFileSystem.Instance);
-			var project = loader.LoadProject(o.ScriptPath);
+			if(Path.IsPathRooted(o.ScriptFile)) {
+				throw new CasperException(CasperException.KnownExitCode.InvocationgError, "ScriptFile must be a relative path");
+			}
+
+			var loader = new BooProjectLoader(RealFileSystem.Instance, o.ScriptFile);
+			var project = loader.LoadProject(".");
 			if (o.Tasks) {
 				foreach (var task in project.Tasks) {
 					Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);

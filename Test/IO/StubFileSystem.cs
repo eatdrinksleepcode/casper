@@ -140,6 +140,7 @@ namespace Casper.IO {
 			path = System.IO.Path.IsPathRooted(path) 
 				? path 
 				: System.IO.Path.Combine(GetCurrentDirectory().FullPath, path);
+			path = System.IO.Path.GetFullPath(path);
 			if (!files.TryGetValue(path, out var fileSystemObject)) {
 				file = new StubFile(this, path);
 				files.Add(path, file);
@@ -162,6 +163,7 @@ namespace Casper.IO {
 			path = System.IO.Path.IsPathRooted(path) 
 			             ? path 
 			             : System.IO.Path.Combine(GetCurrentDirectory().FullPath, path);
+			path = System.IO.Path.GetFullPath(path);
 			if (!files.TryGetValue(path, out var fileSystemObject)) {
 				directory = new StubDirectory(this, path);
 				files.Add(path, directory);

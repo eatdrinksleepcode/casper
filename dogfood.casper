@@ -35,4 +35,4 @@ task CleanOutputs(Exec,
 task Dogfood(Exec,
     DependsOn: [Tasks['InstallNew'], Tasks['CleanOutputs']],
     Executable: Path.Combine(newCasperDir, 'Casper.Console', 'tools', 'casper.exe'),
-    Arguments: (buildDogfoodFile.FullPath if buildDogfoodFile.Exists() else 'build.casper') + ' Build')
+    Arguments: (buildDogfoodFile.Name if buildDogfoodFile.Exists() else 'build.casper') + ' Build')
