@@ -47,6 +47,18 @@ namespace Casper {
 		}
 
 		[Test]
+		public void ShowConsoleOutput() {
+			var task = new Exec {
+				Executable = "echo",
+				Arguments = "Hello World!",
+				ShowOutput = true,
+			};
+			task.Execute(fileSystem);
+
+			Assert.That(output.Read().ReadToEnd().TrimEnd(), Does.EndWith("Hello World!"));
+		}
+
+		[Test]
 		public void ExecAndArguments() {
 			var fooFile = workingDirectory.File("foo.txt");
 			var barFile = workingDirectory.File("bar.txt");

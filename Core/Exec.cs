@@ -8,6 +8,9 @@ namespace Casper {
 		public string WorkingDirectory { get; set; }
 		public string Executable { get; set; }
 		public string Arguments { get; set; }
+		public bool ShowOutput { get; set; }
+
+		private static readonly Encoding DefaultStreamEncoding = Encoding.UTF8;
 
 		public override void Execute(IFileSystem fileSystem) {
 			if (null == Executable) {
@@ -23,24 +26,22 @@ namespace Casper {
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
+					StandardOutputEncoding = DefaultStreamEncoding,
+					StandardErrorEncoding = DefaultStreamEncoding,
 				};
 				process = StartProcessAndWatch(allOutput, processStartInfo);
 			} else {
 				var processStartInfo = new ProcessStartInfo {
 					FileName = "cmd.exe",
+					Arguments = $"/c {Executable} {Arguments}",
+					WorkingDirectory = WorkingDirectory,
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
 					RedirectStandardError = true,
-					RedirectStandardInput = true,
+					StandardOutputEncoding = DefaultStreamEncoding,
+					StandardErrorEncoding = DefaultStreamEncoding,
 				};
 				process = StartProcessAndWatch(allOutput, processStartInfo);
-				if(null != WorkingDirectory) {
-					process.StandardInput.WriteLine("cd \"{0}\"", WorkingDirectory);
-				}
-				process.StandardInput.WriteLine("{0} {1}", Executable, Arguments);
-				process.StandardInput.WriteLine("exit %errorlevel%");
-				process.StandardInput.Flush();
-				process.StandardInput.Close();
 			}
 			process.WaitForExit();
 			if (0 != process.ExitCode) {
@@ -53,11 +54,25 @@ namespace Casper {
 
 		private string ArgumentsDescription => (null == Arguments ? "" : " " + Arguments);
 
-		static Process StartProcessAndWatch(StringBuilder allOutput, ProcessStartInfo processStartInfo) {
+		Process StartProcessAndWatch(StringBuilder allOutput, ProcessStartInfo processStartInfo) {
 			var process = Process.Start(processStartInfo);
 			Debug.Assert(process != null, nameof(process) + " != null", "The started process should never be null since UseShellExecute is false.");
-			process.ErrorDataReceived += (sender, e) => { if(e.Data != null) allOutput.AppendLine(e.Data); };
-			process.OutputDataReceived += (sender, e) => { if(e.Data != null) allOutput.AppendLine(e.Data); };
+			process.ErrorDataReceived += (sender, e) => {
+				if(e.Data != null) {
+					if(ShowOutput) {
+						Console.Error.WriteLine(e.Data);
+					}
+					allOutput.AppendLine(e.Data);
+				}
+			};
+			process.OutputDataReceived += (sender, e) => {
+				if(e.Data != null) {
+					if(ShowOutput) {
+						Console.Out.WriteLine(e.Data);
+					}
+					allOutput.AppendLine(e.Data);
+				}
+			};
 			process.BeginOutputReadLine();
 			process.BeginErrorReadLine();
 			return process;
