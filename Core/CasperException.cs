@@ -10,7 +10,7 @@ namespace Casper {
 			MissingTask = 2,
 			ConfigurationError = 3,
 			TaskFailed = 4,
-			InvocationgError = 5,
+			InvocationError = 5,
 			UnhandledException = 255,
 		}
 

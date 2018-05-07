@@ -54,13 +54,13 @@ namespace Casper {
 			return arguments.MapResult(Run, errors =>  {
 				return errors.Any(e => e.Tag == ErrorType.HelpRequestedError)
 										? CasperException.KnownExitCode.None
-										: CasperException.KnownExitCode.InvocationgError;
+										: CasperException.KnownExitCode.InvocationError;
 			});
 		}
 
 		static CasperException.KnownExitCode Run(Options o) {
 			if(Path.IsPathRooted(o.ScriptFile)) {
-				throw new CasperException(CasperException.KnownExitCode.InvocationgError, "ScriptFile must be a relative path");
+				throw new CasperException(CasperException.KnownExitCode.InvocationError, "ScriptFile must be a relative path");
 			}
 
 			var loader = new BooProjectLoader(RealFileSystem.Instance, o.ScriptFile);
