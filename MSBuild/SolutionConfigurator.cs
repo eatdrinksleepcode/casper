@@ -12,7 +12,9 @@ namespace Casper {
 		private class CSharpProject : ProjectBase {
 
 			public CSharpProject(ProjectBase parent, IFile projectFile, string name)
-				: base(parent, projectFile.Directory.FullPath, name) { }
+				: base(parent, projectFile.Directory.FullPath, name) {
+				Console.WriteLine($"Loading empty project at '{projectFile.Directory.FullPath}'");
+			}
 		}
 
 		private class ProjectInfo {
@@ -22,11 +24,13 @@ namespace Casper {
 		}
 
 		private readonly ProjectBase rootProject;
+		private readonly IProjectLoader loader;
 		private readonly IFile solutionFile;
 		private readonly Microsoft.Build.Evaluation.ProjectCollection projects;
 
-		public SolutionConfigurator(ProjectBase rootProject, string solutionFilePath) {
+		public SolutionConfigurator(ProjectBase rootProject, string solutionFilePath, IProjectLoader loader) {
 			this.rootProject = rootProject;
+			this.loader = loader;
 			this.solutionFile = rootProject.File(solutionFilePath);
 			this.projects = new Microsoft.Build.Evaluation.ProjectCollection();
 		}
@@ -49,9 +53,9 @@ namespace Casper {
 			}
 		}
 
-		private static ProjectBase GetOrCreateProject(ProjectBase parent, string name, IFile projectFile) {
+		private ProjectBase GetOrCreateProject(ProjectBase parent, string name, IFile projectFile) {
 			if (!parent.Projects.TryGet(name, out var result)) {
-				result = new CSharpProject(parent, projectFile, name);
+				result = loader?.LoadProject(projectFile.Directory.FullPath, parent, name) ?? new CSharpProject(parent, projectFile, name);
 			}
 
 			return result;

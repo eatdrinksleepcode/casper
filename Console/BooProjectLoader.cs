@@ -46,6 +46,9 @@ namespace Casper {
 		}
 
 		private ProjectBase Load(IFile scriptPath, params object[] args) {
+			if (!scriptPath.Exists()) {
+				return null;
+			}
 			var project = CreateProjectFromProjectType(CompileToProjectType(scriptPath), args);
 			return project;
 		}

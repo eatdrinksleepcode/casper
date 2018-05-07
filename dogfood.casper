@@ -31,7 +31,10 @@ task CleanOutputs(Exec,
     Executable: 'msbuild',
     Arguments: '/t:Clean /p:Configuration=Release /verbosity:quiet /nologo')
 
+task CleanPackages(DependsOn: [Tasks['InstallNew']]):
+    Directory('./out/packages').Delete()
+
 task Dogfood(Exec,
-    DependsOn: [Tasks['InstallNew'], Tasks['CleanOutputs']],
+    DependsOn: [Tasks['InstallNew'], Tasks['CleanOutputs'], Tasks['CleanPackages']],
     Executable: newCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe').FullPath,
     Arguments: (buildDogfoodFile.Name if buildDogfoodFile.Exists() else 'build.casper') + ' Build')
