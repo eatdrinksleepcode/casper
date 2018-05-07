@@ -81,7 +81,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="build.dogfood.casper" />
     <None Include="packages.config" />
     <None Include="build.casper" />
   </ItemGroup>

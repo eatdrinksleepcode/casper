@@ -1,1 +1,0 @@
-﻿Tasks['Compile'].DependsOn.Add(parent.Tasks['GitVersion'])

@@ -1,11 +1,6 @@
 import Casper;
 import System.IO;
 
-include 'Console'
-include 'Core'
-include 'Test'
-include 'Test.Integration'
-
 solution 'Casper.sln'
 
 task GitVersion(Exec,
