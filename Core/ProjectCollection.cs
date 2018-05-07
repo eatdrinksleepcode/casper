@@ -27,7 +27,7 @@ namespace Casper {
 		public ProjectBase this[string name] {
 			get {
 				if(!subprojects.TryGetValue(name, out var result)) {
-					throw new CasperException(CasperException.KnownExitCode.ConfigurationError, "Project '{0}' does not exist in {1}", name, parent.PathDescription);
+					throw new CasperException(CasperException.KnownExitCode.ConfigurationError, $"Project '{name}' does not exist in {parent.PathDescription}");
 				}
 				return result;
 			}

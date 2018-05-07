@@ -19,15 +19,6 @@ namespace Casper {
 			ExitCode = exitCode;
 		}
 
-		public CasperException(KnownExitCode exitCode, string message, params object[] args)
-			: this(exitCode, string.Format(message, args)) {
-		}
-
-		public CasperException(KnownExitCode exitCode, Exception innerException, string message)
-			: base(message, innerException) {
-			ExitCode = exitCode;
-		}
-
 		public CasperException(KnownExitCode exitCode, Exception innerException)
 			: base(innerException.Message, innerException) {
 			ExitCode = exitCode;

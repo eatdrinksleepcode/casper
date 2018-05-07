@@ -42,7 +42,7 @@ namespace Casper {
 					Console.Error.WriteLine(error.Message);
 					Console.Error.WriteLine(error.StackTrace);
 				}
-				throw new CasperException(CasperException.KnownExitCode.TaskFailed, "{0} tests failed", failures.Count);
+				throw new CasperException(CasperException.KnownExitCode.TaskFailed, $"{failures.Count} tests failed");
 			}
 		}
 

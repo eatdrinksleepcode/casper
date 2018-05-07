@@ -45,9 +45,13 @@ namespace Casper {
 			process.WaitForExit();
 			if (0 != process.ExitCode) {
 				Console.Error.WriteLine(allOutput.ToString());
-				throw new CasperException(CasperException.KnownExitCode.TaskFailed, "Process '{0}{1}'{2} exited with code {3}", Executable, null == Arguments ? "" : " " + Arguments, null == WorkingDirectory ? "" : " in '" + WorkingDirectory + "'", process.ExitCode);
+				throw new CasperException(CasperException.KnownExitCode.TaskFailed, $"Process '{Executable}{ArgumentsDescription}'{WorkingDirectoryDescription} exited with code {process.ExitCode}");
 			}
 		}
+
+		private string WorkingDirectoryDescription => (null == WorkingDirectory ? "" : " in '" + WorkingDirectory + "'");
+
+		private string ArgumentsDescription => (null == Arguments ? "" : " " + Arguments);
 
 		static Process StartProcessAndWatch(StringBuilder allOutput, ProcessStartInfo processStartInfo) {
 			var process = Process.Start(processStartInfo);
