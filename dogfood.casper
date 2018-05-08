@@ -14,7 +14,7 @@ task Restore(Exec,
     Arguments: 'restore')
 
 task Build(Exec,
-    DependsOn: [Tasks['Restore']],
+    DependsOn: [Restore],
     Executable: oldCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe').FullPath,
     Arguments: 'build.casper Build')
 
@@ -23,23 +23,23 @@ task CleanNewCasperDir:
     newCasperDir.Create()
 
 task InstallNew(Exec,
-    DependsOn: [Tasks['Build'], Tasks['CleanNewCasperDir']],
+    DependsOn: [Build, CleanNewCasperDir],
     Executable: 'nuget.exe',
     Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory $(newCasperDir.FullPath) -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
 
 task CleanOutputs(Exec,
-    DependsOn: [Tasks['InstallNew']],
+    DependsOn: [InstallNew],
     Executable: 'msbuild',
     Arguments: '/t:Clean /p:Configuration=Release /verbosity:quiet /nologo')
 
-task CleanPackages(DependsOn: [Tasks['InstallNew']]):
+task CleanPackages(DependsOn: [InstallNew]):
     packagesDir.Delete()
 
 task BuildNew(Exec,
-    DependsOn: [Tasks['InstallNew'], Tasks['CleanOutputs'], Tasks['CleanPackages']],
+    DependsOn: [InstallNew, CleanOutputs, CleanPackages],
     Executable: newCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe').FullPath,
     Arguments: (buildDogfoodFile.Name if buildDogfoodFile.Exists() else 'build.casper') + ' Build')
 
-task Dogfood(DependsOn: [Tasks['BuildNew']]):
+task Dogfood(DependsOn: [BuildNew]):
     if(not packagesDir.Exists()):
         raise CasperException(CasperException.KnownExitCode.TaskFailed, "Expected a package to be produced at $(packagesDir.FullPath), but no package was found")
