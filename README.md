@@ -10,4 +10,5 @@ Casper uses previously published versions of itself to build itself. The best wa
 1. Obtain Casper. Casper uses a [bootstrap script](./bootstrap) to install Casper locally from MyGet.
 2. Create a "build.casper" script file and configure it to [build your solution file](./build.casper#L4).
 3. To run NUnit tests, configure a "build.casper" script file in your test project to [execute a NUnit task](./Test/build.casper#L3).
-4. To execute an arbitrary command, add a [Exec task](./build.casper#L6). 
+4. To execute an arbitrary command, add a [Exec task](./build.casper#L6) to your build script.
+5. [Execute casper.exe](./casper#L8) from its bootstrapped location (possibly via mono) and pass the file name of your build script and any tasks you want to run. 
