@@ -1,5 +1,5 @@
 import Casper
-import System.IO
+import Casper.IO
 
 casperDir = Directory('.casper')
 oldCasperDir = casperDir.Directory('old')
@@ -9,13 +9,16 @@ packagesDir = Directory('./out/packages')
 
 buildDogfoodFile = File('build.dogfood.casper')
 
+def quoteExecutable(exec as IFileSystemObject):
+    return (exec.FullPath if Environment.IsUnixFileSystem else "\"$(exec.FullPath)\"")
+
 task Restore(Exec,
     Executable: 'nuget.exe',
     Arguments: 'restore')
 
 task Build(Exec,
     DependsOn: [Restore],
-    Executable: oldCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe').FullPath,
+    Executable: quoteExecutable(oldCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe')),
     Arguments: 'build.casper Build')
 
 task CleanNewCasperDir:
@@ -25,7 +28,7 @@ task CleanNewCasperDir:
 task InstallNew(Exec,
     DependsOn: [Build, CleanNewCasperDir],
     Executable: 'nuget.exe',
-    Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory $(newCasperDir.FullPath) -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
+    Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory \"$(newCasperDir.FullPath)\" -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
 
 task CleanOutputs(Exec,
     DependsOn: [InstallNew],
@@ -37,9 +40,9 @@ task CleanPackages(DependsOn: [InstallNew]):
 
 task BuildNew(Exec,
     DependsOn: [InstallNew, CleanOutputs, CleanPackages],
-    Executable: newCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe').FullPath,
+    Executable: quoteExecutable(newCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe')),
     Arguments: (buildDogfoodFile.Name if buildDogfoodFile.Exists() else 'build.casper') + ' Build')
 
 task Dogfood(DependsOn: [BuildNew]):
     if(not packagesDir.Exists()):
-        raise CasperException(CasperException.KnownExitCode.TaskFailed, "Expected a package to be produced at $(packagesDir.FullPath), but no package was found")
+        raise CasperException(CasperException.KnownExitCode.TaskFailed, "Expected a package to be produced at \"$(packagesDir.FullPath)\", but no package was found")
