@@ -21,17 +21,26 @@ task Build(Exec,
     Executable: quoteExecutable(oldCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe')),
     Arguments: 'build.casper Build')
 
+task ConfirmBuild(DependsOn: [Build]):
+    if(not packagesDir.Exists()):
+        raise CasperException(CasperException.KnownExitCode.TaskFailed, "Expected a package to be produced at \"$(packagesDir.FullPath)\", but no package was found")
+
 task CleanNewCasperDir:
     newCasperDir.Delete()
     newCasperDir.Create()
 
 task InstallNew(Exec,
-    DependsOn: [Build, CleanNewCasperDir],
+    DependsOn: [ConfirmBuild, CleanNewCasperDir],
     Executable: 'nuget.exe',
     Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory \"$(newCasperDir.FullPath)\" -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
 
+task ConfirmInstall(DependsOn: [InstallNew]):
+    newCasperInstallDir = newCasperDir.Directory('Casper.Console')
+    if(not newCasperInstallDir.Exists()):
+        raise CasperException(CasperException.KnownExitCode.TaskFailed, "Expected new Casper to be installed at \"$(newCasperInstallDir.FullPath)\", but no package was found")
+
 task CleanOutputs(Exec,
-    DependsOn: [InstallNew],
+    DependsOn: [ConfirmBuild],
     Executable: 'msbuild',
     Arguments: '/t:Clean /p:Configuration=Release /verbosity:quiet /nologo')
 
@@ -39,7 +48,7 @@ task CleanPackages(DependsOn: [InstallNew]):
     packagesDir.Delete()
 
 task BuildNew(Exec,
-    DependsOn: [InstallNew, CleanOutputs, CleanPackages],
+    DependsOn: [ConfirmInstall, CleanOutputs, CleanPackages],
     Executable: quoteExecutable(newCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe')),
     Arguments: (buildDogfoodFile.Name if buildDogfoodFile.Exists() else 'build.casper') + ' Build')
 
