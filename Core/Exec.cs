@@ -45,7 +45,9 @@ namespace Casper {
 			}
 			process.WaitForExit();
 			if (0 != process.ExitCode) {
-				Console.Error.WriteLine(allOutput.ToString());
+				if (!ShowOutput) {
+					Console.Error.WriteLine(allOutput.ToString());
+				}
 				throw new CasperException(CasperException.KnownExitCode.TaskFailed, $"Process '{Executable}{ArgumentsDescription}'{WorkingDirectoryDescription} exited with code {process.ExitCode}");
 			}
 		}

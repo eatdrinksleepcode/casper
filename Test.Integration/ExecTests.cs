@@ -59,6 +59,28 @@ namespace Casper {
 		}
 
 		[Test]
+		public void DontDupeConsoleOutputOnFailure() {
+			var fooFile = workingDirectory.File("foo.txt");
+			var barFile = workingDirectory.File("bar.txt");
+			fooFile.Delete();
+			barFile.Delete();
+
+			var task = new Exec {
+				WorkingDirectory = workingDirectory.FullPath,
+				Executable = MoveCommand,
+				Arguments = "foo.txt bar.txt",
+				ShowOutput = true,
+			};
+
+			Assert.Throws<CasperException>(() => task.Execute(fileSystem));
+
+			var errorContent = error.ToString();
+			var errorStart = errorContent.Substring(0, 10);
+			
+			Assert.That(errorContent.Substring(10), Is.Not.StringContaining(errorStart));
+		}
+
+		[Test]
 		public void ExecAndArguments() {
 			var fooFile = workingDirectory.File("foo.txt");
 			var barFile = workingDirectory.File("bar.txt");
