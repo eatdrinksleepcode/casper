@@ -2,8 +2,9 @@
 
 myDir="`dirname \"$0\"`"
 localNugetConfig=$myDir/local-nuget.config
+casperVersion=$(cat .casper.version)
 
-echo Installing old Casper...
+echo Installing old Casper \($casperVersion\)...
 oldPackageDir=$myDir/.casper/old
 mkdir -p $oldPackageDir
-$myDir/nuget install Casper.Console -Version 0.1.0-ci0171 -OutputDirectory $oldPackageDir -pre -Verbosity quiet -Source "MyGet" -ConfigFile $localNugetConfig -ExcludeVersion || exit $?
+$myDir/nuget install Casper.Console -Version $casperVersion -OutputDirectory $oldPackageDir -pre -Verbosity quiet -Source "MyGet" -ConfigFile $localNugetConfig -ExcludeVersion || exit $?
