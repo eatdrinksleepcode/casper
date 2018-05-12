@@ -61,23 +61,27 @@ namespace Casper {
 			Debug.Assert(process != null, nameof(process) + " != null", "The started process should never be null since UseShellExecute is false.");
 			process.ErrorDataReceived += (sender, e) => {
 				if(e.Data != null) {
+					var indentedData = IndentPrefix + e.Data;
 					if(ShowOutput) {
-						Console.Error.WriteLine(e.Data);
+						Console.Error.WriteLine(indentedData);
 					}
-					allOutput.AppendLine(e.Data);
+					allOutput.AppendLine(indentedData);
 				}
 			};
 			process.OutputDataReceived += (sender, e) => {
 				if(e.Data != null) {
+					var indentedData = IndentPrefix + e.Data;
 					if(ShowOutput) {
-						Console.Out.WriteLine(e.Data);
+						Console.Out.WriteLine(indentedData);
 					}
-					allOutput.AppendLine(e.Data);
+					allOutput.AppendLine(indentedData);
 				}
 			};
 			process.BeginOutputReadLine();
 			process.BeginErrorReadLine();
 			return process;
 		}
+
+		private const string IndentPrefix = "\t";
 	}
 }

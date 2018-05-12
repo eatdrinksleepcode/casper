@@ -55,7 +55,7 @@ namespace Casper {
 			};
 			task.Execute(fileSystem);
 
-			Assert.That(output.Read().ReadToEnd().TrimEnd(), Does.EndWith("Hello World!"));
+			Assert.That(output.Read().ReadToEnd().TrimEnd(), Is.EqualTo("\tHello World!"));
 		}
 
 		[Test]
