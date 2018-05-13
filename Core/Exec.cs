@@ -47,6 +47,7 @@ namespace Casper {
 			if (0 != process.ExitCode) {
 				if (!ShowOutput) {
 					Console.Error.WriteLine(allOutput.ToString());
+					Console.Error.Flush();
 				}
 				throw new CasperException(CasperException.KnownExitCode.TaskFailed, $"Process '{Executable}{ArgumentsDescription}'{WorkingDirectoryDescription} exited with code {process.ExitCode}");
 			}
@@ -63,7 +64,8 @@ namespace Casper {
 				if(e.Data != null) {
 					var indentedData = IndentPrefix + e.Data;
 					if(ShowOutput) {
-						Console.Error.WriteLine(indentedData);
+						Console.Out.WriteLine(indentedData);
+						Console.Out.Flush();
 					}
 					allOutput.AppendLine(indentedData);
 				}
@@ -73,6 +75,7 @@ namespace Casper {
 					var indentedData = IndentPrefix + e.Data;
 					if(ShowOutput) {
 						Console.Out.WriteLine(indentedData);
+						Console.Out.Flush();
 					}
 					allOutput.AppendLine(indentedData);
 				}

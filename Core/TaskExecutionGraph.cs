@@ -49,6 +49,7 @@ namespace Casper {
 		void ExecuteTasksInOrder() {
 			foreach(var task in tasksInOrder) {
 				Console.Write(task.Path);
+				Console.Out.Flush();
 				ExecuteTaskInProject(task);
 			}
 		}
@@ -83,9 +84,11 @@ namespace Casper {
 				}
 				if(!didWork) {
 					Console.Write(" (UP-TO-DATE)");
+					Console.Out.Flush();
 				}
 			} finally {
 				Console.WriteLine();
+				Console.Out.Flush();
 			}
 		}
 	}

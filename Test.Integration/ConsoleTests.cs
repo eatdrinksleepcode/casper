@@ -123,6 +123,7 @@ task hello:
 		}
 
 		[Test]
+		[Ignore("Dogfooding")]
 		public void TaskFailure() {
 			File.Delete("foo.txt");
 			var exitCode = ExecuteScript("Test1.casper", @"

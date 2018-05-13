@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Casper.IO;
 using CommandLine;
 using CommandLine.Text;
@@ -47,6 +48,7 @@ namespace Casper {
 			} finally {
 				Console.WriteLine();
 				Console.WriteLine("Total time: {0}", timer.Elapsed);
+				Console.Out.Flush();
 			}
 		}
 
@@ -69,11 +71,13 @@ namespace Casper {
 				foreach (var task in project.Tasks) {
 					Console.Error.WriteLine("{0} - {1}", task.Name, task.Description);
 				}
+				Console.Error.Flush();
 			} else if (o.Projects) {
 				var allProjects = new List<ProjectBase> {project}.FindAllProjects();
 				foreach (var p in allProjects) {
 					Console.Error.WriteLine(p.PathDescription);
 				}
+				Console.Error.Flush();
 			} else {
 				TaskExecutionGraph taskGraph;
 				try {
@@ -84,6 +88,7 @@ namespace Casper {
 
 				taskGraph.ExecuteTasks();
 				WriteLine(ConsoleColor.Green, Console.Out, "BUILD SUCCESS");
+				Console.Out.Flush();
 			}
 
 			return CasperException.KnownExitCode.None;
@@ -99,12 +104,14 @@ namespace Casper {
 			Console.Error.WriteLine();
 			Console.Error.WriteLine("* What went wrong:");
 			Console.Error.WriteLine(whatWentWrong);
+			Console.Error.Flush();
 		}
 
 		static void WriteLine(ConsoleColor consoleColor, System.IO.TextWriter writer, object message) {
 			try {
 				Console.ForegroundColor = consoleColor;
 				writer.WriteLine(message);
+				writer.Flush();
 			}
 			finally {
 				Console.ResetColor();
