@@ -5,6 +5,8 @@ using Casper.IO;
 
 namespace Casper {
 	public class Exec : TaskBase {
+		private static readonly object outputLock = new object();
+		
 		public string WorkingDirectory { get; set; }
 		public string Executable { get; set; }
 		public string Arguments { get; set; }
@@ -63,8 +65,10 @@ namespace Casper {
 				if(e.Data != null) {
 					var indentedData = IndentPrefix + e.Data;
 					if(ShowOutput) {
-						Console.Error.WriteLine(indentedData);
-					}
+						lock (outputLock) {
+							Console.Error.WriteLine(indentedData);
+						}
+					} 
 					allOutput.AppendLine(indentedData);
 				}
 			};
@@ -72,7 +76,9 @@ namespace Casper {
 				if(e.Data != null) {
 					var indentedData = IndentPrefix + e.Data;
 					if(ShowOutput) {
-						Console.Out.WriteLine(indentedData);
+						lock (outputLock) {
+							Console.Out.WriteLine(indentedData);
+						}
 					}
 					allOutput.AppendLine(indentedData);
 				}
