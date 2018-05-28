@@ -18,7 +18,7 @@ task Restore(Exec,
 
 task Build(Exec,
     DependsOn: [Restore],
-    Executable: quoteExecutable(oldCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe')),
+    Executable: quoteExecutable(oldCasperDir.Directory('Casper.Console/tools/casper.exe')),
     Arguments: 'build.casper Build',
     ShowOutput: true)
 
@@ -50,7 +50,7 @@ task CleanPackages(DependsOn: [InstallNew]):
 
 task BuildNew(Exec,
     DependsOn: [ConfirmInstall, CleanOutputs, CleanPackages],
-    Executable: quoteExecutable(newCasperDir.Directory('Casper.Console').Directory('tools').File('casper.exe')),
+    Executable: quoteExecutable(newCasperDir.Directory('Casper.Console/tools/casper.exe')),
     Arguments: (buildDogfoodFile.Name if buildDogfoodFile.Exists() else 'build.casper') + ' Build',
     ShowOutput: true)
 

@@ -39,13 +39,13 @@ Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""My.Library.UnitTests"", 
 EndProject
 ");
 
-			projectRootPath.Directory("Library").File("My.Library.csproj").WriteAllText(
+			projectRootPath.File("Library/My.Library.csproj").WriteAllText(
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 </Project>
 ");
 
-			projectRootPath.Directory("Library.UnitTests").File("My.Library.UnitTests.csproj").WriteAllText(
+			projectRootPath.File("Library.UnitTests/My.Library.UnitTests.csproj").WriteAllText(
 @"<Project xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
   <ItemGroup>
     <ProjectReference Include=""..\Library\My.Library.csproj"">
@@ -78,7 +78,7 @@ Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""My.Library"", ""Library\
 EndProject
 ");
 
-			projectRootPath.Directory("Library").File("My.Library.csproj").WriteAllText(
+			projectRootPath.File("Library/My.Library.csproj").WriteAllText(
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 </Project>
@@ -111,7 +111,7 @@ Project(""{2150E333-8FDC-42A3-9474-1A3956D46DE8}"") = ""Extra Files"", ""Extras"
 EndProject
 ");
 
-			projectRootPath.Directory("Library").File("My.Library.csproj").WriteAllText(
+			projectRootPath.File("Library/My.Library.csproj").WriteAllText(
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 </Project>
@@ -143,7 +143,7 @@ Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""My.Library.UnitTests"", 
 EndProject
 ");
 
-			projectRootPath.Directory("Library").File("My.Library.csproj").WriteAllText(
+			projectRootPath.File("Library/My.Library.csproj").WriteAllText(
 @"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 	<Target Name=""Compile""/>
@@ -151,7 +151,7 @@ EndProject
 </Project>
 ");
 
-			projectRootPath.Directory("Library").File("My.Library.other.csproj").WriteAllText("");
+			projectRootPath.File("Library/My.Library.other.csproj").WriteAllText("");
 
 			var rootProject = new TestProject(fileSystem, projectRootPath);
 			rootProject.ConfigureFromSolution(slnFile.FullPath);
@@ -181,7 +181,7 @@ Project(""{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}"") = ""My.Library.UnitTests"", 
 EndProject
 ");
 
-			projectRootPath.Directory("Library").File("My.Library.csproj").WriteAllText(
+			projectRootPath.File("Library/My.Library.csproj").WriteAllText(
 				@"<?xml version=""1.0"" encoding=""utf-8""?>
 <Project xmlns=""http://schemas.microsoft.com/developer/msbuild/2003"">
 	<Target Name=""Compile""/>
@@ -189,7 +189,7 @@ EndProject
 </Project>
 ");
 
-			projectRootPath.Directory("Library").File("build.casper").WriteAllText(@"
+			projectRootPath.File("Library/build.casper").WriteAllText(@"
 task PreCompile
 ");
 
