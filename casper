@@ -5,4 +5,4 @@ myDir="`dirname \"$0\"`"
 
 $myDir/bootstrap || exit $?
 
-mono --debug $myDir/.casper/old/Casper.Console/tools/casper.exe build.casper Build || exit $?
+mono --debug $myDir/.casper/old/Casper.Console/tools/casper.exe build.casper $task || exit $?

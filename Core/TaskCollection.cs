@@ -14,6 +14,10 @@ namespace Casper {
 			tasks.Add(task.Name, task);
 		}
 
+		public void Remove(TaskBase task) {
+			tasks.Remove(task.Name);
+		}
+
 		public TaskBase this[string name] {
 			get {
 				if (!TryGetValue(name, out var result)) {

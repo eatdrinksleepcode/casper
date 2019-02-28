@@ -112,6 +112,8 @@ namespace Casper.IO {
 				return fileSystem.Directory(System.IO.Path.Combine(FullPath, relativePath));
 			}
 
+			public IDirectory Parent => fileSystem.Directory(System.IO.Path.GetDirectoryName(FullPath));
+
 			public void SetAsCurrent() {
 				fileSystem.SetCurrentDirectory(this);
 			}

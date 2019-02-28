@@ -1,1 +1,21 @@
-﻿Tasks['Compile'].DependsOn.Add(parent.Tasks['GitVersion'])
+﻿import Casper
+import System
+import System.Linq
+import System.Linq.Enumerable
+
+Tasks['Compile'].DependsOn.Add(parent.Tasks['GitVersion'])
+
+monoDir = Directory('.').RootDirectory.Directory('Library/Frameworks/Mono.framework/Versions/5.8.0')
+systemReferenceDir = monoDir.Directory('lib/mono/4.7.1-api')
+
+systemReferences = [
+    'mscorlib',
+    'System',
+    'System.Core',
+]
+
+cscReferences = systemReferences.Select({r | '/reference:' + systemReferenceDir.File(r + '.dll').FullPath})
+
+task Csc(Exec,
+    Executable: monoDir.File('Commands/csc').FullPath,
+    Arguments: '/recurse:*.cs /target:library /noconfig /nostdlib+ /errorreport:none /debug+ /debug:portable /optimize+ /out:bin/Casper.Core.dll ' + String.Join(' ', cscReferences))

@@ -6,5 +6,6 @@ namespace Casper.IO {
 		void Create();
 
 		IDirectory RootDirectory { get; }
+		IDirectory Parent { get; }
 	}
 }

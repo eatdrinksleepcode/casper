@@ -136,6 +136,8 @@ namespace Casper.IO {
 
 			public IDirectory RootDirectory => Directory(System.IO.Directory.GetDirectoryRoot(FullPath));
 
+			public IDirectory Parent => new RealDirectory(System.IO.Path.GetDirectoryName(FullPath));
+
 			public string Name => System.IO.Path.GetFileName(FullPath);
 		}
 	}
