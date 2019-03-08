@@ -59,6 +59,7 @@ namespace Casper {
 		private string ArgumentsDescription => (null == Arguments ? "" : " " + Arguments);
 
 		Process StartProcessAndWatch(StringBuilder allOutput, ProcessStartInfo processStartInfo) {
+			Console.WriteLine("Starting process: " + processStartInfo.FileName + " " + String.Join(", ", processStartInfo.Arguments));
 			var process = Process.Start(processStartInfo);
 			Debug.Assert(process != null, nameof(process) + " != null", "The started process should never be null since UseShellExecute is false.");
 			process.ErrorDataReceived += (sender, e) => {
