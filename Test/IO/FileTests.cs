@@ -9,7 +9,7 @@ namespace Casper.IO {
 		private IDirectory testDirectory;
 		private IDirectory originalWorkingDirectory;
 
-		[TestFixtureSetUp]
+		[OneTimeSetUp]
 		public void SetUpOnce() {
 			fileSystem = GetFileSystemInstance();
 			var testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().Location).Directory;
@@ -20,7 +20,7 @@ namespace Casper.IO {
 
 		protected abstract IFileSystem GetFileSystemInstance();
 
-		[TestFixtureTearDown]
+		[OneTimeTearDown]
 		public void TearDownOnce() {
 			testDirectory.Delete();
 		}

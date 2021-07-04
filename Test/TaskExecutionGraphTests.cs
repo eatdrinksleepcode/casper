@@ -7,7 +7,7 @@ namespace Casper {
 		private IFileSystem fileSystem;
 		private IFile outputFile;
 
-		[TestFixtureSetUp]
+		[OneTimeSetUp]
 		public static void OneTimeSetUp() {
 			output = RedirectedStandardOutput.RedirectOut();
 		}
@@ -20,7 +20,7 @@ namespace Casper {
 			outputFile.WriteAllText("Output");
 		}
 
-		[TestFixtureTearDown]
+		[OneTimeTearDown]
 		public void OneTimeTearDown() {
 			output.Dispose();
 		}

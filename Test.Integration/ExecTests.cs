@@ -11,7 +11,7 @@ namespace Casper {
 		IFileSystem fileSystem = RealFileSystem.Instance;
 		IDirectory workingDirectory;
 
-		[TestFixtureSetUp]
+		[OneTimeSetUp]
 		public static void OneTimeSetUp() {
 			output = RedirectedStandardOutput.RedirectOut();
 			error = RedirectedStandardOutput.RedirectError();
@@ -29,7 +29,7 @@ namespace Casper {
 			workingDirectory.Delete();
 		}
 
-		[TestFixtureTearDown]
+		[OneTimeTearDown]
 		public void OneTimeTearDown() {
 			output.Dispose();
 			error.Dispose();

@@ -8,7 +8,7 @@ namespace Casper.IO {
 		private IDirectory currentDirectory;
 		private IDirectory originalWorkingDirectory;
 
-		[TestFixtureSetUp]
+		[OneTimeSetUp]
 		public void SetUpOnce() {
 			fileSystem = GetFileSystemInstance();
 			var testParentDirectory = fileSystem.File(Assembly.GetExecutingAssembly().Location).Directory;
