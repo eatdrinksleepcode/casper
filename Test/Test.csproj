@@ -2,7 +2,6 @@
   <Import Project="..\packages\NUnit3TestAdapter.4.0.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.4.0.0\build\net35\NUnit3TestAdapter.props')" />
   <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>Casper</RootNamespace>
     <AssemblyName>Casper.Test</AssemblyName>

@@ -1,6 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net471</TargetFramework>
     <OutputType>Exe</OutputType>
     <RootNamespace>Casper</RootNamespace>
     <AssemblyName>casper</AssemblyName>
