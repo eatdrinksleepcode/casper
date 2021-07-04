@@ -1,33 +1,14 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\packages\NUnit3TestAdapter.4.0.0\build\net35\NUnit3TestAdapter.props" Condition="Exists('..\packages\NUnit3TestAdapter.4.0.0\build\net35\NUnit3TestAdapter.props')" />
   <Import Project="..\packages\NUnit.3.10.1\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" />
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{3C4A6731-C785-4D14-BE04-8BDA4C4E7E33}</ProjectGuid>
+    <TargetFramework>net471</TargetFramework>
     <OutputType>Library</OutputType>
     <RootNamespace>Casper</RootNamespace>
     <AssemblyName>Casper.Test.Integration</AssemblyName>
-    <TargetFrameworkVersion Condition="'$(TargetFrameworkVersion)' == ''">v4.7.1</TargetFrameworkVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <PropertyGroup>
@@ -45,41 +26,6 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="Boo.Lang">
-      <HintPath>..\packages\Boo.0.9.4\lib\Boo.Lang.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Compiler">
-      <HintPath>..\packages\Boo-Compiler.0.9.4\lib\Boo.Lang.Compiler.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Parser">
-      <HintPath>..\packages\Boo-Compiler.0.9.4\lib\Boo.Lang.Parser.dll</HintPath>
-    </Reference>
-    <Reference Include="Boo.Lang.Interpreter">
-      <HintPath>..\packages\Boo-Interpreter.0.9.4\lib\Boo.Lang.Interpreter.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\packages\NUnit.3.10.1\lib\net45\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="Mono.Cecil">
-      <HintPath>..\packages\NUnit.Engine.3.10.0\lib\net20\Mono.Cecil.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit-agent">
-      <HintPath>..\packages\NUnit.Engine.3.10.0\lib\net20\nunit-agent.exe</HintPath>
-    </Reference>
-    <Reference Include="nunit-agent-x86">
-      <HintPath>..\packages\NUnit.Engine.3.10.0\lib\net20\nunit-agent-x86.exe</HintPath>
-    </Reference>
-    <Reference Include="nunit.engine">
-      <HintPath>..\packages\NUnit.Engine.3.10.0\lib\net20\nunit.engine.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.engine.api">
-      <HintPath>..\packages\NUnit.Engine.3.10.0\lib\net20\nunit.engine.api.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="*.cs" />
-    <Compile Include="IO\*.cs" />
     <Compile Include="..\Test\TestProject.cs">
       <Link>TestProject.cs</Link>
     </Compile>
@@ -93,37 +39,19 @@
       <Link>IO\FileTests.cs</Link>
     </Compile>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="build.casper" />
+    <ProjectReference Include="..\Core\Core.csproj" />
+    <ProjectReference Include="..\Console\Console.csproj" />
+    <ProjectReference Include="..\MSBuild\MSBuild.csproj" />
+    <ProjectReference Include="..\NUnit\NUnit.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Core\Core.csproj">
-      <Project>{B6E67DA9-81EB-47AF-AB22-1CC148901165}</Project>
-      <Name>Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Console\Console.csproj">
-      <Project>{CA667BDA-EB41-40CC-87CB-490802903432}</Project>
-      <Name>Console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\MSBuild\MSBuild.csproj">
-      <Project>{F9AB3C7A-9663-467D-9540-F1F575F006C7}</Project>
-      <Name>MSBuild</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NUnit\NUnit.csproj">
-      <Project>{42CB5134-5D5F-4564-A548-6260352C0420}</Project>
-      <Name>NUnit</Name>
-    </ProjectReference>
+    <PackageReference Include="Boo" Version="0.9.4" />
+    <PackageReference Include="Boo-Compiler" Version="0.9.4" />
+    <PackageReference Include="Boo-Interpreter" Version="0.9.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.10.0" />
+    <PackageReference Include="NUnit" Version="3.10.1" />
+    <PackageReference Include="NUnit.Engine" Version="3.10.0" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="IO\" />
-  </ItemGroup>
-  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
-    <PropertyGroup>
-      <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105.The missing file is {0}.</ErrorText>
-    </PropertyGroup>
-    <Error Condition="!Exists('..\packages\NUnit.3.10.1\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.10.1\build\NUnit.props'))" />
-    <Error Condition="!Exists('..\packages\NUnit3TestAdapter.4.0.0\build\net35\NUnit3TestAdapter.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit3TestAdapter.4.0.0\build\net35\NUnit3TestAdapter.props'))" />
-  </Target>
 </Project>
