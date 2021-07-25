@@ -27,6 +27,7 @@
     <PackageReference Include="Boo-Compiler" Version="0.9.4" />
     <PackageReference Include="Boo-Interpreter" Version="0.9.4" />
     <PackageReference Include="CommandLineParser" Version="2.0.251-beta" />
+    <PackageReference Include="FSharp.Compiler.Service" Version="40.0.0" />
     <PackageReference Include="GitVersion.CommandLine" Version="3.6.5" />
     <PackageReference Include="NUnit.Engine" Version="3.10.0" />
   </ItemGroup>

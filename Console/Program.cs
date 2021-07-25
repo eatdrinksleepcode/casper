@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using Casper.IO;
 using CommandLine;
 using CommandLine.Text;
+using Microsoft.FSharp.Control;
+using Microsoft.VisualBasic;
 
 namespace Casper {
 	public static class MainClass {
@@ -63,7 +66,13 @@ namespace Casper {
 				throw new CasperException(CasperException.KnownExitCode.InvocationError, "ScriptFile must be a relative path");
 			}
 
-			var loader = new BooProjectLoader(RealFileSystem.Instance, o.ScriptFile);
+			IProjectLoader loader;
+			if (Path.GetExtension(o.ScriptFile) == ".fsx") {
+				loader = new FSharpProjectLoader(RealFileSystem.Instance, o.ScriptFile);
+			}
+			else {
+				loader = new BooProjectLoader(RealFileSystem.Instance, o.ScriptFile);
+			}
 			var project = loader.LoadProject(".");
 			if (o.Tasks) {
 				foreach (var task in project.Tasks) {
