@@ -1,10 +1,17 @@
 import Casper;
 import System.IO;
 
-solution 'Casper.sln'
+// solution 'Casper.sln'
+
+include 'Core'
+include 'MSBuild'
+include 'NUnit'
+include 'Console'
 
 task GitVersion(Exec,
     Executable: Path.Combine('packages', 'GitVersion.CommandLine.3.6.5', 'tools', 'GitVersion.exe'),
     Arguments: '/updateAssemblyInfo AssemblyInfo.Version.cs /ensureAssemblyInfo /output json /showVariable NuGetVersionV2')
 
 task Build
+
+Build.DependsOn.Add(GitVersion)

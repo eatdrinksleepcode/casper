@@ -7,7 +7,7 @@ task CreatePackagesDir:
 binPath = Path.Combine('bin', 'Release') + Path.DirectorySeparatorChar
 
 task Pack(Exec,
-		  DependsOn: [Tasks['Compile'], CreatePackagesDir],
+		  DependsOn: [CreatePackagesDir],
 		  Executable: Path.Combine('..', 'nuget.exe'),
 		  Arguments: "pack -OutputDirectory ../out/packages -Properties Configuration=Release;BINPATH=$(binPath)")
 
