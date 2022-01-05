@@ -31,7 +31,7 @@ task CleanNewCasperDir:
     newCasperDir.Create()
 
 task InstallNew(Exec,
-    DependsOn: [ConfirmBuild, CleanNewCasperDir],
+    DependsOn: [CleanNewCasperDir],
     Executable: 'nuget.exe',
     Arguments: "install Casper.Console -ExcludeVersion -OutputDirectory \"$(newCasperDir.FullPath)\" -pre -Verbosity quiet -Source \"Casper Dev\" -ConfigFile $(localNugetConfig)")
 
